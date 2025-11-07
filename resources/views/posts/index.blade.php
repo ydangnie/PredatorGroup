@@ -11,6 +11,7 @@
     <thead>
         <tr>
             <th>ID</th>
+            <th>Hinh ảnh</th>
             <th>Tiêu đề</th>
             <th>Ngày tạo</th>
             <th>Hành động</th>
@@ -20,6 +21,7 @@
         @foreach ( $posts as $post )
          <tr>
             <td>{{ $post->id }}</td>
+            <td><img width="150px" src="{{ asset('storage/' . $post->thumbnail)  }}" alt="{{ $post->title }}"></td>
             <td>{{  $post->title }}</td>
             <td>{{  $post->created_at}}</td>
             <td>

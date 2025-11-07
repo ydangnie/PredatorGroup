@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthDangNhap;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
@@ -42,3 +43,4 @@ Route::get('/{id}', 'edit')->name('edit');
 route::put('/{id}', 'update')->name('update');
 Route::get('/{id}/delete', 'delete')->name('delete');
 });
+Route::get('dangnhap', [AuthDangNhap::class, 'dangnhap']);

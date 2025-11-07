@@ -6,6 +6,7 @@ use App\Http\Requests\StorePost;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -22,12 +23,13 @@ class PostController extends Controller
     }
     public function store(StorePost $request)
     {
+
+        $path = null; // <-- Khởi tạo biến $path ở đây
         //xử lý lưu file
-        if($request->hasFile('thumbnail')){
+        if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
             $fileName = time() . '-' . $file->getClientOriginalName();
             $path = $file->storeAs('images', $fileName);
-
         }
 
         DB::table('posts')->insert([
@@ -36,7 +38,7 @@ class PostController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
             'thumbnail' => $path
-            
+
         ]);
         return redirect()->route('posts.index')
             ->with('message', 'Thêm bài viết thành công');
@@ -51,17 +53,36 @@ class PostController extends Controller
     }
     public function update(StorePost $request, $id)
     {
-        DB::table('posts')->where('id', $id)->update(
-            [
-                'title' => $request->get('title'),
-                'content' => $request->get('content'),
-                'updated_at' => now()
-            ]);
-            return redirect()->route('posts.index')->with('message', 'Cập nhật thành công');
+        $posts = Post::findOrFail($id);
+
+        if ($request->hasFile('thumbnail')) {
+            Storage::delete($posts->thumbnail);
+            $file = $request->file('thumbnail');
+            $fileName = time() . '-' . $file->getClientOriginalName();
+            $path =  $file->storeAs('name', $fileName);
+        }
+        // DB::table('posts')->where('id', $id)->update(
+        //     [
+        //         'title' => $request->get('title'),
+        //         'content' => $request->get('content'),
+        //         'updated_at' => now()
+
+        //     ]);
+        $posts->update([
+            'title' => $request->get('title'),
+            'content' => $request->get('content'),
+            'thumbnail' =>$path ?? null
+        ]);
+
+        return redirect()->route('posts.index')->with('message', 'Cập nhật thành công');
     }
-    public function delete($id){
-        DB::table('posts')->where('id',$id)->delete();
+    public function delete($id)
+    {
+        $posts = Post::findOrFail($id);
+        $posts->delete();
+        Storage::delete($posts->thumbnail);
+        // DB::table('posts')->where('id', $id)->delete();
         return back()
-        ->with('message', 'Xóa thành công');
+            ->with('message', 'Xóa thành công');
     }
 }

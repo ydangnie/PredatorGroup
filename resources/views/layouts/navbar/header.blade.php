@@ -9,6 +9,7 @@
                 <li class="nav-item"><a class="nav-link active" href="#">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Giới thiệu</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
+                <li class="nav-item"><a class="nav-link" href="auth/">Đăng nhập</a></li>
             </ul>
         </div>
     </div>
