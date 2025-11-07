@@ -249,3 +249,13 @@
                 padding: 30px 20px;
             }
         }
+        /* Thêm vào cuối file dangnhap.css */
+        
+        .text-danger {
+            color: #e53e3e;
+            /* Hoặc một màu đỏ bạn thích */
+            font-size: 0.875rem;
+            /* 14px */
+            margin-top: 5px;
+            /* Thêm một chút khoảng cách */
+        }

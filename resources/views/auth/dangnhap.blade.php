@@ -13,13 +13,7 @@
 
 <body>
   <div class="container">
-    @if ($errors->any())
-    <div class="alert alert-danger">
-      @foreach($errors->all() as $error)
-      <li>{{ $error }}</li>
-      @endforeach
-    </div>
-    @endif
+
     <div class="left-panel">
       <h1>Chào Mừng</h1>
       <p>Khám phá thế giới của chúng tôi với trải nghiệm đăng nhập an toàn và dễ dàng</p>
@@ -31,18 +25,19 @@
           <div class="toggle-btn" data-target="register-form">Đăng Ký</div>
         </div>
 
-        <form class="form active" id="login-form" action="{{ route('postdangnhap') }}" method="POST" novalidate>
+        <form class="form active" id="login-form" action="{{ route('postdangky') }}" method="POST" novalidate>
+           @csrf
           <h2 class="form-title">Đăng Nhập</h2>
           <div class="input-group">
             <label for="login-email">Email</label>
-            <input type="email" id="login-email" class="input-field" placeholder="Nhập email của bạn">
+            <input type="email" id="login-email" class="input-field" value="{{ old('email') }}" name="email" placeholder="Nhập email của bạn">
             @error('email')
             <div class="text-danger">{{ $message }}</div>
             @enderror
           </div>
           <div class="input-group">
             <label for="login-password">Mật khẩu</label>
-            <input type="password" id="login-password" class="input-field" placeholder="Nhập mật khẩu">
+            <input type="password" id="login-password" name="password" class="input-field" placeholder="Nhập mật khẩu">
           </div>
           <div class="checkbox-group">
             <input type="checkbox" id="remember-me">

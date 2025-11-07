@@ -1,15 +1,20 @@
-<form class="form" id="register-form" action="{{ route('postdangnhap') }}" method="POST" novalidate>
+@if (session('message'))
+<div class="alert alert-success">{{ session('message') }}</div>
+
+@endif
+<form class="form" id="register-form" action="{{ route('postdangky') }}" method="POST" novalidate>
+     @csrf
     <h2 class="form-title">Tạo Tài Khoản</h2>
     <div class="input-group">
         <label for="register-name">Họ và tên</label>
-        <input type="text" id="register-name" class="input-field" placeholder="Nhập họ và tên">
+        <input type="text" id="register-name" name="name" class="input-field" placeholder="Nhập họ và tên" value="{{ old('name') }}">
         @error('name')
         <div class="text-danger">{{ $message }}</div>
         @enderror
     </div>
     <div class="input-group">
         <label for="register-email">Email</label>
-        <input type="email" id="register-email" class="input-field" placeholder="Nhập email của bạn">
+        <input type="email" id="register-email" class="input-field" placeholder="Nhập email của bạn" name="email">
         @error('emal')
         <div class="text-danger">{{ $message }}</div>
         @enderror
