@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="header-main">
-            <div class="logo">PREDATORWATCH</div>
+            <div class="logo" ><a href="/">PREDATORWATCH</a></div>
 
             <nav>
                 <ul class="nav-menu" id="navMenu">
@@ -154,7 +154,7 @@
                 <li class="nav-item" id="logout">
                     @guest
                     
-                    <a href="#" class="nav-link">Login</a>
+                    <a href="{{ route('dangnhap') }}" class="nav-link">Login</a>
                     @endguest
                     @auth
                     
@@ -169,7 +169,7 @@
 
                             </a></li>
 
-                        <li style="color: red;"><a href="#" class="dropdown-item">
+                        <li style="color: red;"><a href="{{ route('dangxuat') }}" class="dropdown-item">
                                 Đăng xuất
 
                             </a></li>

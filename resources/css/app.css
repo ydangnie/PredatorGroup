@@ -16,6 +16,9 @@
 
 /* Bổ sung CSS cho Bố cục Sticky Footer (Sử dụng Flexbox) */
 
+
+/* ... (tailwind imports) ... */
+
 body {
     /* Quan trọng 1: Đặt chiều cao tối thiểu bằng chiều cao của viewport */
     min-height: 100vh;
@@ -25,22 +28,16 @@ body {
 }
 
 .main-content {
-    /* Quan trọng 3: Cho phép phần nội dung chính kéo giãn để lấp đầy không gian còn trống */
+    /* Quan trọng 3: Cho phép phần nội dung chính kéo giãn */
     flex-grow: 1;
-    /* Điều chỉnh lề trên để tránh bị header cố định che khuất */
-    /* Dựa trên header.css, header của bạn có vẻ cao khoảng 100px - 120px */
     padding-top: 100px;
 }
 
-
-/* Đảm bảo Footer không bị co lại */
-
 footer {
     width: 100vw;
-    margin-top: 100px;
-    /* hoặc 100% nếu không bị giới hạn bởi container */
+    margin-top: 0;
+    /* Xóa margin-top cũ */
     background-color: #000;
-    /* màu nền */
     color: #fff;
     border-top: 100px
 }

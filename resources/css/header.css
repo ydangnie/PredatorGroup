@@ -415,3 +415,8 @@ body {
     font-size: 18px;
     letter-spacing: 2px;
 }
+
+.header-actions .nav-item {
+    list-style: none;
+    /* Đảm bảo loại bỏ dấu chấm list style */
+}

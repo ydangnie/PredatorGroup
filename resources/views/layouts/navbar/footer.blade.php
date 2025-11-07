@@ -93,7 +93,7 @@
                 <div class="pw-payment-methods">
                     <span>Phương thức thanh toán:</span>
                     <div class="pw-payment-icon">VISA</div>
-                    <div class="pw-payment-icon">MC</div>
+                    <div class="pw-payment-icon">VNPAY</div>
                     <div class="pw-payment-icon">AMEX</div>
                     <div class="pw-payment-icon">PP</div>
                 </div>

@@ -5,8 +5,8 @@
     font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-body {
-    /* Thêm prefix cho linear-gradient */
+
+/* body.page-login {
     background: -webkit-linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     background: -moz-linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     background: -o-linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -22,11 +22,11 @@ body {
     -ms-flex-pack: center;
     justify-content: center;
     padding: 20px;
-}
+} */
 
 .container {
-    display: -webkit-box;
-    display: -ms-flexbox;
+    margin-left: auto;
+    margin-right: auto;
     display: flex;
     width: 100%;
     max-width: 900px;
@@ -382,4 +382,11 @@ body {
     text-align: center;
     font-weight: 500;
     font-size: 0.95rem;
+}
+
+.dangnhap1 {
+    justify-items: center;
+    margin-top: 170px;
+    text-align: center;
+    margin-bottom: 50px;
 }
