@@ -16,8 +16,6 @@
     <p class="hero-subtitle">ĐỊNH NGHĨA LẠI ĐẲNG CẤP THỜI GIAN</p>
   </section>
 
-
-
 </main>
 
 @include('layouts.navbar.footer')

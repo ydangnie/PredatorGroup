@@ -23,12 +23,6 @@ Route::controller(HomeController::class)-> group(function(){
     Route::get('/about', 'about');
 
 });
-// Route::get('/login', function(){
-//     return 'Login page';
-// })->name('login');
-
-
-
 Route::prefix('users')->controller(UsersController::class)->group(function () {
     Route::get('/', 'index')->name('users.index');
     Route::get('/create', 'create')->name('users.create'); // Tên đầy đủ là 'users.create'
