@@ -57,9 +57,8 @@
           <button type="button" class="google-btn">
             <i class="fab fa-google google-icon"></i>
 
-           <a href="{{ route('logingg') }}">Đăng nhập với Google</a> 
-
            <a href="#">Đăng nhập với Google</a> 
+
 
           </button>
         </form>

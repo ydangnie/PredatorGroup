@@ -37,7 +37,7 @@
                 <div class="nav-item">
                     <i class="fas fa-clock"></i>
 
-                    <span>Sản Phẩm</span>
+                    <span>Quản lý</span>
                 </div>
                 <div class="nav-item">
                     <i class="fas fa-users"></i>
