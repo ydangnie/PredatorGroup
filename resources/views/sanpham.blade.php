@@ -169,33 +169,8 @@
 </head>
 <body class="font-sans">
     <!-- Header -->
-    <header class="border-b border-gray-800 sticky top-0 z-50 bg-dark">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <a href="#" class="text-2xl font-bold tracking-wider">
-                    <span class="text-gold-gradient">CHRONO</span><span class="text-platinum">LUX</span>
-                </a>
-            </div>
-            
-            <nav class="hidden md:flex space-x-8">
-                <a href="#" class="hover:text-gold transition">Bộ sưu tập</a>
-                <a href="#" class="hover:text-gold transition">Thương hiệu</a>
-                <a href="#" class="hover:text-gold transition">Giới thiệu</a>
-                <a href="#" class="hover:text-gold transition">Liên hệ</a>
-            </nav>
-            
-            <div class="flex items-center space-x-5">
-                <div class="relative">
-                    <div class="search-box flex items-center bg-charcoal rounded-full px-4 py-2">
-                        <i class="fas fa-search text-gray-500"></i>
-                        <input type="text" placeholder="Tìm kiếm..." class="bg-transparent border-none focus:outline-none ml-2 text-platinum w-32 md:w-44">
-                    </div>
-                </div>
-                <button class="md:hidden text-xl">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
+    <header @extends('layouts.navbar.header')>
+   
     </header>
 
     <main class="container mx-auto px-4 py-8 flex">

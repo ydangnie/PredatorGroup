@@ -8,8 +8,10 @@ use App\Http\Controllers\bannerController;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LienHeController;
 use App\Http\Controllers\LoginGG;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SanPhamController;
 use App\Http\Controllers\UserConTroller;
 use App\Http\Controllers\UsersController;
 use Faker\Guesser\Name;
@@ -53,7 +55,6 @@ Route::post('dangnhap', [AuthDangKy::class, 'postdangnhap'])->name('postdangnhap
 Route::get('dangxuat', [AuthDangKy::class, 'dangxuat'])->name('dangxuat');
 
 
-
-
-
+Route::get('sanpham', [SanPhamController::class, 'sanpham'])->name('sanpham');
+Route::get('lienhe', [LienHeController::class, 'lienhe'])->name('lienhe');
 

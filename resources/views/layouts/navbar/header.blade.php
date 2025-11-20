@@ -24,7 +24,7 @@
         <nav>
             <ul class="nav-menu" id="navMenu">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('sanpham') }}" class="nav-link">
                         SẢN PHẨM
                         <span class="dropdown-arrow">▼</span>
                     </a>
@@ -135,7 +135,7 @@
                         <span class="dropdown-arrow">▼</span>
                     </a>
                     <ul class="dropdown">
-                        <li><a href="#" class="dropdown-item">
+                        <li><a href="{{ route('lienhe') }}" class="dropdown-item">
                                 Liên hệ
                                 <span class="item-price"></span>
                             </a></li>
@@ -149,54 +149,42 @@
         </nav>
 
         <div class="header-actions">
-            <div class="search-box" id="searchBox">
-                <input type="text" class="search-input" placeholder="Tìm kiếm...">
-                <button class="action-btn" onclick="toggleSearch()"><i class="fa-solid fa-cart-shopping"></i></button>
-            </div>
+            <form action="#" method="GET" class="search-box" id="searchBox">
+                <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm...">
+
+                <button type="button" class="action-btn" onclick="toggleSearch()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </form>
+            <button class="action-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
 
             <button class="action-btn">
-
                 <i class="fa-solid fa-heart"></i>
             </button>
+
             <li class="nav-item" id="logout">
                 @guest
-
                 <a href="{{ route('login') }}" class="nav-link">Login</a>
                 @endguest
                 @auth
-
                 <a href="#" class="action-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span class="dropdown-arrow">▼</span>
-
                 </a>
                 <ul class="dropdown">
                     @if(Auth::user()->role === 'admin')
-
                     <li><a href="{{ route('admin.dasboard') }}" class="dropdown-item">
                             Quản trị admin
-                    @endif
-
+                            @endif
                         </a></li>
-                    <li><a href="#" class="dropdown-item">
-                            Hồ sơ
-
-                        </a></li>
-                    <li style="color: red;"><a href="#" class="dropdown-item">
-                            Lịch sử đơn hàng
-
-                        </a>
-                    </li>
-                    <li style="color: red;"><a href="{{ route('dangxuat') }}" class="dropdown-item">
-                            Đăng xuất
-
-                        </a>
-                    </li>
-
+                    <li><a href="#" class="dropdown-item">Hồ sơ</a></li>
+                    <li style="color: red;"><a href="#" class="dropdown-item">Lịch sử đơn hàng</a></li>
+                    <li style="color: red;"><a href="{{ route('dangxuat') }}" class="dropdown-item">Đăng xuất</a></li>
                 </ul>
                 @endauth
             </li>
-            </button>
             <button class="mobile-toggle" onclick="toggleMenu()">☰</button>
         </div>
     </div>

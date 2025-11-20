@@ -419,3 +419,47 @@ header.body {
     list-style: none;
     /* Đảm bảo loại bỏ dấu chấm list style */
 }
+
+
+/* Căn chỉnh khung tìm kiếm nằm ngang */
+
+.search-box {
+    position: relative;
+    display: flex;
+    /* Thêm flex để input và button nằm ngang hàng */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+    justify-content: flex-end;
+    /* Căn về phía bên phải */
+}
+
+.search-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 20px;
+    /* Trạng thái đóng: width 0 và ẩn padding để không chiếm chỗ */
+    width: 0;
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    /* Ẩn hẳn khi đóng */
+    transition: all 0.4s ease;
+    margin-right: 5px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.search-box.active .search-input,
+.search-box:hover .search-input,
+.search-box:focus-within .search-input {
+    width: 200px;
+    opacity: 1;
+    visibility: visible;
+    padding: 8px 15px;
+    /* Khôi phục padding khi mở */
+}
