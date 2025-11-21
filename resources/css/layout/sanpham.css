@@ -461,3 +461,91 @@
 .wt-main-container {
     margin: 0px;
 }
+
+
+/* --- PAGINATION (PHÂN TRANG) --- */
+
+.wt-pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.wt-pagination {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.wt-page-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--wt-secondary-black);
+    border: 1px solid var(--wt-border-gray);
+    color: var(--wt-text-gray);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.wt-page-link:hover {
+    border-color: var(--wt-accent-gold);
+    color: var(--wt-accent-gold);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.wt-page-link.active {
+    background: var(--wt-accent-gold);
+    color: var(--wt-primary-black);
+    border-color: var(--wt-accent-gold);
+    font-weight: 700;
+    cursor: default;
+    transform: none;
+}
+
+
+/* Nút Next/Prev (nếu có dùng icon) */
+
+.wt-page-link.next {
+    font-size: 0.8rem;
+}
+
+
+/* --- PRODUCT CARD --- */
+
+.wt-product-card {
+    display: block;
+    /* Quan trọng: Để thẻ a hoạt động như một khối hộp */
+    text-decoration: none;
+    /* Bỏ gạch chân của link */
+    color: inherit;
+    /* Giữ màu chữ gốc, không bị đổi sang màu xanh của link */
+    /* Các thuộc tính cũ giữ nguyên */
+    background: var(--wt-secondary-black);
+    border: 1px solid var(--wt-border-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+
+/* Fix lỗi hover text bị đổi màu không mong muốn */
+
+.wt-product-card:hover {
+    color: inherit;
+    transform: translateY(-8px);
+    border-color: var(--wt-accent-gold);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}

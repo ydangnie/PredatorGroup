@@ -39,17 +39,18 @@
                             <div class="mega-menu-column">
                                 <h4>Theo Danh Mục </h4>
                                 <a href="#" class="mega-menu-item">Đồng Hồ Lặn</a>
-                                <a href="#" class="mega-menu-item">Đồng Hồ Pilot</a>
-                                <a href="#" class="mega-menu-item">Dress Watch</a>
-                                <a href="#" class="mega-menu-item">Chronograph</a>
+                                <a href="#" class="mega-menu-item">Đồng Hồ Quân Đội</a>
+                                <a href="#" class="mega-menu-item">Đồng Hồ Thụy Sĩ</a>
+                                <a href="#" class="mega-menu-item">Apple Watch</a>
                             </div>
                             <div class="mega-menu-column">
-                                <h4>Bộ Sưu Tập Đặc Biệt</h4>
-                                <a href="#" class="mega-menu-item">Limited Edition</a>
-                                <a href="#" class="mega-menu-item">Vintage Collection</a>
-                                <a href="#" class="mega-menu-item">Anniversary Edition</a>
-                                <a href="#" class="mega-menu-item">Collaboration Series</a>
+                                <h4>Mức giá </h4>
+                                <a href="#" class="mega-menu-item">Trên 5 triệu</a>
+                                <a href="#" class="mega-menu-item">Trên 10 triệu</a>
+                                <a href="#" class="mega-menu-item">trên 15 triệu</a>
+                                <a href="#" class="mega-menu-item">trên 50 triệu</a>
                             </div>
+                        
                         </div>
                     </div>
                 </li>
