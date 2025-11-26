@@ -54,13 +54,10 @@
             <span>Hoặc</span>
           </div>
 
-          <button type="button" class="google-btn">
+        <a href="{{ route('auth.google') }}" class="google-btn">
             <i class="fab fa-google google-icon"></i>
-
-           <a href="#">Đăng nhập với Google</a> 
-
-
-          </button>
+           <div>Đăng nhập với Google</div>
+        </a>
         </form>
         @include('auth.dangky')
 

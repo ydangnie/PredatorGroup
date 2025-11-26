@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\AuthDangKy;
 use App\Http\Controllers\AuthDangNhap;
 
@@ -29,7 +30,7 @@ Route::get('/users', [UserConTroller::class, 'index'])->middleware('access.time'
 
 
 Route::controller(HomeController::class)-> group(function(){
-    Route::get('/', 'index');
+    Route::get('/', 'index')->name('home.index');
     Route::get('/about', 'about');
 
 });
@@ -61,23 +62,29 @@ Route::get('sanpham', [SanPhamController::class, 'sanpham'])->name('sanpham');
 Route::get('lienhe', [LienHeController::class, 'lienhe'])->name('lienhe');
 Route::get('chitietsanpham', [ChiTietSanPhamCtr::class, 'chitietsanpham'])->name('chitietsanpham');
 
-Route::get('giohang', [GioHangController::class, 'giohang'])->name('giohang');
+Route::get('giohang', [GioHangController::class, 'giohang'])->middleware('auth')->name('giohang');
 
 // ... (giữ nguyên đoạn trên)
 
 Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function () {
     // Danh sách
     Route::get('/banner', [BannerController::class, 'index'])->name('admin.banner.index');
-    
+
     // Thêm mới
     Route::post('/banner/store', [BannerController::class, 'store'])->name('admin.banner.store');
-    
+
     // Form sửa (lấy thông tin banner theo id)
     Route::get('/banner/edit/{id}', [bannerController::class, 'edit'])->name('admin.banner.edit');
-    
+
     // Thực hiện cập nhật (dùng method POST hoặc PUT đều được, ở đây mình dùng POST cho đơn giản với form HTML)
     Route::post('/banner/update/{id}', [bannerController::class, 'update'])->name('admin.banner.update');
-    
+
     // Xóa
     Route::delete('/banner/{id}', [bannerController::class, 'destroy'])->name('admin.banner.destroy');
+});
+
+// google auth login
+Route::middleware('google.guest')->prefix('auth/google')->name('auth.')->group(function () {
+    Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google');
+    Route::get('/callback', [GoogleAuthController::class, 'callback']);
 });
