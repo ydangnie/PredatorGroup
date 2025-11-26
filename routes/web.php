@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthDangNhap;
 
 
 use App\Http\Controllers\bannerController;
+use App\Http\Controllers\BannerController as ControllersBannerController;
 use App\Http\Controllers\ChiTietSanPhamCtr;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\GioHangController;
@@ -65,14 +66,18 @@ Route::get('giohang', [GioHangController::class, 'giohang'])->name('giohang');
 // ... (giữ nguyên đoạn trên)
 
 Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function () {
-    Route::get('/banner', [bannerController::class, 'index'])->name('admin.banner.index');
-    Route::post('/banner/store', [bannerController::class, 'store'])->name('admin.banner.store');
+    // Danh sách
+    Route::get('/banner', [BannerController::class, 'index'])->name('admin.banner.index');
     
-    // Route edit để load lại trang index với dữ liệu
+    // Thêm mới
+    Route::post('/banner/store', [BannerController::class, 'store'])->name('admin.banner.store');
+    
+    // Form sửa (lấy thông tin banner theo id)
     Route::get('/banner/edit/{id}', [bannerController::class, 'edit'])->name('admin.banner.edit');
     
-    // Route update thực hiện lưu
+    // Thực hiện cập nhật (dùng method POST hoặc PUT đều được, ở đây mình dùng POST cho đơn giản với form HTML)
     Route::post('/banner/update/{id}', [bannerController::class, 'update'])->name('admin.banner.update');
     
+    // Xóa
     Route::delete('/banner/{id}', [bannerController::class, 'destroy'])->name('admin.banner.destroy');
 });

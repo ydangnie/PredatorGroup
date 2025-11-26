@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Banner;
 use Illuminate\Support\Facades\Storage;
 
-class bannerController extends Controller
+class BannerController extends Controller
 {
     // 1. Hiển thị danh sách (và form thêm/sửa)
     public function index()
