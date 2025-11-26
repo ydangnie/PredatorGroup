@@ -18,6 +18,7 @@ class Banner extends Model
         'title',
         'mota',
         'hinhanh',
-        'thuonghieu'
+        'thuonghieu',
+        'link'
     ];
 }

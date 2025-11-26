@@ -61,11 +61,7 @@ Route::get('lienhe', [LienHeController::class, 'lienhe'])->name('lienhe');
 Route::get('chitietsanpham', [ChiTietSanPhamCtr::class, 'chitietsanpham'])->name('chitietsanpham');
 
 Route::get('giohang', [GioHangController::class, 'giohang'])->name('giohang');
-Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function () {
-    Route::get('/banner', [bannerController::class, 'index'])->name('admin.banner.index');
-    Route::post('/banner/store', [bannerController::class, 'store'])->name('admin.banner.store');
-    Route::delete('/banner/{id}', [bannerController::class, 'destroy'])->name('admin.banner.destroy');
-});
+
 // ... (giữ nguyên đoạn trên)
 
 Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function () {
