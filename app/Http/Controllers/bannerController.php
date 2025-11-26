@@ -12,7 +12,7 @@ class bannerController extends Controller
     public function index()
     {
         $banners = Banner::all(); // Lấy tất cả banner
-        return view('admin.quan_ly.banner', compact('banners'));
+        return view('admin.banner', compact('banners'));
     }
 
     // Thêm mới (Store)
@@ -36,7 +36,7 @@ class bannerController extends Controller
                 'hinhanh' => $path, // Lưu đường dẫn vào cột 'hinhanh'
             ]);
 
-            return redirect()->route('admin.banner.index')->with('success', 'Thêm banner thành công!');
+            return redirect()->route('admin.banner')->with('success', 'Thêm banner thành công!');
         }
 
         return back()->with('error', 'Lỗi upload ảnh!');
@@ -53,6 +53,6 @@ class bannerController extends Controller
         }
 
         $banner->delete();
-        return redirect()->route('admin.banner.index')->with('success', 'Xóa banner thành công!');
+        return redirect()->route('admin.banner')->with('success', 'Xóa banner thành công!');
     }
 }

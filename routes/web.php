@@ -66,7 +66,15 @@ Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function (
     Route::post('/banner/store', [bannerController::class, 'store'])->name('admin.banner.store');
     Route::delete('/banner/{id}', [bannerController::class, 'destroy'])->name('admin.banner.destroy');
 });
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Route này sẽ có tên là: admin.banner.index
-    Route::resource('banner', BannerController::class); 
+// ... (giữ nguyên đoạn trên)
+
+Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function () {
+    Route::get('/banner', [bannerController::class, 'index'])->name('admin.banner.index');
+    Route::post('/banner/store', [bannerController::class, 'store'])->name('admin.banner.store');
+    Route::delete('/banner/{id}', [bannerController::class, 'destroy'])->name('admin.banner.destroy');
 });
+
+// --- XÓA ĐOẠN DƯỚI ĐÂY ---
+// Route::prefix('admin')->name('admin.')->group(function () {
+//     Route::resource('banner', BannerController::class); 
+// });
