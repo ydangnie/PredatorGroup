@@ -14,7 +14,7 @@
                     class="w-full px-5 py-4 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-4 focus:ring-yellow-500 focus:border-yellow-500 transition"
                     placeholder="Nhập tên sản phẩm..." required>
                 <div class="text-sm text-gray-400 mt-2">
-                    Slug: <span id="slug-preview" class="text-yellow-300 font-bold">{{ Str::slug($name) }}</span>
+                    Slug: <span id="slug-preview" class="text-yellow-300 font-bold">{{ $product ? $product->slug : Str::slug($name) }}</span>
                 </div>
             </div>
 

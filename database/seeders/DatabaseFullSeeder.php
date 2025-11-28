@@ -12,12 +12,14 @@ class DatabaseFullSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Tao du lieu mau
+     *  php artisan migrate:refresh --seed --seeder=DatabaseFullSeeder
      */
     public function run(): void
     {
         //
         \App\Models\User::factory()->create([
-        'name' => 'Admin', 'email' => 'admin@watch.com', 'password' => bcrypt('123'),'role'=>'admin'
+        'name' => 'Admin', 'email' => 'admin@example.com', 'password' => bcrypt('123'),'role'=>'admin'
     ]);
 
     Brand::factory(25)->create();

@@ -19,6 +19,7 @@ class ProductForm extends Component
     public ?Product $product = null;
 
     public $name = '';
+    public $slug = '';
     public $description = '';
     public $content = '';
     public $category_id = '';
@@ -49,6 +50,7 @@ class ProductForm extends Component
         if ($this->product) {
             $product = $this->product;
             $this->name = $product->name;
+            $this->slug = $product->slug;
             $this->description = $product->description ?? '';
             $this->content = $product->content ?? '';
             $this->category_id = $product->category_id;
@@ -133,13 +135,13 @@ class ProductForm extends Component
         $baseSlug = Str::slug($this->name);
         $slug = $baseSlug;
         $count = 1;
-        while (Product::where('slug', $slug)->where('id', '!=', $this->product->id)->exists()) {
+        while (Product::where('slug', $slug)->where('id', '!=', $this->product?->id)->exists()) {
             $slug = $baseSlug . '-' . $count++;
         }
-
+       
         // QUAN TRỌNG: Dùng $this->product để updateOrCreate chính xác
         $product = Product::updateOrCreate(
-            ['id' => $this->product->id],
+            ['id' => $this->product?->id],
             [
                 'name'           => $this->name,
                 'slug'           => $slug,
@@ -155,7 +157,6 @@ class ProductForm extends Component
                 'is_active'      => $this->is_active
             ]
         );
-
         if ($this->has_variations) {
             $existingIds = [];
 
