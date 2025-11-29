@@ -17,7 +17,8 @@
             <div class="logo-container">
                 <div class="logo">
                     <i class="fas fa-clock"></i>
-                    <span>PREDATOR</span>
+                    <a href="{{ route('admin.dasboard') }}">PREDATOR</a>
+                    
                 </div>
             </div>
 

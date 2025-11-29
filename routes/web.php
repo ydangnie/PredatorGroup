@@ -4,8 +4,8 @@ use App\Http\Controllers\AuthDangKy;
 use App\Http\Controllers\AuthDangNhap;
 
 
-use App\Http\Controllers\bannerController;
-use App\Http\Controllers\BannerController as ControllersBannerController;
+use App\Http\Controllers\BannerController;
+
 use App\Http\Controllers\ChiTietSanPhamCtr;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\GioHangController;
@@ -65,7 +65,7 @@ Route::get('giohang', [GioHangController::class, 'giohang'])->name('giohang');
 
 // ... (giữ nguyên đoạn trên)
 
-Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Danh sách
     Route::get('/banner', [BannerController::class, 'index'])->name('admin.banner.index');
     
@@ -73,11 +73,11 @@ Route::prefix('admin')->middleware(['auth', 'PhanQuyenAdmin'])->group(function (
     Route::post('/banner/store', [BannerController::class, 'store'])->name('admin.banner.store');
     
     // Form sửa (lấy thông tin banner theo id)
-    Route::get('/banner/edit/{id}', [bannerController::class, 'edit'])->name('admin.banner.edit');
+    Route::get('/banner/edit/{id}', [BannerController::class, 'edit'])->name('admin.banner.edit');
     
     // Thực hiện cập nhật (dùng method POST hoặc PUT đều được, ở đây mình dùng POST cho đơn giản với form HTML)
-    Route::post('/banner/update/{id}', [bannerController::class, 'update'])->name('admin.banner.update');
+    Route::post('/banner/update/{id}', [BannerController::class, 'update'])->name('admin.banner.update');
     
     // Xóa
-    Route::delete('/banner/{id}', [bannerController::class, 'destroy'])->name('admin.banner.destroy');
+    Route::delete('/banner/{id}', [BannerController::class, 'destroy'])->name('admin.banner.destroy');
 });

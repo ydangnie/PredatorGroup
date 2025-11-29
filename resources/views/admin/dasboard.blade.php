@@ -17,7 +17,8 @@
             <div class="logo-container">
                 <div class="logo">
                     <i class="fas fa-clock"></i>
-                    <span>PREDATOR</span>
+                    <a href="#">PREDATOR</a>
+                    <span></span>
                 </div>
             </div>
 

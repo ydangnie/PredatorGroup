@@ -6,7 +6,7 @@
 </head>
 
 <div class="carousel">
-    <div class="list">
+<div class="list">
         <div class="item">
         <img src="{{ asset('storage/images/img1.png') }}" alt="Ảnh từ Drive">
             <div class="introduce">
