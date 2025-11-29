@@ -18,8 +18,6 @@ class ChatbotController extends Controller
                 return response()->json(['reply' => 'Lỗi: Chưa có API Key.'], 500);
             }
 
-            // --- SỬA TẠI ĐÂY: Dùng đúng tên model trong danh sách của bạn ---
-            // Model: gemini-2.5-flash (Bản ổn định, nhanh nhất hiện nay)
             $modelName = 'gemini-2.5-flash'; 
             
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";

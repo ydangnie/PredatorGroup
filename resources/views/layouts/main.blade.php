@@ -230,7 +230,7 @@
 
     <div id="chat-box" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 450px; background: #fff; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); flex-direction: column; overflow: hidden; border: 1px solid #eee;">
         <div style="background: #000; color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: bold;">Azalman Assistant</span>
+            <span style="font-weight: bold;">PREDATOR CHATBOT</span>
             <span id="close-chat" style="cursor: pointer; font-size: 20px;">&times;</span>
         </div>
 
