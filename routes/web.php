@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthDangKy;
 use App\Http\Controllers\AuthDangNhap;
-
+use App\Http\Controllers\ChatbotController;
 
 use App\Http\Controllers\BannerController;
 
@@ -18,6 +18,7 @@ use App\Http\Controllers\UserConTroller;
 use App\Http\Controllers\UsersController;
 use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -80,4 +81,22 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     
     // Xóa
     Route::delete('/banner/{id}', [BannerController::class, 'destroy'])->name('admin.banner.destroy');
+});
+Route::post('/chat-ai', [ChatbotController::class, 'chat'])->name('chat.ai');
+Route::get('/check-models', function () {
+    $apiKey = env('GOOGLE_API_KEY');
+    
+    // Gửi yêu cầu lấy danh sách model được phép sử dụng
+    $response = Http::withOptions(['verify' => false]) // Tắt SSL
+        ->get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
+
+    return $response->json();
+});
+Route::get('/check-models', function () {
+    $apiKey = env('GOOGLE_API_KEY');
+    // Hỏi Google danh sách model
+    $response = Http::withOptions(['verify' => false])
+        ->get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
+    
+    return $response->json();
 });
