@@ -99,8 +99,19 @@ Route::get('/check-models', function () {
     
     return $response->json();
 });
-Route::get('/brand', [BrandController::class, 'index'])->name('admin.brand.index');
-    Route::post('/brand/store', [BrandController::class, 'store'])->name('admin.brand.store');
-    Route::get('/brand/edit/{id}', [BrandController::class, 'edit'])->name('admin.brand.edit');
-    Route::post('/brand/update/{id}', [BrandController::class, 'update'])->name('admin.brand.update');
-    Route::delete('/brand/{id}', [BrandController::class, 'destroy'])->name('admin.brand.destroy');
+Route::middleware('auth', 'admin')->prefix('admin')->name('admin.')->group(function(){
+    
+    // ... các route cũ ...
+
+    // Thêm các route cho Brand
+    Route::get('/brand', [BrandController::class, 'index'])->name('brand.index');
+    Route::post('/brand/store', [BrandController::class, 'store'])->name('brand.store');
+    
+    // Route Sửa
+    Route::get('/brand/edit/{id}', [BrandController::class, 'edit'])->name('brand.edit');
+    // Route Cập nhật (POST)
+    Route::post('/brand/update/{id}', [BrandController::class, 'update'])->name('brand.update');
+    
+    // Route Xóa
+    Route::delete('/brand/destroy/{id}', [BrandController::class, 'destroy'])->name('brand.destroy');
+});

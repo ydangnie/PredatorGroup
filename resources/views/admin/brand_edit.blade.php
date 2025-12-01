@@ -1,6 +1,3 @@
- {{-- Hoặc extends layout chính của bạn nếu có --}}
-
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -12,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body style="background-color: #18181b; color: #fff;">
-    @extends('admin.nav')
+    @include('admin.nav')
     <div class="container mt-5">
         <div class="card bg-dark text-white border-secondary">
             <div class="card-header">
@@ -50,4 +47,3 @@
 
 </body>
 </html>
-@endsection
