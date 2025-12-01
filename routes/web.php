@@ -20,6 +20,7 @@ use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BrandController;
 
 Route::controller(HomeController::class)-> group(function(){
     Route::get('/', 'index');
@@ -98,3 +99,8 @@ Route::get('/check-models', function () {
     
     return $response->json();
 });
+Route::get('/brand', [BrandController::class, 'index'])->name('admin.brand.index');
+    Route::post('/brand/store', [BrandController::class, 'store'])->name('admin.brand.store');
+    Route::get('/brand/edit/{id}', [BrandController::class, 'edit'])->name('admin.brand.edit');
+    Route::post('/brand/update/{id}', [BrandController::class, 'update'])->name('admin.brand.update');
+    Route::delete('/brand/{id}', [BrandController::class, 'destroy'])->name('admin.brand.destroy');

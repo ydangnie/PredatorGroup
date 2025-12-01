@@ -49,7 +49,7 @@
                         <i class="fas fa-box-open"></i>
                         <span> Sản phẩm</span>
                     </a>
-                    <a href="#" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.brand.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-box-open"></i>
                         <span> Thương hiệu</span>
                     </a>
