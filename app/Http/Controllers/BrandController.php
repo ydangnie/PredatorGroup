@@ -12,20 +12,16 @@ class BrandController extends Controller
     public function index()
     {
         $brands = Brand::all();
-        $brandEdit = null;
+        $brandEdit = null; // Không có dữ liệu sửa
         return view('admin.brand', compact('brands', 'brandEdit'));
     }
 
-    // 2. Hàm khi bấm nút "Sửa" -> Chuyển sang trang sửa hoặc load lại trang với biến edit
-    // Theo style của BannerController bạn gửi thì edit dùng view index nhưng load data vào form, 
-    // tuy nhiên bạn cũng có file banner_edit.blade.php riêng. 
-    // Dưới đây mình làm theo cách bạn dùng cho Banner: edit riêng một trang cho rõ ràng hoặc dùng chung. 
-    // Dựa vào file banner_edit.blade.php bạn gửi, mình sẽ làm trang edit riêng cho giống style đó.
+    // 2. Chuyển sang chế độ sửa trên cùng trang index (Modal)
     public function edit($id)
     {
-        $brand = Brand::findOrFail($id);
-        // Phải return view 'brand_edit' chứ KHÔNG ĐƯỢC return 'brand'
-        return view('admin.brand_edit', compact('brand'));
+        $brands = Brand::all(); // Vẫn lấy danh sách để hiển thị nền
+        $brandEdit = Brand::findOrFail($id); // Lấy item cần sửa
+        return view('admin.brand', compact('brands', 'brandEdit'));
     }
 
     // 3. Thêm mới
@@ -69,7 +65,7 @@ class BrandController extends Controller
 
         $brand->update($data);
 
-        // Quay về trang index
+        // Quay về trang index (xóa query edit)
         return redirect()->route('admin.brand.index')->with('success', 'Cập nhật thành công!');
     }
 

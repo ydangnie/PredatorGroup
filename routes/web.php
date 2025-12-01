@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthDangKy;
 use App\Http\Controllers\AuthDangNhap;
 use App\Http\Controllers\ChatbotController;
@@ -115,3 +115,10 @@ Route::middleware('auth', 'admin')->prefix('admin')->name('admin.')->group(funct
     // Route Xóa
     Route::delete('/brand/destroy/{id}', [BrandController::class, 'destroy'])->name('brand.destroy');
 });
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.') // (1) Đã có tiền tố "admin."
+    ->group(function () {
+        // (2) Resource tên là "product"
+        Route::resource('product', ProductController::class); 
+    });

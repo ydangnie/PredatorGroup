@@ -12,7 +12,7 @@ class HomeController extends Controller
         $banners = Banner::all(); 
         
         // Truyền biến $banners sang view 'index'
-        return view('index', compact('banners'), compact(''));
+        return view('index', compact('banners'));
     }
 
     public function about(){
