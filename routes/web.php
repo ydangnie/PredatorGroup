@@ -21,17 +21,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::controller(HomeController::class)-> group(function(){
+    Route::get('/', 'index');
+    Route::get('/about', 'about');
 
 Route::get('/users', [UserConTroller::class, 'index'])->middleware('access.time');
 
 
 
-Route::controller(HomeController::class)-> group(function(){
-    Route::get('/', 'index');
-    Route::get('/about', 'about');
+
 
 });
 Route::prefix('users')->controller(UsersController::class)->group(function () {

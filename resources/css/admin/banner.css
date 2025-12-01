@@ -1,44 +1,27 @@
 /* resources/css/admin/banner.css */
 
 :root {
-    /* === Bảng màu Premium Dark Grey (Phong cách "Dự án") === */
-    /* Nền chính: Xám đen lì (Không phải đen tuyền 000000) */
     --bg-color: #121212;
-    /* Nền thẻ: Sáng hơn nền một chút (Layer 1) */
     --card-bg: #1e1e1e;
-    /* Nền phụ kiện (Input, Table Header): Sáng hơn thẻ (Layer 2) */
     --surface-bg: #27272a;
-    /* Viền: Xám đậm, rất mảnh */
     --border-color: #3f3f46;
-    /* Typography */
     --text-primary: #f4f4f5;
-    /* Trắng xám (Tiêu đề chính) */
     --text-secondary: #a1a1aa;
-    /* Xám bạc (Chữ phụ) */
     --text-disabled: #52525b;
-    /* Xám tối (Placeholder) */
-    /* Accent: Dùng màu Trắng hoặc Xám rất sáng để làm nổi bật */
     --primary-color: #ffffff;
     --primary-inverse: #000000;
-    /* Trạng thái - Dùng tông màu "Desaturated" (Giảm độ rực) cho đỡ chói */
     --success-color: #059669;
-    /* Xanh lá trầm */
     --danger-color: #be123c;
-    /* Đỏ nhung */
     --warning-color: #d97706;
-    /* Vàng đồng */
     --border-radius: 6px;
-    /* Bo góc nhỏ, vuông vức nam tính */
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
     background-color: var(--bg-color);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--text-secondary);
     line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    /* Giúp chữ mảnh và sắc nét trên nền đen */
 }
 
 .banner-container {
@@ -48,50 +31,72 @@ body {
 }
 
 
-/* === Tiêu đề trang (Minimalist) === */
+/* === BUTTONS === */
 
-.page-header {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
+.btn-action {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    border: 1px solid transparent;
 }
 
-.page-title {
-    font-size: 1.5rem;
+
+/* Nút Thêm Mới ở Header */
+
+.btn-add-new {
+    background-color: var(--primary-color);
+    color: var(--primary-inverse);
     font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    /* Bo tròn hơn cho nổi bật */
+}
+
+.btn-add-new:hover {
+    background-color: #e4e4e7;
+    transform: translateY(-1px);
+}
+
+.btn-edit {
+    background-color: var(--surface-bg);
     color: var(--text-primary);
-    margin: 0;
-    letter-spacing: -0.02em;
-    /* Chữ khít lại xíu cho hiện đại */
+    border: 1px solid var(--border-color);
+    margin-right: 5px;
 }
 
-.page-title i {
-    color: var(--text-secondary);
-    /* Icon màu xám để không chiếm spotlight */
-    margin-right: 12px;
-    font-size: 1.2rem;
+.btn-edit:hover {
+    background-color: #3f3f46;
+}
+
+.btn-delete {
+    background-color: transparent;
+    color: var(--danger-color);
+}
+
+.btn-delete:hover {
+    background-color: rgba(190, 18, 60, 0.1);
 }
 
 
-/* === Card Box (Flat Design) === */
+/* === CARD & TABLE === */
 
 .card-box {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    /* Loại bỏ bóng đổ lòe loẹt, dùng viền để phân cách */
-    box-shadow: none;
-    margin-bottom: 24px;
     overflow: hidden;
 }
 
 .card-header-custom {
     padding: 16px 24px;
     background-color: var(--card-bg);
-    /* Cùng màu body card để liền mạch */
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
@@ -102,17 +107,7 @@ body {
     margin: 0;
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 0.95rem;
-    text-transform: none;
-    /* Bỏ viết hoa toàn bộ, nhìn đỡ gắt */
-}
-
-
-/* Chế độ Edit: Chỉ đổi màu viền trái để báo hiệu */
-
-.card-header-custom.edit-mode {
-    background: var(--card-bg) !important;
-    border-left: 4px solid var(--warning-color);
+    font-size: 1rem;
 }
 
 .card-header-custom.edit-mode h5 {
@@ -123,20 +118,19 @@ body {
     padding: 24px;
 }
 
-
-/* === Bảng (Table) - Style "Data Grid" === */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
 .custom-table th {
     background-color: var(--surface-bg);
-    /* Nền header bảng đậm hơn */
     color: var(--text-secondary);
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
-    padding: 12px 16px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--border-color);
-    border-top: 1px solid var(--border-color);
-    letter-spacing: 0.05em;
     text-align: left;
 }
 
@@ -146,26 +140,15 @@ body {
     border-bottom: 1px solid var(--border-color);
     font-size: 0.9rem;
     color: var(--text-primary);
-    /* Dữ liệu chính màu sáng */
-    background-color: var(--card-bg);
-}
-
-.custom-table tr:last-child td {
-    border-bottom: none;
 }
 
 .custom-table tr:hover td {
     background-color: var(--surface-bg);
-    /* Hover đổi màu nhẹ */
 }
 
-
-/* Ảnh thumbnail */
-
 .thumb-box {
-    width: 80px;
-    /* Nhỏ lại chút cho tinh tế */
-    height: 50px;
+    width: 100px;
+    height: 60px;
     border-radius: 4px;
     overflow: hidden;
     border: 1px solid var(--border-color);
@@ -176,23 +159,61 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.8;
-    /* Ảnh hơi tối đi để hợp nền */
-    transition: var(--transition);
-}
-
-.thumb-box:hover .thumb-img {
-    opacity: 1;
-    transform: scale(1.05);
 }
 
 
-/* === Form Input (High Contrast) === */
+/* === MODAL STYLES === */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    /* Nền tối mờ */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    /* Hiệu ứng mờ nền */
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    width: 500px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease-out;
+    border: 1px solid var(--border-color);
+    /* Giữ style của card-box */
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: var(--text-primary);
+}
+
+
+/* Form Styles trong Modal */
+
+.form-group {
+    margin-bottom: 16px;
+}
 
 .form-label {
     display: block;
     font-size: 0.85rem;
-    font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: 8px;
 }
@@ -203,156 +224,90 @@ body {
     font-size: 0.9rem;
     color: var(--text-primary);
     background-color: var(--bg-color);
-    /* Input màu nền đậm nhất */
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    transition: var(--transition);
+    border-radius: 4px;
+    box-sizing: border-box;
+    /* Quan trọng để không vỡ layout */
 }
 
 .form-input:focus {
     outline: none;
     border-color: var(--text-secondary);
-    /* Focus viền sáng hơn */
     background-color: #000;
-    color: #fff;
 }
 
-.form-input::placeholder {
-    color: var(--text-disabled);
-}
-
-
-/* === Buttons (Monochrome Style) === */
-
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    font-weight: 500;
+.preview-area {
+    margin-top: 10px;
+    padding: 20px;
+    border: 1px dashed var(--border-color);
     border-radius: 4px;
-    cursor: pointer;
-    transition: var(--transition);
-    text-decoration: none;
-    border: 1px solid transparent;
+    text-align: center;
+    background: var(--surface-bg);
 }
-
-
-/* Nút Sửa: Nền xám, hover sáng */
-
-.btn-edit {
-    background-color: var(--surface-bg);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-.btn-edit:hover {
-    background-color: #3f3f46;
-    border-color: #52525b;
-}
-
-
-/* Nút Xóa: Chỉ có chữ đỏ, nền trong suốt (Ghost button) */
-
-.btn-delete {
-    background-color: transparent;
-    color: var(--danger-color);
-    opacity: 0.8;
-}
-
-.btn-delete:hover {
-    background-color: rgba(190, 18, 60, 0.1);
-    /* Nền đỏ rất mờ */
-    opacity: 1;
-}
-
-
-/* Nút Save: Màu TRẮNG trên nền đen (Ngược lại để nổi bật nhất) */
 
 .btn-save {
-    width: 100%;
-    padding: 12px;
     background-color: var(--primary-color);
-    /* Nền trắng */
     color: var(--primary-inverse);
-    /* Chữ đen */
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 20px;
     border: none;
-    border-radius: var(--border-radius);
+    padding: 12px;
 }
 
 .btn-save:hover {
     background-color: #e4e4e7;
-    /* Trắng xám khi hover */
 }
 
-
-/* Nút Back */
-
 .btn-back {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background-color: transparent;
-    color: var(--text-secondary);
     border: 1px solid var(--border-color);
-    margin-top: 12px;
-    padding: 10px;
-    border-radius: var(--border-radius);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: var(--transition);
+    color: var(--text-secondary);
 }
 
 .btn-back:hover {
+    border-color: var(--text-primary);
     color: var(--text-primary);
-    border-color: var(--text-secondary);
 }
 
 
-/* === Alert (Minimal) === */
+/* Animation */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/* Alert */
 
 .alert {
     padding: 12px 16px;
     margin-bottom: 24px;
-    border-radius: var(--border-radius);
+    border-radius: 4px;
     border-left: 4px solid;
-    /* Chỉ có viền trái */
-    background-color: var(--surface-bg);
-    font-size: 0.9rem;
+    background: var(--surface-bg);
 }
 
 .alert-success {
     border-color: var(--success-color);
     color: #34d399;
-    /* Xanh sáng */
 }
 
 .alert-danger {
     border-color: var(--danger-color);
     color: #fb7185;
-    /* Đỏ sáng */
-}
-
-
-/* === Preview Area === */
-
-.preview-area {
-    margin-top: 15px;
-    padding: 30px;
-    border: 1px dashed var(--border-color);
-    border-radius: var(--border-radius);
-    text-align: center;
-    background: var(--bg-color);
-    color: var(--text-disabled);
-}
-
-.preview-area:hover {
-    border-color: var(--text-secondary);
-    color: var(--text-secondary);
 }

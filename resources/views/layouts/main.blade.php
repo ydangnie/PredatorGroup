@@ -2,247 +2,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Airpods Animation | @coding.stella</title>
-    @vite(['resources/css/layout/main.css', 'resources/js/layout/main.js'])
+    @vite(['resources/css/layout/main.css', 'resources/js/layout/main.js', 'resources/css/layout/chatbot.css' ])
 </head>
 
 <div class="carousel">
-<div class="list">
+    <div class="list">
+        {{-- Bắt đầu vòng lặp hiển thị Banner từ Database --}}
+        @foreach($banners as $banner)
         <div class="item">
-        <img src="{{ asset('storage/images/img1.png') }}" alt="Ảnh từ Drive">
+            {{-- Hiển thị ảnh --}}
+            <img src="{{ asset('storage/' . $banner->hinhanh) }}" alt="{{ $banner->title }}">
+            
             <div class="introduce">
-                <div class="title">THEOREMA | BLACK GOLD</div>
-                <div class="topic">CASABLANCA</div>
+                <div class="title">{{ $banner->title }}</div>
+                <div class="topic">{{ $banner->thuonghieu }}</div>
                 <div class="des">
-                    <!-- 20 lorem -->
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia, laborum cumque dignissimos quidem atque et eligendi aperiam voluptates beatae maxime.
+                    {{ $banner->mota }}
                 </div>
+                {{-- Nút xem thêm có thể gắn link nếu muốn --}}
                 <button class="seeMore">SEE MORE &#8599</button>
             </div>
+            
+            {{-- Giữ lại phần detail nếu cần, hoặc có thể ẩn đi vì bảng Banner hiện tại chưa có dữ liệu chi tiết --}}
+            {{-- <div class="detail"> ... </div> --}}
         </div>
-
-        <div class="item">
-            <img src="{{ asset('storage/images/img2.png') }}">
-            <div class="introduce">
-                <div class="title">THEOREMA | RED</div>
-                <div class="topic">AMSTERDAM</div>
-                <div class="des">
-                    <!-- 20 lorem -->
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia, laborum cumque dignissimos quidem atque et eligendi aperiam voluptates beatae maxime.
-                </div>
-                <button class="seeMore">SEE MORE &#8599</button>
-            </div>
-        </div>
-
-        <div class="item">
-            <img src="{{ asset('storage/images/img3.png') }}">
-            <div class="introduce">
-                <div class="title">THEOREMA | GREEN</div>
-                <div class="topic">CASABLANCA</div>
-                <div class="des">
-                    <!-- 20 lorem -->
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia, laborum cumque dignissimos quidem atque et eligendi aperiam voluptates beatae maxime.
-                </div>
-                <button class="seeMore">SEE MORE &#8599</button>
-            </div>
-            <div class="detail">
-                <div class="title">Airpod GHTK</div>
-                <div class="des">
-                    <!-- lorem 50 -->
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor, reiciendis suscipit nobis nulla animi, modi explicabo quod corrupti impedit illo, accusantium in eaque nam quia adipisci aut distinctio porro eligendi. Reprehenderit nostrum consequuntur ea! Accusamus architecto dolores modi ducimus facilis quas voluptatibus! Tempora ratione accusantium magnam nulla tenetur autem beatae.
-                </div>
-                <div class="specifications">
-                    <div>
-                        <p>Used Time</p>
-                        <p>6 hours</p>
-                    </div>
-                    <div>
-                        <p>Charging port</p>
-                        <p>Type-C</p>
-                    </div>
-                    <div>
-                        <p>Compatible</p>
-                        <p>Android</p>
-                    </div>
-                    <div>
-                        <p>Bluetooth</p>
-                        <p>5.3</p>
-                    </div>
-                    <div>
-                        <p>Controlled</p>
-                        <p>Touch</p>
-                    </div>
-                </div>
-                <div class="checkout">
-                    <button>ADD TO CART</button>
-                    <button>CHECKOUT</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="item">
-            <img src="{{ asset('storage/images/img4.png') }}">
-            <div class="introduce">
-                <div class="title">THEOREMA | ORANGE</div>
-                <div class="topic">CASABLANCA</div>
-                <div class="des">
-                    <!-- 20 lorem -->
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia, laborum cumque dignissimos quidem atque et eligendi aperiam voluptates beatae maxime.
-                </div>
-                <button class="seeMore">SEE MORE &#8599</button>
-            </div>
-            <div class="detail">
-                <div class="title">Airpod GHTK</div>
-                <div class="des">
-                    <!-- lorem 50 -->
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor, reiciendis suscipit nobis nulla animi, modi explicabo quod corrupti impedit illo, accusantium in eaque nam quia adipisci aut distinctio porro eligendi. Reprehenderit nostrum consequuntur ea! Accusamus architecto dolores modi ducimus facilis quas voluptatibus! Tempora ratione accusantium magnam nulla tenetur autem beatae.
-                </div>
-                <div class="specifications">
-                    <div>
-                        <p>Used Time</p>
-                        <p>6 hours</p>
-                    </div>
-                    <div>
-                        <p>Charging port</p>
-                        <p>Type-C</p>
-                    </div>
-                    <div>
-                        <p>Compatible</p>
-                        <p>Android</p>
-                    </div>
-                    <div>
-                        <p>Bluetooth</p>
-                        <p>5.3</p>
-                    </div>
-                    <div>
-                        <p>Controlled</p>
-                        <p>Touch</p>
-                    </div>
-                </div>
-                <div class="checkout">
-                    <button>ADD TO CART</button>
-                    <button>CHECKOUT</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="item">
-            <img src="{{ asset('storage/images/img5.png') }}">
-            <div class="introduce">
-                <div class="title">THEOREMA | SILVER</div>
-                <div class="topic">CASABLANCA</div>
-                <div class="des">
-                    <!-- 20 lorem -->
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia, laborum cumque dignissimos quidem atque et eligendi aperiam voluptates beatae maxime.
-                </div>
-                <button class="seeMore">SEE MORE &#8599</button>
-            </div>
-            <div class="detail">
-                <div class="title">Airpod</div>
-                <div class="des">
-                    <!-- lorem 50 -->
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor, reiciendis suscipit nobis nulla animi, modi explicabo quod corrupti impedit illo, accusantium in eaque nam quia adipisci aut distinctio porro eligendi. Reprehenderit nostrum consequuntur ea! Accusamus architecto dolores modi ducimus facilis quas voluptatibus! Tempora ratione accusantium magnam nulla tenetur autem beatae.
-                </div>
-                <div class="specifications">
-                    <div>
-                        <p>Used Time</p>
-                        <p>6 hours</p>
-                    </div>
-                    <div>
-                        <p>Charging port</p>
-                        <p>Type-C</p>
-                    </div>
-                    <div>
-                        <p>Compatible</p>
-                        <p>Android</p>
-                    </div>
-                    <div>
-                        <p>Bluetooth</p>
-                        <p>5.3</p>
-                    </div>
-                    <div>
-                        <p>Controlled</p>
-                        <p>Touch</p>
-                    </div>
-                </div>
-                <div class="checkout">
-                    <button>ADD TO CART</button>
-                    <button>CHECKOUT</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="item">
-            <img src="{{ asset('storage/images/img6.png') }}">
-            <div class="introduce">
-                <div class="title">THEOREMA | GOLD</div>
-                <div class="topic">CASABLANCA</div>
-                <div class="des">
-                    <!-- 20 lorem -->
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia, laborum cumque dignissimos quidem atque et eligendi aperiam voluptates beatae maxime.
-                </div>
-                <button class="seeMore">SEE MORE &#8599</button>
-            </div>
-            <div class="detail">
-                <div class="title">Airpod GHTK</div>
-                <div class="des">
-                    <!-- lorem 50 -->
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor, reiciendis suscipit nobis nulla animi, modi explicabo quod corrupti impedit illo, accusantium in eaque nam quia adipisci aut distinctio porro eligendi. Reprehenderit nostrum consequuntur ea! Accusamus architecto dolores modi ducimus facilis quas voluptatibus! Tempora ratione accusantium magnam nulla tenetur autem beatae.
-                </div>
-                <div class="specifications">
-                    <div>
-                        <p>Used Time</p>
-                        <p>6 hours</p>
-                    </div>
-                    <div>
-                        <p>Charging port</p>
-                        <p>Type-C</p>
-                    </div>
-                    <div>
-                        <p>Compatible</p>
-                        <p>Android</p>
-                    </div>
-                    <div>
-                        <p>Bluetooth</p>
-                        <p>5.3</p>
-                    </div>
-                    <div>
-                        <p>Controlled</p>
-                        <p>Touch</p>
-                    </div>
-                </div>
-                <div class="checkout">
-                    <button>ADD TO CART</button>
-                    <button>CHECKOUT</button>
-                </div>
-            </div>
-        </div>
+        @endforeach
+        {{-- Kết thúc vòng lặp --}}
     </div>
-     <div class="arrows">
-            <button id="prev"><</button>
-            <button id="next">></button>
-            <button id="back">See All  &#8599</button>
-        </div>
+
+    <div class="arrows">
+        <button id="prev"><</button>
+        <button id="next">></button>
+        <button id="back">See All &#8599</button>
+    </div>
 </div>
-<div id="chatbot-ui" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; font-family: sans-serif;">
-    <button id="toggle-chat" style="width: 60px; height: 60px; border-radius: 50%; background: #000; color: #fff; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 24px;">
-        💬
+<div class="chatbot-container">
+    <button id="toggle-chat" class="chatbot-toggle-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z" fill="currentColor"/>
+        </svg>
+    </button>
+<div class="chatbot-container">
+    <button id="toggle-chat" class="chatbot-toggle-btn">
+        <svg class="icon-msg" width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z" fill="currentColor"/>
+        </svg>
+        <svg class="icon-close" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
     </button>
 
-    <div id="chat-box" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 450px; background: #fff; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); flex-direction: column; overflow: hidden; border: 1px solid #eee;">
-        <div style="background: #000; color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: bold;">PREDATOR CHATBOT</span>
-            <span id="close-chat" style="cursor: pointer; font-size: 20px;">&times;</span>
+    <div id="chat-box" class="chatbot-window">
+        <div class="chat-header">
+            <span class="chat-title">ĐĂNG NIÊ CHATBOT AI</span>
+            <span id="close-chat-mini" class="chat-close-mini" title="Đóng">&times;</span>
         </div>
 
-        <div id="messages" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px;">
-            <div style="background: #e9ecef; padding: 8px 12px; border-radius: 15px; align-self: flex-start; max-width: 80%;">
-                Chào bạn! Tôi có thể giúp gì cho bạn về thời trang Azalman hôm nay?
+        <div id="messages" class="chat-messages">
+            <div class="message bot-message">
+                Chào bạn! Predator có thể hỗ trợ gì cho phong cách của bạn hôm nay?
             </div>
         </div>
 
-        <div style="padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px;">
-            <input type="text" id="user-input" placeholder="Nhập câu hỏi..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none;">
-            <button id="send-btn" style="background: #000; color: #fff; border: none; padding: 10px 15px; border-radius: 20px; cursor: pointer;">➤</button>
+        <div class="chat-input-area">
+            <input type="text" id="user-input" class="chat-input" placeholder="Nhập câu hỏi...">
+            <button id="send-btn" class="chat-send-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
         </div>
     </div>
 </div>
@@ -251,76 +81,92 @@
 document.addEventListener('DOMContentLoaded', function() {
     const toggleBtn = document.getElementById('toggle-chat');
     const chatBox = document.getElementById('chat-box');
-    const closeBtn = document.getElementById('close-chat');
+    const closeBtnMini = document.getElementById('close-chat-mini');
     const sendBtn = document.getElementById('send-btn');
     const userInput = document.getElementById('user-input');
     const messages = document.getElementById('messages');
 
-    // Ẩn/Hiện chat
-    toggleBtn.addEventListener('click', () => chatBox.style.display = 'flex');
-    closeBtn.addEventListener('click', () => chatBox.style.display = 'none');
+    // --- XỬ LÝ ĐÓNG/MỞ CHAT (Hiệu ứng xoay nút) ---
+    function toggleChat() {
+        chatBox.classList.toggle('active');
+        toggleBtn.classList.toggle('toggled'); // Class này sẽ kích hoạt CSS xoay icon
+        
+        // Focus vào ô nhập khi mở chat
+        if(chatBox.classList.contains('active')) {
+            setTimeout(() => userInput.focus(), 300);
+        }
+    }
 
-    // Xử lý gửi tin nhắn
+    toggleBtn.addEventListener('click', toggleChat);
+    
+    // Nút đóng nhỏ (X) ở góc trên chatbox
+    closeBtnMini.addEventListener('click', () => {
+        chatBox.classList.remove('active');
+        toggleBtn.classList.remove('toggled');
+    });
+
+    // --- XỬ LÝ GỬI TIN NHẮN ---
     function sendMessage() {
         const text = userInput.value.trim();
         if (!text) return;
 
-        // Hiện tin nhắn người dùng
+        // 1. Hiện tin nhắn user
         appendMessage(text, 'user');
         userInput.value = '';
 
-        // Hiển thị trạng thái đang gõ...
+        // 2. Tạo hiệu ứng "Đang nhập..." (...)
+        const loadingId = 'loading-' + Date.now();
         const loadingDiv = document.createElement('div');
-        loadingDiv.textContent = 'Đang trả lời...';
-        loadingDiv.style.fontSize = '12px';
-        loadingDiv.style.color = '#888';
-        loadingDiv.style.marginLeft = '15px';
+        loadingDiv.id = loadingId;
+        loadingDiv.className = 'message bot-message loading';
+        loadingDiv.innerHTML = '<span>.</span><span>.</span><span>.</span>';
         messages.appendChild(loadingDiv);
+        scrollToBottom();
 
-        // Gửi API lên Server Laravel
+        // 3. Gửi API
         fetch('{{ route("chat.ai") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Token bảo mật của Laravel
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({ message: text })
         })
         .then(res => res.json())
         .then(data => {
-            messages.removeChild(loadingDiv);
+            // Xóa loading và hiện câu trả lời
+            removeLoading(loadingId);
             appendMessage(data.reply, 'ai');
         })
         .catch(err => {
-            messages.removeChild(loadingDiv);
-            appendMessage('Có lỗi xảy ra, vui lòng thử lại.', 'ai');
+            removeLoading(loadingId);
+            appendMessage('Hệ thống đang bận, vui lòng thử lại sau.', 'ai');
+            console.error(err);
         });
     }
 
+    // --- HÀM HỖ TRỢ ---
+    function appendMessage(text, sender) {
+        const div = document.createElement('div');
+        div.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+        div.textContent = text;
+        messages.appendChild(div);
+        scrollToBottom();
+    }
+
+    function removeLoading(id) {
+        const el = document.getElementById(id);
+        if(el) el.remove();
+    }
+
+    function scrollToBottom() {
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    // Sự kiện Click và Enter
     sendBtn.addEventListener('click', sendMessage);
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
-
-    function appendMessage(text, sender) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        div.style.padding = '8px 12px';
-        div.style.borderRadius = '15px';
-        div.style.maxWidth = '80%';
-        div.style.wordWrap = 'break-word';
-
-        if (sender === 'user') {
-            div.style.background = '#000'; // Màu đen theo thương hiệu
-            div.style.color = '#fff';
-            div.style.alignSelf = 'flex-end';
-        } else {
-            div.style.background = '#e9ecef';
-            div.style.color = '#000';
-            div.style.alignSelf = 'flex-start';
-        }
-        messages.appendChild(div);
-        messages.scrollTop = messages.scrollHeight; // Tự cuộn xuống dưới
-    }
 });
 </script>
