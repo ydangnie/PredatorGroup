@@ -1,10 +1,6 @@
-@extends('admin.nav') {{-- Hoặc extends layout chính của bạn nếu có --}}
+ {{-- Hoặc extends layout chính của bạn nếu có --}}
 
-@section('content') 
-{{-- Lưu ý: Kiểm tra lại layout chính của bạn xem nó yield section nào, 
-     trong file banner_edit bạn gửi dùng @section('content1') nhưng file layout không rõ ràng.
-     Mình sẽ viết code HTML đầy đủ bao gồm cả CSS để đảm bảo chạy được như trang index.
---}}
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -16,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body style="background-color: #18181b; color: #fff;">
-    
+    @extends('admin.nav')
     <div class="container mt-5">
         <div class="card bg-dark text-white border-secondary">
             <div class="card-header">

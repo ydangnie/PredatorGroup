@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Banner;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Brand;
 class BannerController extends Controller
 {
     // 1. Hiển thị danh sách (và form thêm/sửa)
@@ -13,7 +13,8 @@ class BannerController extends Controller
     {
         $banners = Banner::all();
         $bannerEdit = null; // Mặc định không có banner nào đang sửa
-        return view('admin.banner', compact('banners', 'bannerEdit'));
+        $listBrands = Brand::all();
+       return view('admin.banner', compact('banners', 'bannerEdit', 'listBrands'));
     }
 
     // 2. Hàm khi bấm nút "Sửa"
@@ -21,9 +22,10 @@ class BannerController extends Controller
     {
         $banners = Banner::all(); // Vẫn lấy danh sách để hiện khung bên trái
         $bannerEdit = Banner::findOrFail($id); // Lấy banner cần sửa để điền vào khung bên phải
+        $listBrands = Brand::all();
         
         // Trả về view cũ (admin.banner) nhưng có thêm biến $bannerEdit
-        return view('admin.banner', compact('banners', 'bannerEdit'));
+       return view('admin.banner', compact('banners', 'bannerEdit', 'listBrands'));
     }
 
     // 3. Thêm mới (Giữ nguyên logic)

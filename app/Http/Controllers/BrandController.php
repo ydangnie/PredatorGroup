@@ -23,8 +23,12 @@ class BrandController extends Controller
     // Dựa vào file banner_edit.blade.php bạn gửi, mình sẽ làm trang edit riêng cho giống style đó.
     public function edit($id)
     {
-        $brand = Brand::findOrFail($id);
-        return view('admin.brand_edit', compact('brand'));
+      $brands = Brand::all(); 
+    // Lấy thương hiệu cần sửa để điền vào form
+    $brandEdit = Brand::findOrFail($id); 
+
+    // Trả về view 'admin.brand' (trang danh sách) nhưng kèm biến $brandEdit
+    return view('admin.brand', compact('brands', 'brandEdit'));
     }
 
     // 3. Thêm mới
@@ -50,25 +54,26 @@ class BrandController extends Controller
     public function update(Request $request, $id)
     {
         $brand = Brand::findOrFail($id);
+    
+    // Validate...
+    $request->validate([
+        'ten_thuonghieu' => 'required|string|max:100',
+        'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        $request->validate([
-            'ten_thuonghieu' => 'required|string|max:100',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+    $data = $request->only(['ten_thuonghieu']);
 
-        $data = $request->only(['ten_thuonghieu']);
-
-        if ($request->hasFile('logo')) {
-            // Xóa ảnh cũ nếu có
-            if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
-                Storage::disk('public')->delete($brand->logo);
-            }
-            $data['logo'] = $request->file('logo')->store('brands', 'public');
+    if ($request->hasFile('logo')) {
+        if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
+            Storage::disk('public')->delete($brand->logo);
         }
+        $data['logo'] = $request->file('logo')->store('brands', 'public');
+    }
 
-        $brand->update($data);
-        
-        return redirect()->route('admin.brand.index')->with('success', 'Cập nhật thương hiệu thành công!');
+    $brand->update($data);
+
+    // Quay về trang index
+    return redirect()->route('admin.brand.index')->with('success', 'Cập nhật thành công!');
     }
 
     // 5. Xóa

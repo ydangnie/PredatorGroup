@@ -51,7 +51,7 @@
                                 <div style="font-weight: 700; color: #f4f4f5; font-size: 1rem;">{{ $item->ten_thuonghieu }}</div>
                             </td>
                             <td>
-                                <div class="thumb-box">
+                                <div class="thumb-box" id="brandlogo">
                                     <img src="{{ asset('storage/'.$item->logo) }}" class="thumb-img" alt="Logo">
                                 </div>
                             </td>

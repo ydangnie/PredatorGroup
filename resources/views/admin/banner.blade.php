@@ -13,7 +13,7 @@
 
 <body>
     @include('admin.nav')
-    
+
     <div class="banner-container">
         @if(session('success'))
         <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
@@ -25,17 +25,17 @@
         <div class="card-box">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
                 <h5><i class="fas fa-list-ul"></i> Danh sách Banner</h5>
-                
+
                 @if(isset($bannerEdit))
-                    {{-- Nếu đang sửa thì nút này sẽ reset về trang danh sách --}}
-                    <a href="{{ route('admin.banner.index') }}" class="btn-action btn-add-new">
-                        <i class="fas fa-plus-circle"></i> Thêm Mới
-                    </a>
+                {{-- Nếu đang sửa thì nút này sẽ reset về trang danh sách --}}
+                <a href="{{ route('admin.banner.index') }}" class="btn-action btn-add-new">
+                    <i class="fas fa-plus-circle"></i> Thêm Mới
+                </a>
                 @else
-                    {{-- Nếu đang ở trang chủ thì mở Modal JS --}}
-                    <button type="button" class="btn-action btn-add-new" onclick="openModal()">
-                        <i class="fas fa-plus-circle"></i> Thêm Mới
-                    </button>
+                {{-- Nếu đang ở trang chủ thì mở Modal JS --}}
+                <button type="button" class="btn-action btn-add-new" onclick="openModal()">
+                    <i class="fas fa-plus-circle"></i> Thêm Mới
+                </button>
                 @endif
             </div>
 
@@ -66,7 +66,9 @@
                                 @endif
                             </td>
                             <td>{{ $item->thuonghieu }}</td>
-                            <td><div style="color: #8898aa; font-size: 0.9rem;">{{ Str::limit($item->mota, 50) }}</div></td>
+                            <td>
+                                <div style="color: #8898aa; font-size: 0.9rem;">{{ Str::limit($item->mota, 50) }}</div>
+                            </td>
                             <td>
                                 <div class="thumb-box">
                                     <img src="{{ asset('storage/'.$item->hinhanh) }}" class="thumb-img" alt="Banner">
@@ -107,7 +109,7 @@
                 </h5>
                 <button type="button" class="close-modal" onclick="closeModal()">&times;</button>
             </div>
-            
+
             <div class="card-body-custom">
                 <form action="{{ isset($bannerEdit) ? route('admin.banner.update', $bannerEdit->id) : route('admin.banner.store') }}"
                     method="POST" enctype="multipart/form-data">
@@ -122,9 +124,17 @@
 
                     <div class="form-group">
                         <label class="form-label">Thương hiệu</label>
-                        <input type="text" name="thuonghieu" class="form-input"
-                            value="{{ isset($bannerEdit) ? $bannerEdit->thuonghieu : old('thuonghieu') }}"
-                            placeholder="VD: Nike, Adidas...">
+                        <select name="thuonghieu" class="form-input">
+                            <option value="">-- Chọn Thương Hiệu --</option>
+                            @if(isset($listBrands))
+                            @foreach($listBrands as $brand)
+                            <option value="{{ $brand->ten_thuonghieu }}"
+                                {{ (isset($bannerEdit) && $bannerEdit->thuonghieu == $brand->ten_thuonghieu) ? 'selected' : '' }}>
+                                {{ $brand->ten_thuonghieu }}
+                            </option>
+                            @endforeach
+                            @endif
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -182,8 +192,8 @@
         function closeModal() {
             // Nếu đang ở chế độ edit mà đóng thì nên chuyển về index để reset form
             // Nhưng ở đây chỉ ẩn đi cho đơn giản (với nút Thêm Mới)
-             modal.style.display = 'none';
-             document.body.style.overflow = 'auto';
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         // Logic Preview ảnh
@@ -210,7 +220,7 @@
         // Hoặc nếu có lỗi validate form (Laravel redirect back with errors)
         document.addEventListener("DOMContentLoaded", function() {
             @if(isset($bannerEdit) || $errors->any())
-                openModal();
+            openModal();
             @endif
         });
 
@@ -219,10 +229,11 @@
             if (event.target == modal) {
                 // Chỉ đóng nếu không phải đang Edit (để tránh mất dữ liệu lỡ tay click ra ngoài)
                 @if(!isset($bannerEdit))
-                    closeModal();
+                closeModal();
                 @endif
             }
         }
     </script>
 </body>
+
 </html>
