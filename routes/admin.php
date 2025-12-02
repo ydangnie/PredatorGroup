@@ -16,6 +16,6 @@ Route::resource('voucher', VoucherController::class);
 Route::resource('category', CategoryController::class);
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function(){
     // ... các route khác ...
-    Route::resource('product', ProductController::class);
+   Route::resource('product', ProductController::class);
 });
 });

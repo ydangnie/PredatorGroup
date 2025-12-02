@@ -223,6 +223,7 @@
             </div>
             
             <div class="card-body-custom">
+       
                 <form action="{{ isset($productEdit) ? route('admin.product.update', $productEdit->id) : route('admin.product.store') }}" 
                       method="POST" enctype="multipart/form-data">
                     @csrf
