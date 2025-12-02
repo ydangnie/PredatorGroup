@@ -306,3 +306,65 @@
         height: 60vh;
     }
 }
+
+
+/* Thanh cuộn ngang cho danh sách sản phẩm trong chat */
+
+.bot-products {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: #444 #1a1a1a;
+}
+
+.bot-products::-webkit-scrollbar {
+    height: 6px;
+}
+
+.bot-products::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 3px;
+}
+
+
+/* Hiệu ứng hover cho thẻ sản phẩm */
+
+.chat-product-card:hover {
+    background: #333 !important;
+    border-color: #d4af37 !important;
+    transform: translateY(-2px);
+}
+
+
+/* Thanh cuộn ngang cho danh sách sản phẩm trong chat */
+
+.bot-products {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: #444 #1a1a1a;
+}
+
+.bot-products::-webkit-scrollbar {
+    height: 6px;
+}
+
+.bot-products::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 3px;
+}
+
+
+/* Hiệu ứng hover cho thẻ sản phẩm */
+
+.chat-product-card:hover {
+    background: #333 !important;
+    border-color: #d4af37 !important;
+    transform: translateY(-2px);
+}
