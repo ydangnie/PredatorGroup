@@ -58,6 +58,28 @@
             accent-color: #3b82f6;
             transform: scale(1.1);
         }
+
+        /* Nút xóa ảnh trong album */
+        .btn-delete-img {
+            position: absolute; 
+            top: -8px; 
+            right: -8px; 
+            background: #ef4444; 
+            color: white; 
+            border-radius: 50%; 
+            width: 20px; 
+            height: 20px; 
+            text-align: center; 
+            line-height: 20px; 
+            font-size: 12px; 
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .btn-delete-img:hover {
+            background: #dc2626;
+        }
     </style>
 </head>
 <body>
@@ -113,7 +135,7 @@
                     <tbody>
                         @foreach($products as $key => $item)
                         <tr>
-                            {{-- Sử dụng bộ đếm STT đơn giản --}}
+                            {{-- STT tăng dần đơn giản (không phân trang) --}}
                             <td>{{ $key + 1 }}</td>
                             <td>
                                 <div class="thumb-box" style="width: 60px; height: 60px;">
@@ -124,6 +146,13 @@
                                 <div style="font-weight: 700; color: #f4f4f5; font-size: 0.95rem;">{{ $item->tensp }}</div>
                                 @if($item->sku)
                                     <div style="font-size: 0.8rem; color: #a1a1aa; margin-top: 2px;">SKU: {{ $item->sku }}</div>
+                                @endif
+                                
+                                {{-- Hiển thị số lượng ảnh album --}}
+                                @if($item->images->count() > 0)
+                                    <div style="font-size: 0.75rem; color: #3b82f6; margin-top: 2px;">
+                                        <i class="fas fa-images"></i> +{{ $item->images->count() }} ảnh phụ
+                                    </div>
                                 @endif
                             </td>
                             <td>
@@ -179,9 +208,6 @@
                     Chưa có sản phẩm nào. Hãy nhấn "Thêm Mới".
                 </div>
                 @endif
-                
-                {{-- ĐÃ BỎ THANH PHÂN TRANG TẠI ĐÂY --}}
-
             </div>
         </div>
     </div>
@@ -278,19 +304,50 @@
                                 </div>
                             </div>
 
-                            {{-- Hình ảnh --}}
+                            {{-- Hình ảnh chính --}}
                             <div class="form-group">
                                 <label class="form-label">Hình ảnh chính <span style="color:red">*</span></label>
                                 <input type="file" name="hinh_anh" class="form-input" onchange="previewFile(this)" {{ isset($productEdit) ? '' : 'required' }}>
                                 
                                 <div class="preview-area" style="margin-top: 10px;">
                                     <img id="preview" src="{{ isset($productEdit) && $productEdit->hinh_anh ? asset('storage/'.$productEdit->hinh_anh) : '#' }}" 
-                                         style="display: {{ isset($productEdit) && $productEdit->hinh_anh ? 'block' : 'none' }}; max-width: 150px; max-height: 150px; border-radius: 6px; border: 1px solid #52525b;">
+                                         style="display: {{ isset($productEdit) && $productEdit->hinh_anh ? 'block' : 'none' }}; max-width: 150px; max-height: 150px; border-radius: 6px; border: 1px solid #52525b; object-fit: cover;">
                                     @if(!isset($productEdit))
                                         <p id="placeholder-text" style="color: #71717a; font-size: 0.9rem; margin-top:5px;">Chưa chọn ảnh</p>
                                     @endif
                                 </div>
                             </div>
+
+                            {{-- Album ảnh phụ --}}
+                            <div class="form-group mt-3">
+                                <label class="form-label">Album ảnh phụ (Chọn nhiều)</label>
+                                <input type="file" name="album[]" class="form-input" multiple onchange="previewAlbum(this)">
+                                
+                                {{-- Preview ảnh mới chọn --}}
+                                <div id="album-preview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+                            </div>
+
+                            {{-- Hiển thị ảnh cũ trong Album (Chỉ hiện khi Edit) --}}
+                            @if(isset($productEdit) && $productEdit->images->count() > 0)
+                                <label class="form-label mt-2" style="font-size: 0.9rem; color: #a1a1aa;">Ảnh album hiện tại:</label>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap; background: #27272a; padding: 10px; border-radius: 6px;">
+                                    @foreach($productEdit->images as $img)
+                                        <div style="position: relative; width: 70px; height: 70px; border: 1px solid #52525b; border-radius: 4px;">
+                                            <img src="{{ asset('storage/'.$img->image_path) }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                                            
+                                            {{-- Nút xóa ảnh nhỏ --}}
+                                            <a href="{{ route('admin.product.image.delete', $img->id) }}" 
+                                               onclick="event.preventDefault(); if(confirm('Xóa ảnh này?')) document.getElementById('del-img-{{$img->id}}').submit();"
+                                               class="btn-delete-img" title="Xóa ảnh">
+                                               &times;
+                                            </a>
+                                            <form id="del-img-{{$img->id}}" action="{{ route('admin.product.image.delete', $img->id) }}" method="POST" style="display: none;">
+                                                @csrf @method('DELETE')
+                                            </form>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
 
                         <div class="col-md-6" style="padding-left: 20px;">
@@ -372,7 +429,7 @@
             @endif
         }
 
-        // Preview ảnh khi chọn file
+        // Preview ảnh chính khi chọn file
         function previewFile(input) {
             var file = input.files[0];
             if (file) {
@@ -385,6 +442,29 @@
                     if (placeholder) placeholder.style.display = 'none';
                 }
                 reader.readAsDataURL(file);
+            }
+        }
+
+        // Preview Album ảnh khi chọn nhiều file
+        function previewAlbum(input) {
+            var container = document.getElementById('album-preview');
+            container.innerHTML = ''; // Xóa preview cũ
+
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.width = '60px';
+                        img.style.height = '60px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '4px';
+                        img.style.border = '1px solid #52525b';
+                        container.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
             }
         }
 

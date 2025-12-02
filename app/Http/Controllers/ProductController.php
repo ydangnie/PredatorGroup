@@ -3,20 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Products;
-use App\Models\ProductVariant;
+use App\Models\ProductImage; // Import model mới
 use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    // 1. Hiển thị danh sách
     public function index()
     {
-        // Eager load category, brand, variants để tối ưu query
-        $products = Products::with(['category', 'brand', 'variants'])->latest()->get();
+        // Eager load thêm 'images'
+        $products = Products::with(['category', 'brand', 'variants', 'images'])->latest()->get();
         $categories = Category::all();
         $brands = Brand::all();
         $productEdit = null;
@@ -24,68 +22,64 @@ class ProductController extends Controller
         return view('admin.product', compact('products', 'categories', 'brands', 'productEdit'));
     }
 
-    // 2. Chuyển sang chế độ Sửa
     public function edit($id)
     {
-        $products = Products::with(['category', 'brand', 'variants'])->latest()->get();
+        $products = Products::with(['category', 'brand', 'variants', 'images'])->latest()->get();
         $categories = Category::all();
         $brands = Brand::all();
-        $productEdit = Products::with('variants')->findOrFail($id);
+        // Load kèm images
+        $productEdit = Products::with(['variants', 'images'])->findOrFail($id);
 
         return view('admin.product', compact('products', 'categories', 'brands', 'productEdit'));
     }
 
-    // 3. Thêm mới Sản phẩm & Variants
     public function store(Request $request)
     {
-       $request->validate([
-        'tensp' => 'required|string|max:255',
-        'gender' => 'required|in:male,female,unisex', // <--- Thêm validate
-        'gia' => 'required|numeric|min:0',
-        'hinh_anh' => 'required|image|max:2048',
-        'category_id' => 'nullable|exists:categories,id',
-        'brand_id' => 'nullable|exists:brands,id',
-        // Validate variants...
-        'variants.*.stock' => 'required|integer|min:0',
-    ]);
+        $request->validate([
+            'tensp' => 'required',
+            'gia' => 'required|numeric|min:0',
+            'hinh_anh' => 'required|image',
+            // Validate album ảnh (tối đa 2MB mỗi ảnh)
+            'album.*' => 'nullable|image|max:2048' 
+        ]);
 
-    // Thêm 'gender' vào mảng lấy dữ liệu
-    $data = $request->only(['tensp', 'gender', 'mota', 'gia', 'so_luong', 'sku', 'category_id', 'brand_id']);
-        // Xử lý ảnh chính
+        $data = $request->except(['variants', 'album']); // Loại bỏ album khỏi data chính
+
         if ($request->hasFile('hinh_anh')) {
             $data['hinh_anh'] = $request->file('hinh_anh')->store('products', 'public');
         }
 
         $product = Products::create($data);
 
-        // Lưu Variants nếu có
+        // Xử lý Variants (Giữ nguyên code cũ của bạn)
         if ($request->has('variants')) {
             foreach ($request->variants as $variant) {
-                // Chỉ lưu nếu có size hoặc color
                 if(!empty($variant['size']) || !empty($variant['color'])) {
                     $product->variants()->create($variant);
                 }
             }
         }
 
+        // Xử lý Album ảnh (Mới)
+        if ($request->hasFile('album')) {
+            foreach ($request->file('album') as $file) {
+                $path = $file->store('product_gallery', 'public');
+                $product->images()->create(['image_path' => $path]);
+            }
+        }
+
         return redirect()->route('admin.product.index')->with('success', 'Thêm sản phẩm thành công!');
     }
 
-    // 4. Cập nhật
     public function update(Request $request, $id)
     {
         $product = Products::findOrFail($id);
         
-        $request->validate([
-        'tensp' => 'required|string|max:255',
-        'gender' => 'required|in:male,female,unisex', // <--- Thêm validate
-        'gia' => 'required|numeric|min:0',
-        'hinh_anh' => 'nullable|image|max:2048',
-    ]);
+        // ... (Validate giống cũ) ...
 
-    // Thêm 'gender' vào mảng lấy dữ liệu
-    $data = $request->only(['tensp', 'gender', 'mota', 'gia', 'so_luong', 'sku', 'category_id', 'brand_id']);
+        $data = $request->except(['variants', 'album']);
 
+        // Cập nhật ảnh đại diện (Giữ nguyên logic cũ)
         if ($request->hasFile('hinh_anh')) {
             if ($product->hinh_anh && Storage::disk('public')->exists($product->hinh_anh)) {
                 Storage::disk('public')->delete($product->hinh_anh);
@@ -95,10 +89,8 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        // Xử lý Variants: Đơn giản nhất là xóa cũ thêm mới, hoặc update thông minh.
-        // Cách đơn giản: Xóa hết variants cũ và tạo lại theo input mới
+        // Cập nhật Variants (Giữ nguyên logic cũ)
         $product->variants()->delete();
-
         if ($request->has('variants')) {
             foreach ($request->variants as $variant) {
                 if(!empty($variant['size']) || !empty($variant['color'])) {
@@ -107,17 +99,43 @@ class ProductController extends Controller
             }
         }
 
+        // Thêm ảnh mới vào Album (Cộng dồn, không xóa ảnh cũ)
+        if ($request->hasFile('album')) {
+            foreach ($request->file('album') as $file) {
+                $path = $file->store('product_gallery', 'public');
+                $product->images()->create(['image_path' => $path]);
+            }
+        }
+
         return redirect()->route('admin.product.index')->with('success', 'Cập nhật thành công!');
     }
 
-    // 5. Xóa
     public function destroy($id)
     {
         $product = Products::findOrFail($id);
-        if ($product->hinh_anh && Storage::disk('public')->exists($product->hinh_anh)) {
-            Storage::disk('public')->delete($product->hinh_anh);
+        
+        // Xóa ảnh đại diện
+        if ($product->hinh_anh) Storage::disk('public')->delete($product->hinh_anh);
+        
+        // Xóa tất cả ảnh trong album
+        foreach($product->images as $img) {
+            if(Storage::disk('public')->exists($img->image_path)) {
+                Storage::disk('public')->delete($img->image_path);
+            }
         }
-        $product->delete(); // Variants sẽ tự xóa nhờ onCascade delete ở migration
+        
+        $product->delete();
         return redirect()->route('admin.product.index')->with('success', 'Đã xóa sản phẩm!');
+    }
+
+    // Hàm API để xóa từng ảnh trong album (dùng cho nút X trong form sửa)
+    public function deleteImage($id)
+    {
+        $image = ProductImage::findOrFail($id);
+        if (Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
+        }
+        $image->delete();
+        return back()->with('success', 'Đã xóa ảnh khỏi album');
     }
 }

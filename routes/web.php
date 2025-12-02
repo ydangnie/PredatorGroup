@@ -122,3 +122,4 @@ Route::middleware(['auth', 'admin'])
         // (2) Resource tên là "product"
         Route::resource('product', ProductController::class); 
     });
+    Route::delete('/product-image/{id}', [ProductController::class, 'deleteImage'])->name('admin.product.image.delete');
