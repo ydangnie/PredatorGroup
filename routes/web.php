@@ -59,7 +59,8 @@ Route::get('dangxuat', [AuthDangKy::class, 'dangxuat'])->name('dangxuat');
 
 Route::get('sanpham', [SanPhamController::class, 'sanpham'])->name('sanpham');
 Route::get('lienhe', [LienHeController::class, 'lienhe'])->name('lienhe');
-Route::get('chitietsanpham', [ChiTietSanPhamCtr::class, 'chitietsanpham'])->name('chitietsanpham');
+// Tìm dòng route chitietsanpham cũ và sửa thành:
+Route::get('chi-tiet-san-pham/{id}', [ChiTietSanPhamCtr::class, 'chitietsanpham'])->name('chitietsanpham');
 
 Route::get('giohang', [GioHangController::class, 'giohang'])->name('giohang');
 

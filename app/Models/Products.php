@@ -8,38 +8,33 @@ use Illuminate\Database\Eloquent\Model;
 class Products extends Model
 {
     use HasFactory;
-    
-    // Khai báo tên bảng nếu cần (do tên model số nhiều)
-    protected $table = 'products';
 
+    // Khai báo các cột được phép lưu vào database
     protected $fillable = [
-    'tensp', 
-    'gender', // <--- Thêm dòng này
-    'mota', 
-    'gia', 
-    'hinh_anh', 
-    'so_luong', 
-    'sku', 
-    'category_id', 
-    'brand_id'
-];
+        'tensp', 
+        'gender', 
+        'mota', 
+        'gia', 
+        'so_luong', // <--- QUAN TRỌNG: Phải có cột này
+        'hinh_anh', 
+        'sku', 
+        'category_id', 
+        'brand_id'
+    ];
 
-    // Quan hệ với Category
     public function category() {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    // Quan hệ với Brand
     public function brand() {
         return $this->belongsTo(Brand::class, 'brand_id');
     }
 
-    // Quan hệ với Variants
     public function variants() {
         return $this->hasMany(ProductVariant::class, 'product_id');
     }
-    public function images()
-{
-    return $this->hasMany(ProductImage::class, 'product_id');
-}
+
+    public function images() {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
 }
