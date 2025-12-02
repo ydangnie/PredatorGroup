@@ -916,3 +916,131 @@ main.header nav a {
         height: 200px;
     }
 }
+
+
+/* --- FEATURED BRANDS SECTION (Predator Style) --- */
+
+
+/* Center Alignment & Gold Line */
+
+.clx-text-center {
+    text-align: center;
+}
+
+.gold-line-center {
+    width: 60px;
+    height: 2px;
+    background: #D4AF37;
+    /* Hardcoded var(--clx-gold) for safety */
+    margin: 20px auto 0;
+}
+
+
+/* Brand Card Container */
+
+.brand-card {
+    background-color: #161616;
+    /* Deep matte black */
+    border: 1px solid #333;
+    border-radius: 4px;
+    /* Sharp, masculine corners */
+    padding: 0;
+    /* Reset padding for full-width image */
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* Hover Effects: Lift & Gold Border */
+
+.brand-card:hover {
+    transform: translateY(-8px);
+    border-color: #D4AF37;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+
+/* Image Wrapper */
+
+.clx-card-img-wrapper {
+    width: 100%;
+    height: 240px;
+    /* Fixed height for uniformity */
+    overflow: hidden;
+    border-bottom: 1px solid #333;
+}
+
+.clx-card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+    filter: grayscale(30%);
+    /* Subtle desaturation for elegance */
+}
+
+.brand-card:hover .clx-card-img-wrapper img {
+    transform: scale(1.1);
+    /* Zoom effect */
+    filter: grayscale(0%);
+    /* Return to full color */
+}
+
+
+/* Card Content Body */
+
+.clx-card-body {
+    padding: 30px 25px;
+    text-align: center;
+}
+
+.clx-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.clx-card-desc {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    min-height: 45px;
+    /* Ensures alignment even with variable text length */
+}
+
+
+/* Text Link with Arrow */
+
+.clx-btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #D4AF37;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+}
+
+.clx-btn-link i {
+    transition: transform 0.3s ease;
+}
+
+.brand-card:hover .clx-btn-link {
+    color: #fff;
+    border-bottom-color: #D4AF37;
+}
+
+.brand-card:hover .clx-btn-link i {
+    transform: translateX(5px);
+    /* Slide arrow right */
+}

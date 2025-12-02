@@ -23,53 +23,47 @@
         @endforeach
     </div>
     <div class="arrows">
-        <button id="prev"><</button>
-        <button id="next">></button>
-        <button id="back">See All &#8599</button>
+        <button id="prev">
+            < </button>
+                <button id="next">></button>
+                <button id="back">See All &#8599</button>
     </div>
 </div>
 
 {{-- ▼▼▼ PHẦN MỚI: TÍCH HỢP CHRONOSLUX STYLE ▼▼▼ --}}
 <div class="clx-wrapper">
-    
+
     <section id="brands" class="clx-section clx-bg-medium">
-        <div class="clx-container">
-            <h2 class="clx-heading">Thương Hiệu Nổi Bật</h2>
-            <p class="clx-subheading">Chúng tôi tự hào giới thiệu ba cái tên dẫn đầu về sự sang trọng, phức tạp và di sản.</p>
-
-            <div class="clx-grid-3">
-                <div class="clx-card">
-                    <img src="https://images.unsplash.com/photo-1619504046991-9241e32e4496?q=80&w=1974&auto=format&fit=crop" alt="Zenith">
-                    <div class="clx-card-body">
-                        <h3 class="clx-card-title">ZENITH</h3>
-                        <p class="clx-card-subtitle">Độ Chính Xác Vượt Thời Gian</p>
-                        <p class="clx-card-desc">Được biết đến với bộ máy El Primero huyền thoại, đại diện cho đỉnh cao chronograph tốc độ cao.</p>
-                        <a href="#" class="clx-btn-outline">Khám Phá Ngay</a>
-                    </div>
-                </div>
-
-                <div class="clx-card">
-                    <img src="https://images.unsplash.com/photo-1599880367680-5010e13a543a?q=80&w=1974&auto=format&fit=crop" alt="Audemars Piguet">
-                    <div class="clx-card-body">
-                        <h3 class="clx-card-title">AUDEMARS PIGUET</h3>
-                        <p class="clx-card-subtitle">Biểu Tượng Của Sự Khác Biệt</p>
-                        <p class="clx-card-desc">Thách thức các quy tắc truyền thống với thiết kế Royal Oak táo bạo, sang trọng và thể thao.</p>
-                        <a href="#" class="clx-btn-outline">Khám Phá Ngay</a>
-                    </div>
-                </div>
-
-                <div class="clx-card">
-                    <img src="https://images.unsplash.com/photo-1619504045453-9689a467d63c?q=80&w=1974&auto=format&fit=crop" alt="Jaeger-LeCoultre">
-                    <div class="clx-card-body">
-                        <h3 class="clx-card-title">JAEGER-LECOULTRE</h3>
-                        <p class="clx-card-subtitle">Nghệ Thuật Chế Tác Đồng Hồ</p>
-                        <p class="clx-card-desc">"Nhà sản xuất của các nhà sản xuất", với sự phức tạp cơ khí đáng kinh ngạc.</p>
-                        <a href="#" class="clx-btn-outline">Khám Phá Ngay</a>
-                    </div>
-                </div>
-            </div>
+    <div class="clx-container">
+        <div class="clx-text-center mb-20">
+            <span class="clx-gold-text">Đối Tác Chính Hãng</span>
+            <h2 class="clx-heading">THƯƠNG HIỆU DANH TIẾNG</h2>
+            <div class="gold-line-center"></div>
         </div>
-    </section>
+
+        <div class="clx-grid-3">
+            {{-- Nếu có biến $brands từ Controller thì dùng vòng lặp --}}
+            @if(isset($brands) && count($brands) > 0)
+                @foreach($brands as $brand)
+                <div class="clx-card brand-card">
+                    <div class="clx-card-img-wrapper">
+                        {{-- Hiển thị Logo hoặc Ảnh đại diện --}}
+                        <img src="{{ asset('storage/' . $brand->logo) }}" alt="{{ $brand->ten_thuonghieu }}">
+                    </div>
+                    <div class="clx-card-body">
+                        <h3 class="clx-card-title">{{ $brand->ten_thuonghieu }}</h3>
+                        {{-- Mô tả ngắn (có thể thêm cột 'mota' vào bảng brands nếu cần) --}}
+                        <p class="clx-card-desc">Biểu tượng của sự đẳng cấp và di sản vượt thời gian.</p>
+                        <a href="#" class="clx-btn-link">Xem Bộ Sưu Tập <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                @endforeach
+            
+              
+            @endif
+        </div>
+    </div>
+</section>
 
     <section id="collection" class="clx-section clx-bg-dark">
         <div class="clx-container">
@@ -80,7 +74,7 @@
 
             <div class="clx-showcase-row">
                 <div class="clx-showcase-img">
-                    <img src="https://images.unsplash.com/photo-1551794726-839d58a6822b?q=80&w=1974&auto=format&fit=crop" alt="Watch Model I">
+                    <img src="{{ asset('storage/images/img1.webp') }}" alt="Watch Model I">
                     <div class="clx-badge">New Arrival</div>
                 </div>
                 <div class="clx-showcase-info">
@@ -100,7 +94,7 @@
 
             <div class="clx-showcase-row reverse">
                 <div class="clx-showcase-img">
-                    <img src="https://images.unsplash.com/photo-1523783337698-a164899cc9e4?q=80&w=1974&auto=format&fit=crop" alt="Watch Model II">
+                    <img src="{{ asset('storage/images/img2.webp') }}" alt="Watch Model II">
                     <div class="clx-badge-dark">Best Seller</div>
                 </div>
                 <div class="clx-showcase-info">
@@ -134,7 +128,7 @@
             </div>
             <div class="clx-half relative">
                 <div class="clx-img-overlay"></div>
-                <img src="https://images.unsplash.com/photo-1551420006-a3e34630e1a6?q=80&w=1935&auto=format&fit=crop" class="clx-rounded-img" alt="Craftsmanship">
+                <img src="{{ asset('storage/images/img3.webp') }}" class="clx-rounded-img" alt="Craftsmanship">
             </div>
         </div>
     </section>
@@ -156,7 +150,7 @@
         {{-- ... Icon chat ... --}}
         <i class="fa-solid fa-comment-dots" style="font-size: 24px;"></i>
     </button>
-    
+
     <div id="chat-box" class="chatbot-window">
         <div class="chat-header">
             <span class="chat-title">PREDATOR AI</span>
