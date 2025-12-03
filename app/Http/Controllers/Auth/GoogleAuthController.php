@@ -61,7 +61,7 @@ class GoogleAuthController extends Controller
             return redirect()->route('home.index');
         } catch (Exception $e) {
             // Log lỗi nếu cần: Log::error($e);
-            dd($e->getMessage());
+            // dd($e->getMessage());
             return redirect()->route('login')
                 ->with('error', 'Đăng nhập Google thất bại! Vui lòng thử lại.');
         }
