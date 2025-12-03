@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('google_id')->nullable()->unique()->after('id');
-            $table->string('avatar')->nullable()->after('password');
+            // $table->string('avatar')->nullable()->after('password');
         });
     }
 
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['google_id', 'avatar']);
+            $table->dropColumn(['google_id',
+            // 'avatar'
+        ]);
         });
     }
 };
