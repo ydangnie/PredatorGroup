@@ -1,5 +1,3 @@
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,7 +49,7 @@
                         <i class="fas fa-box-open"></i>
                         <span> Thương hiệu</span>
                     </a>
-                    <a href="#" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.users.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-box-open"></i>
                         <span> Người dùng</span>
                     </a>
@@ -71,10 +69,10 @@
                     <i class="fas fa-chart-line"></i>
                     <span>Thống Kê</span>
                 </div>
-                <div class="nav-item">
+                <a href="{{ route('admin.inventory.index') }}" class="nav-item sub-nav-item">
                     <i class="fas fa-warehouse"></i>
-                    <span>Kho Hàng</span>
-                </div>
+                    <span> Kho hàng</span>
+                </a>
                 <div class="nav-item">
                     <i class="fas fa-tags"></i>
                     <span>Khuyến Mãi</span>
@@ -171,7 +169,11 @@
 
                     <div class="dropdown-container">
                         <div class="user-profile" id="profileToggle">
-                            <div class="avatar">AD</div>
+                            <div class="avatar" style="overflow: hidden;">
+                                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=D4AF37&color=000' }}"
+                                    alt="Avatar"
+                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            </div>
                             <div>
                                 <div style="font-weight: 600; color: #ffffff;">{{ Auth::user()->name}}</div>
                                 <div style="font-size: 0.85rem; color: #9a9a9a;">{{ Auth::user()->role}} </div>
@@ -240,4 +242,3 @@
                 }
             </script>
 </body>
-

@@ -32,7 +32,8 @@ class AuthDangKy extends Controller
 
             'name' => $request->get('name'),
             'email' => $request->get('email'),
-            'password' => $request->get('password')
+            'password' => $request->get('password'),
+            'role' => 'user',
         ]);
 
 
