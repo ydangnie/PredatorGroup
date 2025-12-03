@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 
 
 <head>
@@ -12,12 +10,13 @@
 </head>
 
 <body>
-     <div class="dashboard-container">
+    <div class="dashboard-container">
         <div class="sidebar" id="sidebar">
             <div class="logo-container">
                 <div class="logo">
                     <i class="fas fa-clock"></i>
-                    <span>PREDATOR</span>
+                    <a href="{{ route('admin.dasboard') }}">PREDATOR</a>
+
                 </div>
             </div>
 
@@ -30,7 +29,7 @@
                     <i class="fas fa-shopping-bag"></i>
                     <span onclick="toggleBanner()">Giỏ hàng </span>
                     <div id="banner-content" style="display: none;">
-                       
+
                     </div>
                 </div>
 
@@ -40,15 +39,15 @@
                     <i class="fas fa-chevron-down nav-arrow"></i>
                 </div>
                 <div class="sub-nav-container" style="display: none;">
-                    <a href="#" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.category.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-tags"></i>
                         <span> Danh mục</span>
                     </a>
-                    <a href="#" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.product.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-box-open"></i>
                         <span> Sản phẩm</span>
                     </a>
-                    <a href="#" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.brand.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-box-open"></i>
                         <span> Thương hiệu</span>
                     </a>
@@ -56,9 +55,12 @@
                         <i class="fas fa-box-open"></i>
                         <span> Người dùng</span>
                     </a>
-                    <a href="#" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.admin.banner') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-box-open"></i>
                         <span>Banner</span>
+                    </a>
+                    <a href="{{ route('admin.voucher.index') }}" class="nav-item sub-nav-item">
+                        <i class="fas fa-ticket-alt"></i>Voucher
                     </a>
                 </div>
                 <div class="nav-item">
@@ -200,44 +202,42 @@
             </div>
 
 
-        <script>
-            function toggleSubMenu(navItem) {
-                // Lấy phần tử menu con ngay sau mục vừa nhấp
-                const subMenu = navItem.nextElementSibling;
-                // Lấy mũi tên bên trong mục vừa nhấp
-                const arrow = navItem.querySelector('.nav-arrow');
+            <script>
+                function toggleSubMenu(navItem) {
+                    // Lấy phần tử menu con ngay sau mục vừa nhấp
+                    const subMenu = navItem.nextElementSibling;
+                    // Lấy mũi tên bên trong mục vừa nhấp
+                    const arrow = navItem.querySelector('.nav-arrow');
 
-                // Kiểm tra xem có phải là menu con hợp lệ không
-                if (subMenu && subMenu.classList.contains('sub-nav-container')) {
-                    // Nếu đang ẩn thì hiện ra
-                    if (subMenu.style.display === "none" || subMenu.style.display === "") {
-                        subMenu.style.display = "block";
-                        navItem.classList.add('active'); // Thêm class 'active' để làm nổi bật
-                        if (arrow) {
-                            arrow.style.transform = "rotate(180deg)"; // Xoay mũi tên
-                        }
-                    } else {
-                        // Nếu đang hiện thì ẩn đi
-                        subMenu.style.display = "none";
-                        navItem.classList.remove('active'); // Bỏ class 'active'
-                        if (arrow) {
-                            arrow.style.transform = "rotate(0deg)"; // Quay lại mũi tên
+                    // Kiểm tra xem có phải là menu con hợp lệ không
+                    if (subMenu && subMenu.classList.contains('sub-nav-container')) {
+                        // Nếu đang ẩn thì hiện ra
+                        if (subMenu.style.display === "none" || subMenu.style.display === "") {
+                            subMenu.style.display = "block";
+                            navItem.classList.add('active'); // Thêm class 'active' để làm nổi bật
+                            if (arrow) {
+                                arrow.style.transform = "rotate(180deg)"; // Xoay mũi tên
+                            }
+                        } else {
+                            // Nếu đang hiện thì ẩn đi
+                            subMenu.style.display = "none";
+                            navItem.classList.remove('active'); // Bỏ class 'active'
+                            if (arrow) {
+                                arrow.style.transform = "rotate(0deg)"; // Quay lại mũi tên
+                            }
                         }
                     }
                 }
-            }
 
-            // Giữ lại hàm gốc cho banner
-            function toggleBanner() {
-                var bannerContent = document.getElementById('banner-content');
-                if (bannerContent.style.display === 'none') {
-                    bannerContent.style.display = 'block';
-                } else {
-                    bannerContent.style.display = 'none';
+                // Giữ lại hàm gốc cho banner
+                function toggleBanner() {
+                    var bannerContent = document.getElementById('banner-content');
+                    if (bannerContent.style.display === 'none') {
+                        bannerContent.style.display = 'block';
+                    } else {
+                        bannerContent.style.display = 'none';
+                    }
                 }
-            }
-        </script>
+            </script>
 </body>
 
-
-</html>

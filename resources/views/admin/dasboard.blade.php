@@ -1,5 +1,3 @@
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    </head>
+</head>
 
 <body>
     <div class="dashboard-container">
@@ -17,7 +15,8 @@
             <div class="logo-container">
                 <div class="logo">
                     <i class="fas fa-clock"></i>
-                    <span>PREDATOR</span>
+                    <a href="#">PREDATOR</a>
+                    <span></span>
                 </div>
             </div>
 
@@ -30,7 +29,7 @@
                     <i class="fas fa-shopping-bag"></i>
                     <span onclick="toggleBanner()">Giỏ hàng </span>
                     <div id="banner-content" style="display: none;">
-                       
+
                     </div>
                 </div>
 
@@ -40,15 +39,15 @@
                     <i class="fas fa-chevron-down nav-arrow"></i>
                 </div>
                 <div class="sub-nav-container" style="display: none;">
-                    <a href="#" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.category.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-tags"></i>
                         <span> Danh mục</span>
                     </a>
-                    <a href="#" class="nav-item sub-nav-item">
-                        <i class="fas fa-box-open"></i>
-                        <span> Sản phẩm</span>
-                    </a>
-                    <a href="#" class="nav-item sub-nav-item">
+                   <a href="{{ route('admin.product.index') }}" class="nav-item sub-nav-item">
+    <i class="fas fa-box-open"></i>
+    <span> Sản phẩm</span>
+</a>
+                    <a href="{{ route('admin.brand.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-box-open"></i>
                         <span> Thương hiệu</span>
                     </a>
@@ -59,6 +58,9 @@
                     <a href="{{ route('admin.admin.banner') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-box-open"></i>
                         <span>Banner</span>
+                    </a>
+                    <a href="{{ route('admin.voucher.index') }}" class="nav-item sub-nav-item">
+                        <i class="fas fa-ticket-alt"></i>Voucher
                     </a>
                 </div>
                 <div class="nav-item">
@@ -422,4 +424,3 @@
         }
     </script>
 </body>
-

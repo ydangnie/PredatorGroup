@@ -1,13 +1,11 @@
-
-
 @section('content1')
 <div class="container">
     <h2>Chỉnh sửa Banner</h2>
-    
+
     {{-- Hàm route trỏ đến route update mà ta vừa khai báo --}}
     <form action="{{ route('admin.banner.update', $banner->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
-        
+
         <div class="mb-3">
             <label>Tiêu đề</label>
             <input type="text" name="title" class="form-control" value="{{ $banner->title }}">
@@ -20,7 +18,17 @@
 
         <div class="mb-3">
             <label>Thương hiệu</label>
-            <input type="text" name="thuonghieu" class="form-control" value="{{ $banner->thuonghieu }}">
+            {{-- Thay input bằng select --}}
+            <select name="thuonghieu" class="form-control">
+                <option value="">-- Chọn thương hiệu --</option>
+                {{-- Lưu ý: Bạn cần truyền $listBrands từ Controller vào view edit riêng này nếu chưa có --}}
+                @foreach($listBrands as $brand)
+                <option value="{{ $brand->ten_thuonghieu }}"
+                    {{ $banner->thuonghieu == $brand->ten_thuonghieu ? 'selected' : '' }}>
+                    {{ $brand->ten_thuonghieu }}
+                </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="mb-3">
