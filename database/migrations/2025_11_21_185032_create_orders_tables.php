@@ -1,5 +1,5 @@
 <?php
-// database/migrations/xxxx_xx_xx_xxxxxx_create_orders_tables.php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -8,37 +8,43 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Bảng Đơn hàng tổng
+        // 1. Bảng đơn hàng (orders)
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Người mua
-            $table->decimal('tong_tien', 12, 2);
-            $table->string('trang_thai')->default('pending'); // pending, processing, completed, cancelled
-            $table->string('phuong_thuc_thanh_toan')->default('cod'); // cod, vnpay, momo
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             
-            // Thông tin giao hàng (lưu riêng tại thời điểm đặt để tránh user đổi địa chỉ profile làm sai lệch đơn cũ)
-            $table->string('nguoi_nhan');
-            $table->string('sdt_nhan');
-            $table->string('dia_chi_giao');
-            $table->text('ghi_chu')->nullable();
+            // Thông tin giao hàng (Chuẩn tiếng Anh để khớp Controller)
+            $table->string('name');             // Tên người nhận
+            $table->string('phone');            // Số điện thoại
+            $table->string('address');          // Địa chỉ giao hàng
+            $table->text('note')->nullable();   // Ghi chú
+            
+            // Thông tin thanh toán
+            $table->string('payment_method');   // cod, banking, vnpay
+            $table->decimal('total_price', 15, 2); // Tổng tiền
+            $table->string('status')->default('pending'); // Trạng thái: pending, paid, etc.
             
             $table->timestamps();
         });
 
-        // Bảng Chi tiết sản phẩm trong đơn hàng
-        Schema::create('order_details', function (Blueprint $table) {
+        // 2. Bảng chi tiết đơn hàng (order_items)
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products'); 
-            $table->integer('so_luong');
-            $table->decimal('don_gia', 12, 2); // Lưu giá tại thời điểm mua
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            
+            $table->string('product_name'); // Lưu tên SP lúc mua
+            $table->integer('quantity');
+            $table->decimal('price', 15, 2);
+            $table->decimal('total', 15, 2);
+            
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('order_details');
+        Schema::dropIfExists('order_items');
         Schema::dropIfExists('orders');
     }
 };
