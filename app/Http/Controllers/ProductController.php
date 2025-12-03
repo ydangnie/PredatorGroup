@@ -34,27 +34,36 @@ class ProductController extends Controller
         $request->validate([
             'tensp' => 'required',
             'gia' => 'required|numeric|min:0',
-            'so_luong' => 'nullable|integer|min:0', // <--- Đã thêm
+            'so_luong' => 'nullable|integer|min:0',
             'hinh_anh' => 'required|image',
             'album.*' => 'nullable|image|max:2048'
         ]);
 
-        $data = $request->except(['variants', 'album']);
+        // Loại bỏ variants, album và _token khỏi mảng data để tạo Product
+        $data = $request->except(['variants', 'album', '_token']);
 
         if ($request->hasFile('hinh_anh')) {
             $data['hinh_anh'] = $request->file('hinh_anh')->store('products', 'public');
         }
 
+        // Tạo sản phẩm chính
         $product = Products::create($data);
 
+        // Xử lý thêm biến thể (ProductVariant)
         if ($request->has('variants')) {
             foreach ($request->variants as $variant) {
+                // Kiểm tra nếu có size hoặc màu thì mới lưu
                 if(!empty($variant['size']) || !empty($variant['color'])) {
-                    $product->variants()->create($variant);
+                    $product->variants()->create([
+                        'size' => $variant['size'],
+                        'color' => $variant['color'],
+                        'stock' => $variant['stock'] ?? 0, // Lấy đúng tên cột stock
+                    ]);
                 }
             }
         }
 
+        // Xử lý album ảnh phụ
         if ($request->hasFile('album')) {
             foreach ($request->file('album') as $file) {
                 $path = $file->store('product_gallery', 'public');
@@ -72,31 +81,40 @@ class ProductController extends Controller
         $request->validate([
             'tensp' => 'required',
             'gia' => 'required|numeric|min:0',
-            'so_luong' => 'nullable|integer|min:0', // <--- Đã thêm
+            'so_luong' => 'nullable|integer|min:0',
             'hinh_anh' => 'nullable|image',
             'album.*' => 'nullable|image|max:2048'
         ]);
 
-        $data = $request->except(['variants', 'album']);
+        // Loại bỏ các trường không thuộc bảng products
+        $data = $request->except(['variants', 'album', '_token']);
 
         if ($request->hasFile('hinh_anh')) {
+            // Xóa ảnh cũ nếu có
             if ($product->hinh_anh && Storage::disk('public')->exists($product->hinh_anh)) {
                 Storage::disk('public')->delete($product->hinh_anh);
             }
             $data['hinh_anh'] = $request->file('hinh_anh')->store('products', 'public');
         }
 
+        // Cập nhật thông tin sản phẩm chính
         $product->update($data);
 
+        // Xử lý biến thể: Xóa cũ -> Thêm mới
         $product->variants()->delete();
         if ($request->has('variants')) {
             foreach ($request->variants as $variant) {
                 if(!empty($variant['size']) || !empty($variant['color'])) {
-                    $product->variants()->create($variant);
+                    $product->variants()->create([
+                        'size' => $variant['size'],
+                        'color' => $variant['color'],
+                        'stock' => $variant['stock'] ?? 0,
+                    ]);
                 }
             }
         }
 
+        // Xử lý thêm ảnh vào album (không xóa ảnh cũ, chỉ thêm mới)
         if ($request->hasFile('album')) {
             foreach ($request->file('album') as $file) {
                 $path = $file->store('product_gallery', 'public');
@@ -110,12 +128,19 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Products::findOrFail($id);
+        
+        // Xóa ảnh chính
         if ($product->hinh_anh && Storage::disk('public')->exists($product->hinh_anh)) {
             Storage::disk('public')->delete($product->hinh_anh);
         }
+        
+        // Xóa album ảnh
         foreach($product->images as $img) {
-            if(Storage::disk('public')->exists($img->image_path)) Storage::disk('public')->delete($img->image_path);
+            if(Storage::disk('public')->exists($img->image_path)) {
+                Storage::disk('public')->delete($img->image_path);
+            }
         }
+        
         $product->delete();
         return redirect()->route('admin.product.index')->with('success', 'Đã xóa sản phẩm!');
     }

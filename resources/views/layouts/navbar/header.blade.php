@@ -3,7 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PREDATORWATCH - Luxury Timepieces</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-<meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 
@@ -95,8 +95,15 @@
                 </button>
             </form>
 
-            <a class="action-btn" href="{{ route('giohang') }}">
+            <a class="action-btn" href="{{ route('giohang') }}" style="position: relative;">
                 <i class="fa-solid fa-cart-shopping"></i>
+                {{-- Badge số lượng --}}
+                <span id="cart-count-badge"
+                    style="position: absolute; top: -5px; right: -5px;
+                 background-color: #D4AF37; color: #000;
+                 font-size: 10px; font-weight: bold;
+                 padding: 2px 5px; border-radius: 50%;
+                 display: none;">0</span>
             </a>
 
             <button class="action-btn">
@@ -118,7 +125,7 @@
                             Quản trị admin
                             @endif
                         </a></li>
-                    <li><a href="#" class="dropdown-item">Hồ sơ</a></li>
+                    <li><a href="{{ route('profile.index') }}" class="dropdown-item">Hồ sơ</a></li>
                     <li style="color: red;"><a href="#" class="dropdown-item">Lịch sử đơn hàng</a></li>
                     <li style="color: red;"><a href="{{ route('dangxuat') }}" class="dropdown-item">Đăng xuất</a></li>
                 </ul>
@@ -128,3 +135,16 @@
         </div>
     </div>
 </header>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('{{ route("cart.count") }}')
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('cart-count-badge');
+                if(data.count > 0) {
+                    badge.innerText = data.count;
+                    badge.style.display = 'inline-block';
+                }
+            });
+    });
+</script>

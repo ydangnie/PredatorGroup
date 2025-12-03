@@ -18,13 +18,16 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'id',
-        'name',
-        'email',
-        'password',
-        'role',
-        'google_id'
-    ];
+    'name',
+    'email',
+    'password',
+    'role',
+    'avatar',
+    'so_dien_thoai',
+    'dia_chi',
+    'gioi_tinh', // Mới thêm
+    'ngay_sinh', // Mới thêm
+];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -46,10 +49,22 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            
+
         ];
     }
-    public function laAdmin(){
+    public function laAdmin()
+    {
         return $this->role === 'admin';
     }
+    // Thêm vào trong class User
+    // Thêm vào trong class User
+public function addresses() {
+    return $this->hasMany(UserAddress::class);
+}
+
+public function orders() {
+    return $this->hasMany(Order::class); // Giả sử bạn đã có Model Order
+}
+
+    
 }

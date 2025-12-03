@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +24,7 @@
             gap: 10px;
             align-items: center;
         }
+
         .variant-item input {
             background: #18181b;
             border: 1px solid #52525b;
@@ -32,15 +34,18 @@
             width: 100%;
             font-size: 0.9rem;
         }
+
         .variant-item input::placeholder {
             color: #71717a;
         }
+
         .btn-remove-variant {
             color: #ef4444;
             cursor: pointer;
             font-size: 1.1rem;
             padding: 0 5px;
         }
+
         .btn-remove-variant:hover {
             color: #dc2626;
         }
@@ -54,6 +59,7 @@
             color: #d4d4d8;
             font-weight: normal;
         }
+
         .gender-option input[type="radio"] {
             accent-color: #3b82f6;
             transform: scale(1.1);
@@ -74,29 +80,31 @@
             font-size: 12px;
             cursor: pointer;
             text-decoration: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             z-index: 10;
         }
+
         .btn-delete-img:hover {
             background: #dc2626;
         }
     </style>
 </head>
+
 <body>
     @include('admin.nav')
 
     <div class="banner-container">
         @if(session('success'))
-            <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
         @endif
 
         <div class="card-box">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
                 <h5><i class="fas fa-box"></i> Danh sách Sản phẩm</h5>
                 @if(isset($productEdit))
-                    <a href="{{ route('admin.product.index') }}" class="btn-action btn-add-new"><i class="fas fa-plus-circle"></i> Thêm Mới</a>
+                <a href="{{ route('admin.product.index') }}" class="btn-action btn-add-new"><i class="fas fa-plus-circle"></i> Thêm Mới</a>
                 @else
-                    <button type="button" class="btn-action btn-add-new" onclick="openModal()"><i class="fas fa-plus-circle"></i> Thêm Mới</button>
+                <button type="button" class="btn-action btn-add-new" onclick="openModal()"><i class="fas fa-plus-circle"></i> Thêm Mới</button>
                 @endif
             </div>
 
@@ -125,7 +133,7 @@
                                 <div style="font-weight: 700; color: #f4f4f5;">{{ $item->tensp }}</div>
                                 @if($item->sku) <small style="color:#aaa">{{ $item->sku }}</small> @endif
                                 @if($item->images->count() > 0)
-                                    <div style="font-size: 0.75rem; color: #3b82f6; margin-top: 3px;">+{{ $item->images->count() }} ảnh phụ</div>
+                                <div style="font-size: 0.75rem; color: #3b82f6; margin-top: 3px;">+{{ $item->images->count() }} ảnh phụ</div>
                                 @endif
                             </td>
                             <td>
@@ -145,7 +153,7 @@
                             <td>
                                 <div style="max-height: 60px; overflow-y: auto; font-size: 0.8rem; color: #a1a1aa;">
                                     @foreach($item->variants as $v)
-                                        <div>{{ $v->size }} - {{ $v->color }} (SL: {{ $v->stock }})</div>
+                                    <div>{{ $v->size }} - {{ $v->color }} (SL: {{ $v->stock }})</div>
                                     @endforeach
                                 </div>
                             </td>
@@ -161,7 +169,7 @@
                     </tbody>
                 </table>
                 @if($products->isEmpty())
-                    <div style="padding: 30px; text-align: center; color: #888;">Chưa có dữ liệu sản phẩm.</div>
+                <div style="padding: 30px; text-align: center; color: #888;">Chưa có dữ liệu sản phẩm.</div>
                 @endif
             </div>
         </div>
@@ -176,15 +184,15 @@
 
             <div class="card-body-custom">
                 @if($errors->any())
-                    <div class="alert alert-danger" style="margin-bottom: 20px;">
-                        <ul style="margin: 0; padding-left: 20px;">
-                            @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
-                        </ul>
-                    </div>
+                <div class="alert alert-danger" style="margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+                    </ul>
+                </div>
                 @endif
 
                 <form action="{{ isset($productEdit) ? route('admin.product.update', $productEdit->id) : route('admin.product.store') }}"
-                      method="POST" enctype="multipart/form-data">
+                    method="POST" enctype="multipart/form-data">
                     @csrf
                     @if(isset($productEdit)) @method('PUT') @endif
 
@@ -193,7 +201,7 @@
                             <div class="form-group">
                                 <label class="form-label">Tên sản phẩm <span style="color:red">*</span></label>
                                 <input type="text" name="tensp" class="form-input" required
-                                       value="{{ isset($productEdit) ? $productEdit->tensp : old('tensp') }}">
+                                    value="{{ isset($productEdit) ? $productEdit->tensp : old('tensp') }}">
                             </div>
 
                             <div class="form-group">
@@ -209,17 +217,17 @@
                                 <div class="form-group" style="flex: 1;">
                                     <label class="form-label">Giá bán <span style="color:red">*</span></label>
                                     <input type="number" name="gia" class="form-input" required
-                                           value="{{ isset($productEdit) ? $productEdit->gia : old('gia') }}">
+                                        value="{{ isset($productEdit) ? $productEdit->gia : old('gia') }}">
                                 </div>
                                 <div class="form-group" style="flex: 1;">
                                     <label class="form-label">Số lượng kho</label>
                                     <input type="number" name="so_luong" class="form-input" min="0"
-                                           value="{{ isset($productEdit) ? $productEdit->so_luong : old('so_luong', 0) }}">
+                                        value="{{ isset($productEdit) ? $productEdit->so_luong : old('so_luong', 0) }}">
                                 </div>
                                 <div class="form-group" style="flex: 1;">
                                     <label class="form-label">SKU</label>
                                     <input type="text" name="sku" class="form-input"
-                                           value="{{ isset($productEdit) ? $productEdit->sku : old('sku') }}">
+                                        value="{{ isset($productEdit) ? $productEdit->sku : old('sku') }}">
                                 </div>
                             </div>
 
@@ -229,7 +237,7 @@
                                     <select name="category_id" class="form-input">
                                         <option value="">-- Chọn --</option>
                                         @foreach($categories as $cat)
-                                            <option value="{{ $cat->id }}" {{ (isset($productEdit) && $productEdit->category_id == $cat->id) ? 'selected' : '' }}>{{ $cat->ten_danhmuc }}</option>
+                                        <option value="{{ $cat->id }}" {{ (isset($productEdit) && $productEdit->category_id == $cat->id) ? 'selected' : '' }}>{{ $cat->ten_danhmuc }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -238,7 +246,7 @@
                                     <select name="brand_id" class="form-input">
                                         <option value="">-- Chọn --</option>
                                         @foreach($brands as $br)
-                                            <option value="{{ $br->id }}" {{ (isset($productEdit) && $productEdit->brand_id == $br->id) ? 'selected' : '' }}>{{ $br->ten_thuonghieu }}</option>
+                                        <option value="{{ $br->id }}" {{ (isset($productEdit) && $productEdit->brand_id == $br->id) ? 'selected' : '' }}>{{ $br->ten_thuonghieu }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -249,7 +257,7 @@
                                 <input type="file" name="hinh_anh" class="form-input" onchange="previewFile(this)" {{ isset($productEdit) ? '' : 'required' }}>
                                 <div style="margin-top: 10px;">
                                     <img id="preview" src="{{ isset($productEdit) && $productEdit->hinh_anh ? asset('storage/'.$productEdit->hinh_anh) : '' }}"
-                                         style="max-width: 120px; border-radius: 5px; border: 1px solid #555; display: {{ isset($productEdit) && $productEdit->hinh_anh ? 'block' : 'none' }}">
+                                        style="max-width: 120px; border-radius: 5px; border: 1px solid #555; display: {{ isset($productEdit) && $productEdit->hinh_anh ? 'block' : 'none' }}">
                                 </div>
                             </div>
 
@@ -258,18 +266,19 @@
                                 <input type="file" name="album[]" class="form-input" multiple onchange="previewAlbum(this)">
                                 <div id="album-preview" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
                                 @if(isset($productEdit) && $productEdit->images->count() > 0)
-                                    <div style="margin-top: 10px; font-size: 0.85rem; color: #ccc;">Ảnh hiện tại:</div>
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px;">
-                                        @foreach($productEdit->images as $img)
-                                            <div style="position: relative; width: 60px; height: 60px;">
-                                                <img src="{{ asset('storage/'.$img->image_path) }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #555;">
-                                                <a href="{{ route('admin.product.image.delete', $img->id) }}"
-                                                   onclick="event.preventDefault(); if(confirm('Xóa ảnh này?')) document.getElementById('del-img-{{$img->id}}').submit();"
-                                                   class="btn-delete-img">&times;</a>
-                                                <form id="del-img-{{$img->id}}" action="{{ route('admin.product.image.delete', $img->id) }}" method="POST" style="display: none;">@csrf @method('DELETE')</form>
-                                            </div>
-                                        @endforeach
+                                <div style="margin-top: 10px; font-size: 0.85rem; color: #ccc;">Ảnh hiện tại:</div>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px;">
+                                    @foreach($productEdit->images as $img)
+                                    <div style="position: relative; width: 60px; height: 60px;">
+                                        <img src="{{ asset('storage/'.$img->image_path) }}"
+                                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #555;">
+
+                                        {{-- Dùng button thường gọi hàm Javascript --}}
+                                        <button type="button" class="btn-delete-img"
+                                            onclick="deleteImage('{{ route('admin.product.image.delete', $img->id) }}')">&times;</button>
                                     </div>
+                                    @endforeach
+                                </div>
                                 @endif
                             </div>
                         </div>
@@ -282,21 +291,21 @@
                                 </label>
                                 <div id="variant-container" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
                                     @if(isset($productEdit) && $productEdit->variants->count() > 0)
-                                        @foreach($productEdit->variants as $index => $v)
-                                        <div class="variant-item">
-                                            <input type="text" name="variants[{{$index}}][size]" placeholder="Size" value="{{ $v->size }}">
-                                            <input type="text" name="variants[{{$index}}][color]" placeholder="Màu" value="{{ $v->color }}">
-                                            <input type="number" name="variants[{{$index}}][stock]" placeholder="SL" value="{{ $v->stock }}" style="width: 60px;">
-                                            <i class="fas fa-times btn-remove-variant" onclick="this.parentElement.remove()"></i>
-                                        </div>
-                                        @endforeach
+                                    @foreach($productEdit->variants as $index => $v)
+                                    <div class="variant-item">
+                                        <input type="text" name="variants[{{$index}}][size]" placeholder="Size" value="{{ $v->size }}">
+                                        <input type="text" name="variants[{{$index}}][color]" placeholder="Màu" value="{{ $v->color }}">
+                                        <input type="number" name="variants[{{$index}}][stock]" placeholder="SL" value="{{ $v->stock }}" style="width: 60px;">
+                                        <i class="fas fa-times btn-remove-variant" onclick="this.parentElement.remove()"></i>
+                                    </div>
+                                    @endforeach
                                     @else
-                                        <div class="variant-item">
-                                            <input type="text" name="variants[0][size]" placeholder="Size">
-                                            <input type="text" name="variants[0][color]" placeholder="Màu">
-                                            <input type="number" name="variants[0][stock]" placeholder="SL" value="0" style="width: 60px;">
-                                            <i class="fas fa-times btn-remove-variant" onclick="this.parentElement.remove()"></i>
-                                        </div>
+                                    <div class="variant-item">
+                                        <input type="text" name="variants[0][size]" placeholder="Size">
+                                        <input type="text" name="variants[0][color]" placeholder="Màu">
+                                        <input type="number" name="variants[0][stock]" placeholder="SL" value="0" style="width: 60px;">
+                                        <i class="fas fa-times btn-remove-variant" onclick="this.parentElement.remove()"></i>
+                                    </div>
                                     @endif
                                 </div>
                             </div>
@@ -309,9 +318,9 @@
 
                     <div style="margin-top: 20px; text-align: right; border-top: 1px solid #3f3f46; padding-top: 15px;">
                         @if(isset($productEdit))
-                            <a href="{{ route('admin.product.index') }}" class="btn-action btn-back" style="text-decoration: none; margin-right: 10px;">Hủy</a>
+                        <a href="{{ route('admin.product.index') }}" class="btn-action btn-back" style="text-decoration: none; margin-right: 10px;">Hủy</a>
                         @else
-                            <button type="button" class="btn-action btn-back" onclick="closeModal()" style="margin-right: 10px;">Hủy</button>
+                        <button type="button" class="btn-action btn-back" onclick="closeModal()" style="margin-right: 10px;">Hủy</button>
                         @endif
                         <button type="submit" class="btn-action btn-save">Lưu Thay Đổi</button>
                     </div>
@@ -319,36 +328,66 @@
             </div>
         </div>
     </div>
+</form>
+    {{-- ^^^ HÃY CHẮC CHẮN BẠN ĐÃ DÁN CODE DƯỚI ĐÂY SAU THẺ ĐÓNG FORM NÀY ^^^ --}}
+
+    {{-- Form ẩn dùng chung để xóa ảnh (Nằm ngoài form chính nên không gây lỗi) --}}
+    <form id="delete-image-form" action="" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
 
     <script>
         const modal = document.getElementById('productModal');
-        let variantIndex = {{ isset($productEdit) ? $productEdit->variants->count() : 1 }};
+        // Khởi tạo variantIndex: đếm số biến thể hiện có để tạo index tiếp theo
+        let variantIndex = {{ isset($productEdit) && $productEdit->variants ? $productEdit->variants->count() : 1 }};
 
-        function openModal() { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-        function closeModal() {
-            @if(!isset($productEdit)) modal.style.display = 'none'; document.body.style.overflow = 'auto'; @endif
+        function openModal() {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
+
+        function closeModal() {
+            @if(!isset($productEdit))
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            @else
+                // Nếu đang sửa mà ấn đóng (hoặc click ra ngoài), quay về danh sách
+                window.location.href = "{{ route('admin.product.index') }}";
+            @endif
+        }
+
         function previewFile(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
-                reader.onload = function(e) { document.getElementById('preview').src = e.target.result; document.getElementById('preview').style.display = 'block'; }
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                }
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
         function previewAlbum(input) {
-            var container = document.getElementById('album-preview'); container.innerHTML = '';
+            var container = document.getElementById('album-preview');
+            container.innerHTML = '';
             if (input.files) {
                 Array.from(input.files).forEach(file => {
                     var reader = new FileReader();
                     reader.onload = function(e) {
-                        var img = document.createElement('img'); img.src = e.target.result;
-                        img.style.width = '50px'; img.style.height = '50px'; img.style.objectFit = 'cover'; img.style.borderRadius = '3px';
+                        var img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.width = '50px';
+                        img.style.height = '50px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '3px';
                         container.appendChild(img);
                     }
                     reader.readAsDataURL(file);
                 });
             }
         }
+
         function addVariant() {
             const html = `<div class="variant-item">
                 <input type="text" name="variants[${variantIndex}][size]" placeholder="Size">
@@ -358,10 +397,30 @@
             document.getElementById('variant-container').insertAdjacentHTML('beforeend', html);
             variantIndex++;
         }
+
+        // Hàm xóa ảnh (Được gọi từ nút X trên ảnh)
+        function deleteImage(url) {
+            if (confirm('Bạn có chắc chắn muốn xóa ảnh này không?')) {
+                var form = document.getElementById('delete-image-form');
+                form.action = url;
+                form.submit();
+            }
+        }
+
+        // Tự động mở Modal nếu đang sửa hoặc có lỗi validate
         document.addEventListener("DOMContentLoaded", function() {
-            @if(isset($productEdit) || $errors->any()) openModal(); @endif
+            @if(isset($productEdit) || $errors->any())
+                openModal();
+            @endif
         });
-        window.onclick = function(event) { if (event.target == modal) { @if(!isset($productEdit)) closeModal(); @endif } }
+
+        // Đóng modal khi click ra ngoài (chỉ áp dụng khi thêm mới)
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                @if(!isset($productEdit)) closeModal(); @endif
+            }
+        }
     </script>
 </body>
+
 </html>

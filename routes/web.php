@@ -71,6 +71,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Thêm mới
     Route::post('/banner/store', [BannerController::class, 'store'])->name('admin.banner.store');
 
+    // Form sửa (lấy thông tin banner theo id)
     Route::get('/banner/edit/{id}', [BannerController::class, 'edit'])->name('admin.banner.edit');
 
     // Thực hiện cập nhật (dùng method POST hoặc PUT đều được, ở đây mình dùng POST cho đơn giản với form HTML)
@@ -120,11 +121,41 @@ Route::middleware(['auth', 'admin'])
     ->group(function () {
         // (2) Resource tên là "product"
         Route::resource('product', ProductController::class);
+        Route::resource('users', UsersController::class);
+        Route::delete('/product-image/{id}', [ProductController::class, 'deleteImage'])->name('product.image.delete');
     });
-Route::delete('/product-image/{id}', [ProductController::class, 'deleteImage'])->name('admin.product.image.delete');
+
+    use App\Http\Controllers\ProfileController;
+
+// Nhóm route yêu cầu đăng nhập
+Route::middleware(['auth'])->group(function () {
+    Route::get('/ho-so', [ProfileController::class, 'index'])->name('profile.index');
+    Route::post('/ho-so/update', [ProfileController::class, 'update'])->name('profile.update');
+    // Route mới cho địa chỉ
+    Route::post('/ho-so/address', [ProfileController::class, 'addAddress'])->name('profile.address.add');
+    Route::delete('/ho-so/address/{id}', [ProfileController::class, 'deleteAddress'])->name('profile.address.delete');
+    Route::get('/ho-so/don-hang/{id}', [ProfileController::class, 'showOrder'])->name('profile.order.show');
+});
 
 
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // ... các route cũ ...
 
+    // Quản lý Tồn kho
+    Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
+    Route::post('/inventory/update', [App\Http\Controllers\InventoryController::class, 'update'])->name('inventory.update');
+});
+
+Route::post('/add-to-cart', [GioHangController::class, 'addToCart'])->name('cart.add');
+Route::patch('/update-cart', [GioHangController::class, 'updateCart'])->name('cart.update'); // Mới
+Route::delete('/remove-from-cart', [GioHangController::class, 'removeCart'])->name('cart.remove'); // Mới
+Route::get('/cart-count', [GioHangController::class, 'getCartCount'])->name('cart.count');
+// Thêm vào nhóm middleware auth nếu bắt buộc đăng nhập để mua, hoặc để ngoài nếu cho phép khách vãng lai
+Route::middleware(['auth'])->group(function () {
+    Route::get('/thanh-toan', [GioHangController::class, 'checkout'])->name('checkout');
+    Route::post('/thanh-toan', [GioHangController::class, 'processCheckout'])->name('checkout.process');
+    Route::get('/thanh-toan/vnpay-return', [GioHangController::class, 'vnpayReturn'])->name('vnpay.return');
+});
 
 // author: VuNamPhi
 // google auth login
@@ -132,3 +163,5 @@ Route::middleware('google.guest')->prefix('auth/google')->name('auth.')->group(f
     Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google');
     Route::get('/callback', [GoogleAuthController::class, 'callback']);
 });
+
+
