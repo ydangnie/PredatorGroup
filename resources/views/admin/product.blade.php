@@ -7,10 +7,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     {{-- Sử dụng CSS chung của Admin --}}
     @vite(['resources/css/admin/banner.css'])
-    
+
     <style>
         /* CSS riêng cho phần variants */
         .variant-item {
@@ -44,7 +44,7 @@
         .btn-remove-variant:hover {
             color: #dc2626;
         }
-        
+
         /* CSS cho radio button giới tính */
         .gender-option {
             display: flex;
@@ -61,17 +61,17 @@
 
         /* Nút xóa ảnh trong album */
         .btn-delete-img {
-            position: absolute; 
-            top: -8px; 
-            right: -8px; 
-            background: #ef4444; 
-            color: white; 
-            border-radius: 50%; 
-            width: 20px; 
-            height: 20px; 
-            text-align: center; 
-            line-height: 20px; 
-            font-size: 12px; 
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
             cursor: pointer;
             text-decoration: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -84,12 +84,12 @@
 </head>
 <body>
     @include('admin.nav')
-    
+
     <div class="banner-container">
         @if(session('success'))
             <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
         @endif
-        
+
         <div class="card-box">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
                 <h5><i class="fas fa-box"></i> Danh sách Sản phẩm</h5>
@@ -173,7 +173,7 @@
                 <h5><i class="fas {{ isset($productEdit) ? 'fa-edit' : 'fa-plus' }}"></i> {{ isset($productEdit) ? 'Cập Nhật Sản Phẩm' : 'Thêm Sản Phẩm Mới' }}</h5>
                 <button type="button" class="close-modal" onclick="closeModal()">&times;</button>
             </div>
-            
+
             <div class="card-body-custom">
                 @if($errors->any())
                     <div class="alert alert-danger" style="margin-bottom: 20px;">
@@ -183,7 +183,7 @@
                     </div>
                 @endif
 
-                <form action="{{ isset($productEdit) ? route('admin.product.update', $productEdit->id) : route('admin.product.store') }}" 
+                <form action="{{ isset($productEdit) ? route('admin.product.update', $productEdit->id) : route('admin.product.store') }}"
                       method="POST" enctype="multipart/form-data">
                     @csrf
                     @if(isset($productEdit)) @method('PUT') @endif
@@ -192,10 +192,10 @@
                         <div class="col-md-6" style="padding-right: 20px; border-right: 1px solid #3f3f46;">
                             <div class="form-group">
                                 <label class="form-label">Tên sản phẩm <span style="color:red">*</span></label>
-                                <input type="text" name="tensp" class="form-input" required 
+                                <input type="text" name="tensp" class="form-input" required
                                        value="{{ isset($productEdit) ? $productEdit->tensp : old('tensp') }}">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">Giới tính <span style="color:red">*</span></label>
                                 <div style="display: flex; gap: 20px;">
@@ -208,7 +208,7 @@
                             <div class="row" style="display: flex; gap: 10px;">
                                 <div class="form-group" style="flex: 1;">
                                     <label class="form-label">Giá bán <span style="color:red">*</span></label>
-                                    <input type="number" name="gia" class="form-input" required 
+                                    <input type="number" name="gia" class="form-input" required
                                            value="{{ isset($productEdit) ? $productEdit->gia : old('gia') }}">
                                 </div>
                                 <div class="form-group" style="flex: 1;">
@@ -218,7 +218,7 @@
                                 </div>
                                 <div class="form-group" style="flex: 1;">
                                     <label class="form-label">SKU</label>
-                                    <input type="text" name="sku" class="form-input" 
+                                    <input type="text" name="sku" class="form-input"
                                            value="{{ isset($productEdit) ? $productEdit->sku : old('sku') }}">
                                 </div>
                             </div>
@@ -248,7 +248,7 @@
                                 <label class="form-label">Hình ảnh chính <span style="color:red">*</span></label>
                                 <input type="file" name="hinh_anh" class="form-input" onchange="previewFile(this)" {{ isset($productEdit) ? '' : 'required' }}>
                                 <div style="margin-top: 10px;">
-                                    <img id="preview" src="{{ isset($productEdit) && $productEdit->hinh_anh ? asset('storage/'.$productEdit->hinh_anh) : '' }}" 
+                                    <img id="preview" src="{{ isset($productEdit) && $productEdit->hinh_anh ? asset('storage/'.$productEdit->hinh_anh) : '' }}"
                                          style="max-width: 120px; border-radius: 5px; border: 1px solid #555; display: {{ isset($productEdit) && $productEdit->hinh_anh ? 'block' : 'none' }}">
                                 </div>
                             </div>
@@ -263,7 +263,7 @@
                                         @foreach($productEdit->images as $img)
                                             <div style="position: relative; width: 60px; height: 60px;">
                                                 <img src="{{ asset('storage/'.$img->image_path) }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #555;">
-                                                <a href="{{ route('admin.product.image.delete', $img->id) }}" 
+                                                <a href="{{ route('admin.product.image.delete', $img->id) }}"
                                                    onclick="event.preventDefault(); if(confirm('Xóa ảnh này?')) document.getElementById('del-img-{{$img->id}}').submit();"
                                                    class="btn-delete-img">&times;</a>
                                                 <form id="del-img-{{$img->id}}" action="{{ route('admin.product.image.delete', $img->id) }}" method="POST" style="display: none;">@csrf @method('DELETE')</form>
@@ -277,7 +277,7 @@
                         <div class="col-md-6" style="padding-left: 20px;">
                             <div class="form-group">
                                 <label class="form-label" style="display:flex; justify-content:space-between;">
-                                    Biến thể (Size / Màu / Tồn kho) 
+                                    Biến thể (Size / Màu / Tồn kho)
                                     <button type="button" class="btn btn-sm btn-secondary" onclick="addVariant()"><i class="fas fa-plus"></i> Thêm</button>
                                 </label>
                                 <div id="variant-container" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">

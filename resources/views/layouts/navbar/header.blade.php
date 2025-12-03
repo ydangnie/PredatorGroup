@@ -94,7 +94,7 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </form>
-            
+
             <a class="action-btn" href="{{ route('giohang') }}">
                 <i class="fa-solid fa-cart-shopping"></i>
             </a>
@@ -114,7 +114,7 @@
                 </a>
                 <ul class="dropdown">
                     @if(Auth::user()->role === 'admin')
-                    <li><a href="{{ route('admin.dasboard') }}" class="dropdown-item">
+                    <li><a href="{{ route('admin.dashboard') }}" class="dropdown-item">
                             Quản trị admin
                             @endif
                         </a></li>

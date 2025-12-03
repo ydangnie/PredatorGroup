@@ -1,9 +1,7 @@
 @include('layouts.navbar.header')
 
 <main class="main-content">
-
    @include('layouts.main')
-
 </main>
 
 
