@@ -3,7 +3,6 @@
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthDangKy;
-use App\Http\Controllers\AuthDangNhap;
 use App\Http\Controllers\ChatbotController;
 
 use App\Http\Controllers\BannerController;
@@ -18,12 +17,10 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\SanPhamController;
 use App\Http\Controllers\UserConTroller;
 use App\Http\Controllers\UsersController;
-use Faker\Guesser\Name;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ProfileController;
 
 Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('home.index');
@@ -125,7 +122,7 @@ Route::middleware(['auth', 'admin'])
         Route::delete('/product-image/{id}', [ProductController::class, 'deleteImage'])->name('product.image.delete');
     });
 
-    use App\Http\Controllers\ProfileController;
+
 
 // Nhóm route yêu cầu đăng nhập
 Route::middleware(['auth'])->group(function () {
@@ -163,5 +160,3 @@ Route::middleware('google.guest')->prefix('auth/google')->name('auth.')->group(f
     Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google');
     Route::get('/callback', [GoogleAuthController::class, 'callback']);
 });
-
-
