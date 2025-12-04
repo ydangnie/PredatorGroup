@@ -7,23 +7,23 @@ use Illuminate\Http\Request;
 
 class VoucherController extends Controller
 {
-    // 1. Hiển thị danh sách & Form Modal
+    // 1. Hiển thị danh sách
     public function index()
     {
-        $vouchers = Voucher::orderBy('created_at', 'desc')->get();
+        $vouchers = Voucher::latest()->get();
         $voucherEdit = null;
         return view('admin.voucher', compact('vouchers', 'voucherEdit'));
     }
 
-    // 2. Chuyển sang chế độ sửa (trên cùng trang index)
+    // 2. Hiển thị form sửa
     public function edit($id)
     {
-        $vouchers = Voucher::orderBy('created_at', 'desc')->get();
+        $vouchers = Voucher::latest()->get();
         $voucherEdit = Voucher::findOrFail($id);
         return view('admin.voucher', compact('vouchers', 'voucherEdit'));
     }
 
-    // 3. Thêm mới
+    // 3. Xử lý Thêm mới
     public function store(Request $request)
     {
         $request->validate([
@@ -33,17 +33,26 @@ class VoucherController extends Controller
             'quantity' => 'required|integer|min:1',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'required|boolean',
         ], [
             'code.unique' => 'Mã giảm giá này đã tồn tại!',
             'end_date.after_or_equal' => 'Ngày kết thúc phải sau ngày bắt đầu.',
         ]);
 
-        Voucher::create($request->all());
+        Voucher::create([
+            'code' => strtoupper($request->code), // Tự động viết hoa mã
+            'type' => $request->type,
+            'value' => $request->value,
+            'quantity' => $request->quantity,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('admin.voucher.index')->with('success', 'Thêm mã giảm giá thành công!');
     }
 
-    // 4. Cập nhật
+    // 4. Xử lý Cập nhật
     public function update(Request $request, $id)
     {
         $voucher = Voucher::findOrFail($id);
@@ -55,11 +64,20 @@ class VoucherController extends Controller
             'quantity' => 'required|integer|min:0',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'required|boolean',
         ]);
 
-        $voucher->update($request->all());
+        $voucher->update([
+            'code' => strtoupper($request->code),
+            'type' => $request->type,
+            'value' => $request->value,
+            'quantity' => $request->quantity,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+        ]);
 
-        return redirect()->route('admin.voucher.index')->with('success', 'Cập nhật thành công!');
+        return redirect()->route('admin.voucher.index')->with('success', 'Cập nhật mã giảm giá thành công!');
     }
 
     // 5. Xóa

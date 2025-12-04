@@ -39,7 +39,7 @@
           <div class="input-group">
             <label for="login-password">Mật khẩu</label>
             <input type="password" id="login-password" name="password" class="input-field" placeholder="Nhập mật khẩu">
-             @error('password')
+            @error('password')
             <div class="text-danger">{{ $message }}</div>
             @enderror
           </div>
@@ -57,7 +57,9 @@
           <button type="button" class="google-btn">
             <i class="fab fa-google google-icon"></i>
 
-           <a href="#">Đăng nhập với Google</a> 
+            <a href="{{ route('google.login') }}" class="btn-google">
+               Đăng nhập với Google
+            </a>
 
 
           </button>

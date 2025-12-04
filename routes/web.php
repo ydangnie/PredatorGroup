@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthDangKy;
 use App\Http\Controllers\AuthDangNhap;
@@ -152,3 +152,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/thanh-toan', [GioHangController::class, 'processCheckout'])->name('checkout.process');
     Route::get('/thanh-toan/vnpay-return', [GioHangController::class, 'vnpayReturn'])->name('vnpay.return');
 });
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
