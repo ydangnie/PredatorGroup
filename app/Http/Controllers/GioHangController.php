@@ -260,9 +260,9 @@ class GioHangController extends Controller
 
         if (!$result['success']) {
             // --- THANH TOÁN THẤT BẠI / HỦY BỎ ---
-
             // 1. Cập nhật trạng thái đơn hàng thành Cancelled (Đã hủy)
-            $order->update(['status' => 'cancelled']);
+            if($order)
+                $order->update(['status' => 'cancelled']);
 
             // 2. KHÔNG XÓA GIỎ HÀNG -> Để người dùng có thể đặt lại hoặc chọn phương thức khác
             return redirect()->route('giohang')->with('error', 'Giao dịch thanh toán thất bại hoặc đã bị hủy.');
