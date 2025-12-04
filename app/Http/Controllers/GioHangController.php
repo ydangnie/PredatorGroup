@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 
 class GioHangController extends Controller
 {
@@ -178,22 +179,22 @@ class GioHangController extends Controller
             DB::commit();
 
             // 3. Xử lý theo phương thức thanh toán
-            
+
             // === TRƯỜNG HỢP 1: THANH TOÁN VNPAY ===
             if ($request->payment_method == 'banking') {
                 // Tạo URL thanh toán
                 $vnpUrl = $vnpayService->createPaymentUrl($order->id, $total);
-                
+
                 // LƯU Ý QUAN TRỌNG: Chưa xóa giỏ hàng ở đây!
                 // Chỉ chuyển hướng sang VNPAY. Giỏ hàng sẽ được xóa ở hàm vnpayReturn khi thành công.
-                
-                return redirect($vnpUrl);
+
+                return redirect()->to($vnpUrl);
             }
 
             // === TRƯỜNG HỢP 2: THANH TOÁN COD ===
             // Xóa giỏ hàng ngay lập tức vì đơn đã đặt thành công
             session()->forget('cart');
-            
+
             return redirect()->route('profile.order.show', $order->id)->with('success', 'Đặt hàng thành công! Chúng tôi sẽ sớm liên hệ.');
 
         } catch (\Exception $e) {
@@ -206,7 +207,7 @@ class GioHangController extends Controller
     public function vnpayReturn(Request $request)
     {
         // Lấy dữ liệu trả về
-        $vnp_ResponseCode = $request->input('vnp_ResponseCode'); 
+        $vnp_ResponseCode = $request->input('vnp_ResponseCode');
         $orderId = $request->input('vnp_TxnRef');
 
         $order = Order::find($orderId);
@@ -214,22 +215,22 @@ class GioHangController extends Controller
         if ($order) {
             if ($vnp_ResponseCode == '00') {
                 // --- THANH TOÁN THÀNH CÔNG ---
-                
+
                 // 1. Cập nhật trạng thái đơn hàng thành Processing (Đã thanh toán/Đang xử lý)
-                $order->update(['status' => 'processing']); 
-                
+                $order->update(['status' => 'processing']);
+
                 // 2. Bây giờ mới XÓA GIỎ HÀNG
                 session()->forget('cart');
 
                 return redirect()->route('profile.order.show', $orderId)->with('success', 'Thanh toán VNPAY thành công!');
             } else {
                 // --- THANH TOÁN THẤT BẠI / HỦY BỎ ---
-                
+
                 // 1. Cập nhật trạng thái đơn hàng thành Cancelled (Đã hủy)
                 $order->update(['status' => 'cancelled']);
-                
+
                 // 2. KHÔNG XÓA GIỎ HÀNG -> Để người dùng có thể đặt lại hoặc chọn phương thức khác
-                
+
                 return redirect()->route('giohang')->with('error', 'Giao dịch thanh toán thất bại hoặc đã bị hủy.');
             }
         }
