@@ -6,16 +6,16 @@
     <title>Thanh Toán | Predator Group</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/layout/main.css'])
-    
+
     <style>
         body { background-color: #121212; color: #e0e0e0; font-family: 'Inter', sans-serif; }
         .checkout-container { max-width: 1200px; margin: 120px auto 60px; padding: 0 20px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
-        
+
         /* Card Styles */
         .chk-card { background: #1E1E1E; border: 1px solid #333; border-radius: 8px; padding: 30px; }
         .chk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
         .chk-title { font-family: 'Playfair Display', serif; font-size: 24px; color: #fff; margin: 0; }
-        
+
         /* Form */
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; margin-bottom: 8px; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
@@ -48,14 +48,14 @@
         .sm-name { color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 4px; display: block; }
         .sm-meta { color: #888; font-size: 12px; }
         .sm-price { color: #D4AF37; font-size: 14px; font-weight: 600; }
-        
+
         .total-row { display: flex; justify-content: space-between; margin-bottom: 12px; color: #aaa; font-size: 14px; }
         .total-row.final { border-top: 1px solid #333; padding-top: 15px; margin-top: 15px; color: #D4AF37; font-size: 18px; font-weight: 700; }
-        
-        .btn-confirm { 
-            display: block; width: 100%; background: #D4AF37; color: #000; border: none; 
-            padding: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
-            border-radius: 4px; cursor: pointer; transition: 0.3s; margin-top: 25px; 
+
+        .btn-confirm {
+            display: block; width: 100%; background: #D4AF37; color: #000; border: none;
+            padding: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            border-radius: 4px; cursor: pointer; transition: 0.3s; margin-top: 25px;
         }
         .btn-confirm:hover { background: #c5a028; transform: translateY(-2px); }
 
@@ -71,15 +71,15 @@
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px; }
         .close-modal { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
-        
+
         .addr-list-item {
-            background: #121212; border: 1px solid #333; padding: 15px; 
+            background: #121212; border: 1px solid #333; padding: 15px;
             border-radius: 4px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
         }
         .addr-list-item:hover { border-color: #D4AF37; background: #1a1a1a; }
         .addr-name { color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 5px; }
         .addr-text { color: #aaa; font-size: 13px; }
-        
+
         /* Error Alert */
         .alert-error {
             background: rgba(220, 53, 69, 0.1); border: 1px solid #dc3545; color: #dc3545;
@@ -94,7 +94,7 @@
     @include('layouts.navbar.header')
 
     <div class="checkout-container">
-        
+
         {{-- 1. HIỂN THỊ LỖI NẾU CÓ --}}
         @if ($errors->any())
             <div class="alert-error">
@@ -106,7 +106,7 @@
                 </ul>
             </div>
         @endif
-        
+
         @if(session('error'))
             <div class="alert-error">
                 {{ session('error') }}
@@ -125,7 +125,7 @@
                     </button>
                     @endif
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Họ và tên người nhận</label>
                     <input type="text" name="name" id="inpName" class="form-input" value="{{ old('name', $info['name']) }}" required>
@@ -168,6 +168,13 @@
                             <p>Thẻ ATM, Visa, MasterCard, QR Code (Qua cổng VNPAY).</p>
                         </div>
                     </label>
+                     <label class="payment-option" onclick="selectPayment(this)">
+                        <input type="radio" name="payment_method" value="momo" class="payment-radio">
+                        <div class="payment-info">
+                            <h4>Thanh toán qua MOMO</h4>
+                            <p>Thẻ ATM, Visa, MasterCard, QR Code (Qua cổng NOMO).</p>
+                        </div>
+                    </label>
                 </div>
             </div>
         </form>
@@ -193,10 +200,10 @@
             <div class="total-row"><span>Tạm tính</span><span>{{ number_format($total) }}₫</span></div>
             <div class="total-row"><span>Phí vận chuyển</span><span style="color: #4ade80;">Miễn phí</span></div>
             <div class="total-row final"><span>TỔNG CỘNG</span><span>{{ number_format($total) }}₫</span></div>
-            
+
             {{-- NÚT ĐẶT HÀNG (GỌI HÀM JS ĐỂ SUBMIT FORM AN TOÀN) --}}
             <button type="button" onclick="submitCheckout()" class="btn-confirm">ĐẶT HÀNG NGAY</button>
-            
+
             <a href="{{ route('giohang') }}" style="display:block; text-align:center; margin-top:15px; color:#666; font-size:13px; text-decoration:underline;">Quay lại giỏ hàng</a>
         </div>
     </div>

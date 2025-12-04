@@ -6,14 +6,18 @@ use App\Models\Products;
 use App\Models\ProductImage;
 use App\Models\Category;
 use App\Models\Brand;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Products::with(['category', 'brand', 'variants', 'images'])->latest()->get();
+        $products = Products::with(['category', 'brand', 'variants', 'images'])
+
+        ->latest()->get();
         $categories = Category::all();
         $brands = Brand::all();
         $productEdit = null;
@@ -77,7 +81,7 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Products::findOrFail($id);
-        
+
         $request->validate([
             'tensp' => 'required',
             'gia' => 'required|numeric|min:0',
@@ -128,19 +132,19 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Products::findOrFail($id);
-        
+
         // Xóa ảnh chính
         if ($product->hinh_anh && Storage::disk('public')->exists($product->hinh_anh)) {
             Storage::disk('public')->delete($product->hinh_anh);
         }
-        
+
         // Xóa album ảnh
         foreach($product->images as $img) {
             if(Storage::disk('public')->exists($img->image_path)) {
                 Storage::disk('public')->delete($img->image_path);
             }
         }
-        
+
         $product->delete();
         return redirect()->route('admin.product.index')->with('success', 'Đã xóa sản phẩm!');
     }
@@ -153,5 +157,34 @@ class ProductController extends Controller
         }
         $image->delete();
         return back()->with('success', 'Đã xóa ảnh khỏi album');
+    }
+    // VuNamPhi
+    // Search Product
+    public function search(Request $request)
+    {
+        $keyword = $request->get('keyword');
+        $columns = ['tensp', 'sku', 'gender', 'mota'];
+        $products =  Products::with(['category', 'brand', 'variants', 'images'])
+               ->orWhere(function (Builder $query) use ($columns, $keyword) {
+                foreach ($columns as $value) {
+                    $query->orWhereLike($value, '%' . $keyword . '%');
+                }
+            })
+            ->orWhereHas('brand', function (Builder $query) use ( $keyword) {
+                $query
+                    ->whereLike('ten_thuonghieu', '%' . $keyword . '%')
+                ;
+            })
+            ->orWhereHas('category', function (Builder $query) use ( $keyword) {
+                 $query
+                    ->whereLike('ten_danhmuc', '%' . $keyword . '%');
+            })
+            ->orderBy('tensp', 'asc')
+            ->get();
+        $categories = Category::all();
+        $brands = Brand::all();
+        $productEdit = null;
+
+        return view('admin.product_search', compact('keyword','products', 'categories', 'brands', 'productEdit'));
     }
 }

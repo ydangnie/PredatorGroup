@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Products; // 1. Import Model
+use Illuminate\Database\Eloquent\Builder;
 
 class SanPhamController extends Controller
 {
@@ -63,19 +64,33 @@ class SanPhamController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id) {}
+    //
+    public function sanpham(Request $request)
     {
-        
-    }
-        //
-    public function sanpham(Request $request){
         // 2. Lấy danh sách sản phẩm, kèm Thương hiệu và Danh mục để hiển thị
         // paginate(9): Lấy 9 sản phẩm mỗi trang
+        $keyword = $request->get('keyword');
+        $columns = ['tensp', 'sku', 'gender', 'mota'];
         $products = Products::with(['brand', 'category'])
-                            ->orderBy('created_at', 'desc')
-                            ->paginate(9);
+            ->orWhere(function (Builder $query) use ($columns, $keyword) {
+                foreach ($columns as $value) {
+                    $query->orWhereLike($value, '%' . $keyword . '%');
+                }
+            })
+            ->orWhereHas('brand', function (Builder $query) use ( $keyword) {
+                $query
+                    ->whereLike('ten_thuonghieu', '%' . $keyword . '%')
+                ;
+            })
+            ->orWhereHas('category', function (Builder $query) use ( $keyword) {
+                 $query
+                    ->whereLike('ten_danhmuc', '%' . $keyword . '%');
+            })
+            ->orderBy('tensp', 'asc')
+            ->paginate(9);
 
         // 3. Trả về view kèm biến $products
-        return view('sanpham', compact('products'));
+        return view('sanpham', compact('products', 'keyword'));
     }
 }
