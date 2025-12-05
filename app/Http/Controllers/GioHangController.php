@@ -254,8 +254,7 @@ class GioHangController extends Controller
     public function return(Request $request, MomoService $momo)
     {
         $result = $momo->handleCallback($request);
-
-        $orderId = (int) str_replace('DH_', '', $$result['orderId']);
+        $orderId = (int) str_replace('DH_', '', $result['orderId']);
         $order = Order::find($orderId);
 
         if (!$result['success']) {
