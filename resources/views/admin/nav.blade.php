@@ -91,7 +91,10 @@
         <div class="main-content">
             <div class="top-bar">
                 <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
-                    <input type="text" class="search-bar" placeholder="Tìm kiếm đơn hàng, sản phẩm, khách hàng...">
+                    <form action="{{ route('admin.product.search') }}" >
+                        <input type="text" name="keyword" value="{{ $keyword ?? ''}}" class="search-bar" placeholder="Tìm kiếm đơn hàng, sản phẩm, khách hàng...">
+                       <button class="btn-action" type="submit"><i class="fas fa-search"></i></button>
+                    </form>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -170,9 +173,15 @@
                     <div class="dropdown-container">
                         <div class="user-profile" id="profileToggle">
                             <div class="avatar" style="overflow: hidden;">
-                                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=D4AF37&color=000' }}"
-                                    alt="Avatar"
-                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                @if (file_exists(public_path(Auth::user()->avatar)))
+                                    <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=D4AF37&color=000' }}"
+                                        alt="Avatar"
+                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                @else
+                                    <img src="{{ Auth::user()->avatar ? Auth::user()->avatar : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=D4AF37&color=000' }}"
+                                        alt="Avatar"
+                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                @endif
                             </div>
                             <div>
                                 <div style="font-weight: 600; color: #ffffff;">{{ Auth::user()->name}}</div>

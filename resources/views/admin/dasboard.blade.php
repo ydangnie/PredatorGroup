@@ -73,7 +73,7 @@
                 </div>
 
                 <a href="{{ route('admin.inventory.index') }}" class="nav-item sub-nav-item">
-                    
+
                     <i class="fas fa-warehouse"></i>
                     <span> Kho hàng</span>
                 </a>
@@ -95,9 +95,9 @@
 
         <div class="main-content">
             <div class="top-bar">
-                <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                {{-- <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
                     <input type="text" class="search-bar" placeholder="Tìm kiếm đơn hàng, sản phẩm, khách hàng...">
-                </div>
+                </div> --}}
 
                 <div style="display: flex; align-items: center; gap: 1rem;">
 

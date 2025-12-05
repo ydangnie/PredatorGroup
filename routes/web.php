@@ -53,6 +53,7 @@ Route::get('dangxuat', [AuthDangKy::class, 'dangxuat'])->name('dangxuat');
 
 
 Route::get('sanpham', [SanPhamController::class, 'sanpham'])->name('sanpham');
+
 Route::get('lienhe', [LienHeController::class, 'lienhe'])->name('lienhe');
 // Tìm dòng route chitietsanpham cũ và sửa thành:
 Route::get('chi-tiet-san-pham/{id}', [ChiTietSanPhamCtr::class, 'chitietsanpham'])->name('chitietsanpham');
@@ -120,6 +121,7 @@ Route::middleware(['auth', 'admin'])
         Route::resource('product', ProductController::class);
         Route::resource('users', UsersController::class);
         Route::delete('/product-image/{id}', [ProductController::class, 'deleteImage'])->name('product.image.delete');
+        Route::get('product-search', [ProductController::class,'search'])->name('product.search');
     });
 
 
@@ -152,7 +154,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/thanh-toan', [GioHangController::class, 'checkout'])->name('checkout');
     Route::post('/thanh-toan', [GioHangController::class, 'processCheckout'])->name('checkout.process');
     Route::get('/thanh-toan/vnpay-return', [GioHangController::class, 'vnpayReturn'])->name('vnpay.return');
+
 });
+
+Route::post('/payment/momo/ipn', [GioHangController::class, 'ipn'])->name('payment.momo.ipn'); // Không auth
+Route::get('/payment/momo/return', [GioHangController::class, 'return'])->name('payment.momo.return'); // Cho user
 
 // author: VuNamPhi
 // google auth login

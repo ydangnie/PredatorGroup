@@ -87,10 +87,10 @@
         </nav>
 
         <div class="header-actions">
-            <form action="#" method="GET" class="search-box" id="searchBox">
-                <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm...">
+            <form action="{{ route('sanpham') }}" method="GET" class="search-box" id="searchBox">
+                <input type="text" name="keyword" value="{{ $keyword ?? '' }}" class="search-input" placeholder="Tìm kiếm...">
 
-                <button type="button" class="action-btn" onclick="toggleSearch()">
+                <button type="submit" class="action-btn">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </form>
