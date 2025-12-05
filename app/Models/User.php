@@ -27,6 +27,7 @@ class User extends Authenticatable
     'dia_chi',
     'gioi_tinh', // Mới thêm
     'ngay_sinh', // Mới thêm
+    'google_id'
 ];
 
     /**
@@ -37,6 +38,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id'
     ];
 
     /**

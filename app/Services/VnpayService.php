@@ -18,7 +18,7 @@ class VnpayService
         $vnp_Locale = 'vn';
         $vnp_BankCode = ''; // Để trống để người dùng tự chọn ngân hàng
         $vnp_IpAddr = request()->ip();
-
+        // dd($vnp_IpAddr);
         $inputData = array(
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => $vnp_TmnCode,

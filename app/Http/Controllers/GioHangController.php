@@ -183,7 +183,7 @@ class GioHangController extends Controller
             if ($request->payment_method == 'banking') {
                 // Tạo URL thanh toán
                 $vnpUrl = $vnpayService->createPaymentUrl($order->id, $total);
-                
+               
                 // LƯU Ý QUAN TRỌNG: Chưa xóa giỏ hàng ở đây!
                 // Chỉ chuyển hướng sang VNPAY. Giỏ hàng sẽ được xóa ở hàm vnpayReturn khi thành công.
                 
