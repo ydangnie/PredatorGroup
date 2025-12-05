@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\StatisticsController;
+
 
 Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index');
@@ -140,6 +142,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Quản lý Tồn kho
     Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
     Route::post('/inventory/update', [App\Http\Controllers\InventoryController::class, 'update'])->name('inventory.update');
+    Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics');
 });
 
 Route::post('/add-to-cart', [GioHangController::class, 'addToCart'])->name('cart.add');

@@ -654,9 +654,9 @@
  }
  
  .sub-nav-item {
-     padding-left: 3rem !important;
+     padding:  10px 10px 10px 10px;
      /* Thụt lề các mục con */
-     font-size: 0.95rem;
+     font-size: 1rem;
      /* Kích thước chữ nhỏ hơn một chút */
      color: #aaaaaa;
      /* Màu chữ mờ hơn cho mục con */
@@ -668,6 +668,6 @@
  }
  
  .sub-nav-item i {
-     font-size: 0.9em;
+     font-size: 0.9rem;
      /* Icon nhỏ hơn cho mục con */
  }

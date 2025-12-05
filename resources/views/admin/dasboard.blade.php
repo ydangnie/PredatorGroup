@@ -67,13 +67,16 @@
                     <i class="fas fa-users"></i>
                     <span>Khách Hàng</span>
                 </div>
-                <div class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Thống Kê</span>
+
+                <div class="nav-item" style="">
+                    <a href="{{ route('admin.statistics') }}" class="nav-item sub-nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Thống Kê</span>
+                    </a>
                 </div>
 
                 <a href="{{ route('admin.inventory.index') }}" class="nav-item sub-nav-item">
-                    
+
                     <i class="fas fa-warehouse"></i>
                     <span> Kho hàng</span>
                 </a>
@@ -208,12 +211,13 @@
                 </div>
             </div>
 
+            <!-- KPI CARDS - DỮ LIỆU ĐỘNG -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon revenue">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <div class="stat-value">1.245.800.000₫</div>
+                    <div class="stat-value">{{ number_format($revenueThisMonth, 0, ',', '.') }}₫</div>
                     <div class="stat-label">Doanh Thu Tháng Này</div>
                     <span class="stat-change positive">
                         <i class="fas fa-arrow-up"></i> 12.5%
@@ -224,7 +228,7 @@
                     <div class="stat-icon orders">
                         <i class="fas fa-shopping-cart"></i>
                     </div>
-                    <div class="stat-value">1,847</div>
+                    <div class="stat-value">{{ number_format($totalOrders, 0, ',', '.') }}</div>
                     <div class="stat-label">Đơn Hàng</div>
                     <span class="stat-change positive">
                         <i class="fas fa-arrow-up"></i> 8.2%
@@ -235,7 +239,7 @@
                     <div class="stat-icon products">
                         <i class="fas fa-clock"></i>
                     </div>
-                    <div class="stat-value">324</div>
+                    <div class="stat-value">{{ number_format($totalProducts, 0, ',', '.') }}</div>
                     <div class="stat-label">Sản Phẩm</div>
                     <span class="stat-change positive">
                         <i class="fas fa-arrow-up"></i> 3.1%
@@ -246,7 +250,7 @@
                     <div class="stat-icon customers">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="stat-value">12,459</div>
+                    <div class="stat-value">{{ number_format($totalCustomers, 0, ',', '.') }}</div>
                     <div class="stat-label">Khách Hàng</div>
                     <span class="stat-change positive">
                         <i class="fas fa-arrow-up"></i> 15.3%
@@ -254,6 +258,7 @@
                 </div>
             </div>
 
+            <!-- BIỂU ĐỒ - DỮ LIỆU ĐỘNG -->
             <div class="chart-container">
                 <div class="chart-header">
                     <h3 class="chart-title">Thống Kê Doanh Thu</h3>
@@ -267,12 +272,10 @@
                 <canvas id="revenueChart" style="max-height: 350px;"></canvas>
             </div>
 
+            <!-- BẢNG ĐƠN HÀNG - DỮ LIỆU ĐỘNG -->
             <div class="table-container">
                 <div class="table-header">
                     <h3 class="chart-title">Đơn Hàng Gần Đây</h3>
-                    <!-- <button class="btn-primary">
-                        <i class="fas fa-plus"></i> Thêm Đơn Hàng
-                    </button> -->
                 </div>
                 <table class="admin-table">
                     <thead>
@@ -287,18 +290,35 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($recentOrders as $order)
                         <tr>
-                            <td>#DH-00847</td>
+                            <td>#DH-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect fill='%232a2a2a' width='50' height='50'/%3E%3Ccircle cx='25' cy='25' r='15' fill='%233a3a3a'/%3E%3Ccircle cx='25' cy='25' r='8' fill='%23c0c0c0'/%3E%3C/svg%3E" class="product-img" alt="Watch">
-                                    <span>Rolex Submariner</span>
+                                    @if($order->items->first() && $order->items->first()->product && $order->items->first()->product->hinh_anh)
+                                        <img src="{{ asset('storage/' . $order->items->first()->product->hinh_anh) }}"
+                                            class="product-img" alt="Product" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                    @else
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect fill='%232a2a2a' width='50' height='50'/%3E%3Ccircle cx='25' cy='25' r='15' fill='%233a3a3a'/%3E%3Ccircle cx='25' cy='25' r='8' fill='%23c0c0c0'/%3E%3C/svg%3E"
+                                            class="product-img" alt="Watch">
+                                    @endif
+                                    <span>{{ $order->items->first()->product_name ?? 'Sản phẩm' }}</span>
                                 </div>
                             </td>
-                            <td>Nguyễn Văn A</td>
-                            <td>15/01/2024</td>
-                            <td style="font-weight: 600;">285.000.000₫</td>
-                            <td><span class="status-badge completed">Hoàn Thành</span></td>
+                            <td>{{ $order->name }}</td>
+                            <td>{{ $order->created_at->format('d/m/Y') }}</td>
+                            <td style="font-weight: 600;">{{ number_format($order->total_price, 0, ',', '.') }}₫</td>
+                            <td>
+                                @if($order->status == 'completed')
+                                    <span class="status-badge completed">Hoàn Thành</span>
+                                @elseif($order->status == 'processing')
+                                    <span class="status-badge processing">Đang Xử Lý</span>
+                                @elseif($order->status == 'pending')
+                                    <span class="status-badge pending">Chờ Xác Nhận</span>
+                                @else
+                                    <span class="status-badge">{{ $order->status }}</span>
+                                @endif
+                            </td>
                             <td>
                                 <div class="action-btns">
                                     <div class="action-btn"><i class="fas fa-eye"></i></div>
@@ -307,86 +327,13 @@
                                 </div>
                             </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td>#DH-00846</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect fill='%232a2a2a' width='50' height='50'/%3E%3Crect x='15' y='15' width='20' height='20' rx='3' fill='%233a3a3a'/%3E%3Ccircle cx='25' cy='25' r='6' fill='%23a0a0a0'/%3E%3C/svg%3E" class="product-img" alt="Watch">
-                                    <span>Omega Seamaster</span>
-                                </div>
-                            </td>
-                            <td>Trần Thị B</td>
-                            <td>15/01/2024</td>
-                            <td style="font-weight: 600;">156.000.000₫</td>
-                            <td><span class="status-badge processing">Đang Xử Lý</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
-                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
-                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
-                                </div>
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: #999;">
+                                Chưa có đơn hàng nào
                             </td>
                         </tr>
-                        <tr>
-                            <td>#DH-00845</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect fill='%232a2a2a' width='50' height='50'/%3E%3Ccircle cx='25' cy='25' r='18' fill='%233a3a3a'/%3E%3Cpath d='M25 15 L25 25 L32 25' stroke='%23808080' stroke-width='2' fill='none'/%3E%3C/svg%3E" class="product-img" alt="Watch">
-                                    <span>Patek Philippe Nautilus</span>
-                                </div>
-                            </td>
-                            <td>Lê Văn C</td>
-                            <td>14/01/2024</td>
-                            <td style="font-weight: 600;">895.000.000₫</td>
-                            <td><span class="status-badge pending">Chờ Xác Nhận</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
-                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
-                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#DH-00844</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect fill='%232a2a2a' width='50' height='50'/%3E%3Crect x='10' y='10' width='30' height='30' rx='15' fill='%233a3a3a'/%3E%3Ccircle cx='25' cy='25' r='10' fill='%23c0c0c0'/%3E%3C/svg%3E" class="product-img" alt="Watch">
-                                    <span>Audemars Piguet Royal Oak</span>
-                                </div>
-                            </td>
-                            <td>Phạm Thị D</td>
-                            <td>14/01/2024</td>
-                            <td style="font-weight: 600;">645.000.000₫</td>
-                            <td><span class="status-badge completed">Hoàn Thành</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
-                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
-                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#DH-00843</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect fill='%232a2a2a' width='50' height='50'/%3E%3Ccircle cx='25' cy='25' r='16' fill='%233a3a3a'/%3E%3Ccircle cx='25' cy='25' r='4' fill='%23a0a0a0'/%3E%3C/svg%3E" class="product-img" alt="Watch">
-                                    <span>Tag Heuer Carrera</span>
-                                </div>
-                            </td>
-                            <td>Hoàng Văn E</td>
-                            <td>13/01/2024</td>
-                            <td style="font-weight: 600;">125.000.000₫</td>
-                            <td><span class="status-badge processing">Đang Xử Lý</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
-                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
-                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
-                                </div>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -395,32 +342,26 @@
 
     <script>
         function toggleSubMenu(navItem) {
-            // Lấy phần tử menu con ngay sau mục vừa nhấp
             const subMenu = navItem.nextElementSibling;
-            // Lấy mũi tên bên trong mục vừa nhấp
             const arrow = navItem.querySelector('.nav-arrow');
 
-            // Kiểm tra xem có phải là menu con hợp lệ không
             if (subMenu && subMenu.classList.contains('sub-nav-container')) {
-                // Nếu đang ẩn thì hiện ra
                 if (subMenu.style.display === "none" || subMenu.style.display === "") {
                     subMenu.style.display = "block";
-                    navItem.classList.add('active'); // Thêm class 'active' để làm nổi bật
+                    navItem.classList.add('active');
                     if (arrow) {
-                        arrow.style.transform = "rotate(180deg)"; // Xoay mũi tên
+                        arrow.style.transform = "rotate(180deg)";
                     }
                 } else {
-                    // Nếu đang hiện thì ẩn đi
                     subMenu.style.display = "none";
-                    navItem.classList.remove('active'); // Bỏ class 'active'
+                    navItem.classList.remove('active');
                     if (arrow) {
-                        arrow.style.transform = "rotate(0deg)"; // Quay lại mũi tên
+                        arrow.style.transform = "rotate(0deg)";
                     }
                 }
             }
         }
 
-        // Giữ lại hàm gốc cho banner
         function toggleBanner() {
             var bannerContent = document.getElementById('banner-content');
             if (bannerContent.style.display === 'none') {
@@ -429,5 +370,58 @@
                 bannerContent.style.display = 'none';
             }
         }
+
+        // BIỂU ĐỒ DOANH THU - DỮ LIỆU ĐỘNG TỪ PHP
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @json($chartLabels),
+                    datasets: [{
+                        label: 'Doanh Thu (₫)',
+                        data: @json($chartData),
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Doanh thu: ' + context.parsed.y.toLocaleString('vi-VN') + '₫';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('vi-VN') + '₫';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
     </script>
 </body>
