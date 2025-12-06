@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\AdminReviewController;
 use App\Http\Controllers\bannerController;
 use App\Http\Controllers\VoucherController; // Nhớ import
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+
 
 Route::middleware('auth', 'admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('dasboard', [AdminController::class, 'index'])
@@ -19,5 +20,7 @@ Route::middleware('auth', 'admin')->prefix('admin')->name('admin.')->group(funct
         // ... các route khác ...
         Route::resource('product', ProductController::class);
     });
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
    
 });

@@ -65,7 +65,9 @@
                     <a href="{{ route('admin.orders.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-file-invoice-dollar">Hóa đơn</i>
                     </a>
-                    
+                     <a href="#" class="nav-item sub-nav-item">
+                        <i class="fas fa-file-invoice-dollar">Bình luận</i>
+                    </a>
                 </div>
                 <div class="nav-item">
                     <i class="fas fa-users"></i>

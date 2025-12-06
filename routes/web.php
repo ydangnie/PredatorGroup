@@ -22,7 +22,8 @@ use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\AdminOrderController; // Quan trọng
 use App\Http\Controllers\AdminController;      // Quan trọng
 use App\Http\Controllers\VoucherController;    // Quan trọng
-use App\Http\Controllers\CategoryController;   // Quan trọng
+use App\Http\Controllers\CategoryController; 
+use App\Http\Controllers\ReviewController;  // Quan trọng
 
 /*
 |--------------------------------------------------------------------------
@@ -93,6 +94,10 @@ Route::get('/check-models', function () {
     $response = Http::withOptions(['verify' => false])
         ->get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
     return $response->json();
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/review/store', [ReviewController::class, 'store'])->name('review.store');
 });
 
 /*

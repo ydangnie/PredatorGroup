@@ -12,4 +12,10 @@ class OrderItem extends Model
     public function product() {
         return $this->belongsTo(Products::class, 'product_id');
     }
+
+    // --- THÊM ĐOẠN NÀY ---
+    // Quan hệ ngược về Order (để check status đơn hàng)
+    public function order() {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
 }
