@@ -8,14 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->integer('so_sao'); // 1 đến 5
-            $table->text('binh_luan')->nullable();
-            $table->timestamps();
-        });
+       Schema::create('reviews', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+        $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+        
+        // SỬA DÒNG NÀY: Thêm ->nullable()
+        $table->integer('so_sao')->nullable(); // Cho phép null (để dùng cho bình luận thường)
+        
+        $table->text('binh_luan')->nullable();
+        $table->timestamps();
+    });
     }
 
     public function down(): void

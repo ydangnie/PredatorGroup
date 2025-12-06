@@ -71,7 +71,7 @@
             padding: 8px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            background-color: #f9f9f9;
+            background-color: #fff;
         }
 
         .review-item {
@@ -94,6 +94,7 @@
             font-weight: bold;
             color: #555;
             margin-right: 15px;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -241,10 +242,10 @@
         </div>
 
         {{-- ========================================== --}}
-        {{-- PHẦN ĐÁNH GIÁ & BÌNH LUẬN (MỚI THÊM) --}}
+        {{-- PHẦN ĐÁNH GIÁ & BÌNH LUẬN (ĐÃ SỬA LOGIC) --}}
         {{-- ========================================== --}}
-        <div class="wtch-reviews-section">
-            <h3 class="wtch-section-title">Đánh giá & Bình luận ({{ $reviewCount ?? 0 }})</h3>
+        <div class="wtch-reviews-section" id="review-section">
+            <h3 class="wtch-section-title">Khách hàng nói về sản phẩm</h3>
             
             <div class="wtch-rating-summary" style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
                 <div style="display: flex; align-items: center; gap: 15px;">
@@ -257,7 +258,7 @@
                                 <i class="{{ $i <= round($averageRating ?? 0) ? 'fa-solid' : 'fa-regular' }} fa-star"></i>
                             @endfor
                         </div>
-                        <span style="color: #666;">Dựa trên {{ $reviewCount ?? 0 }} đánh giá</span>
+                        <span style="color: #666;">Dựa trên {{ $reviewCount ?? 0 }} đánh giá thực tế</span>
                     </div>
                 </div>
             </div>
@@ -265,70 +266,108 @@
             {{-- Thông báo lỗi/thành công từ Session --}}
             @if(session('success'))
                 <div style="padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; margin-bottom: 20px;">
-                    {{ session('success') }}
+                    <i class="fa-solid fa-check-circle"></i> {{ session('success') }}
                 </div>
             @endif
             @if(session('error'))
                 <div style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 4px; margin-bottom: 20px;">
-                    {{ session('error') }}
+                    <i class="fa-solid fa-circle-exclamation"></i> {{ session('error') }}
                 </div>
             @endif
 
-            {{-- Form gửi đánh giá --}}
+            {{-- LOGIC HIỂN THỊ FORM --}}
             @auth
-            <form action="{{ route('review.store') }}" method="POST" class="wtch-review-form" style="margin-bottom: 40px;">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                
-                <h4 style="margin-bottom: 15px; font-size: 16px;">Viết đánh giá của bạn</h4>
-                
-                <div style="margin-bottom: 15px;">
-                    <label style="font-weight: 600; margin-right: 10px;">Đánh giá sao:</label>
-                    <select name="so_sao" required>
-                        <option value="5">5 Sao (Tuyệt vời)</option>
-                        <option value="4">4 Sao (Tốt)</option>
-                        <option value="3">3 Sao (Bình thường)</option>
-                        <option value="2">2 Sao (Tệ)</option>
-                        <option value="1">1 Sao (Rất tệ)</option>
-                    </select>
-                </div>
+                @if(isset($hasPurchased) && $hasPurchased)
+                    {{-- FORM CHO NGƯỜI ĐÃ MUA HÀNG (Có chọn Sao) --}}
+                    <form action="{{ route('review.store') }}" method="POST" class="wtch-review-form" style="margin-bottom: 40px; background: #fffcf0; padding: 20px; border: 1px dashed #D4AF37; border-radius: 6px;">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        
+                        <h4 style="margin-bottom: 15px; font-size: 16px; color: #D4AF37;"><i class="fa-solid fa-award"></i> Đánh giá sản phẩm đã mua</h4>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; margin-right: 10px;">Chất lượng sản phẩm:</label>
+                            <div class="star-rating-input" style="display: inline-block;">
+                                <select name="so_sao" style="padding: 5px; border-radius: 4px; border: 1px solid #D4AF37; outline: none;">
+                                    <option value="5">⭐⭐⭐⭐⭐ (Tuyệt vời)</option>
+                                    <option value="4">⭐⭐⭐⭐ (Tốt)</option>
+                                    <option value="3">⭐⭐⭐ (Bình thường)</option>
+                                    <option value="2">⭐⭐ (Không hài lòng)</option>
+                                    <option value="1">⭐ (Rất tệ)</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div style="margin-bottom: 15px;">
-                    <textarea name="binh_luan" rows="4" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm này..." required></textarea>
-                </div>
+                        <div style="margin-bottom: 15px;">
+                            <textarea name="binh_luan" rows="3" placeholder="Sản phẩm dùng thế nào? Hãy chia sẻ cảm nhận của bạn..." style="width:100%; padding:10px; border:1px solid #D4AF37; border-radius:4px;"></textarea>
+                        </div>
 
-                <button type="submit" class="wtch-btn-primary" style="padding: 10px 25px; font-size: 14px;">Gửi đánh giá</button>
-            </form>
+                        <button type="submit" class="wtch-btn-primary" style="padding: 8px 25px; font-size: 14px;">Gửi đánh giá</button>
+                    </form>
+                @else
+                    {{-- FORM CHO NGƯỜI CHƯA MUA (Chỉ Bình luận, Không sao) --}}
+                    <form action="{{ route('review.store') }}" method="POST" class="wtch-review-form" style="margin-bottom: 40px; background: #f9f9f9; padding: 20px; border-radius: 6px;">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        
+                        <h4 style="margin-bottom: 15px; font-size: 16px; color: #333;"><i class="fa-regular fa-comments"></i> Hỏi đáp & Bình luận</h4>
+                        
+                        {{-- Không có input so_sao ở đây --}}
+
+                        <div style="margin-bottom: 15px;">
+                            <textarea name="binh_luan" rows="3" required placeholder="Bạn có thắc mắc gì về sản phẩm này không?" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;"></textarea>
+                        </div>
+
+                        <button type="submit" class="wtch-btn-secondary" style="padding: 8px 25px; font-size: 14px;">Gửi câu hỏi</button>
+                    </form>
+                @endif
             @else
-            <div style="margin-bottom: 30px; padding: 20px; background: #f9f9f9; text-align: center; border-radius: 8px;">
-                <p>Vui lòng <a href="{{ route('login') }}" style="color: #D4AF37; font-weight: bold; text-decoration: underline;">đăng nhập</a> để viết đánh giá.</p>
-            </div>
+                <div style="margin-bottom: 30px; padding: 20px; background: #f9f9f9; text-align: center; border-radius: 8px;">
+                    <p>Vui lòng <a href="{{ route('login') }}" style="color: #D4AF37; font-weight: bold; text-decoration: underline;">đăng nhập</a> để đánh giá hoặc bình luận.</p>
+                </div>
             @endauth
 
-            {{-- Danh sách đánh giá --}}
+            {{-- DANH SÁCH REVIEW & COMMENT --}}
             <div class="wtch-review-list">
                 @if($product->reviews && $product->reviews->count() > 0)
                     @foreach($product->reviews as $review)
                     <div class="review-item">
                         <div style="display: flex;">
-                            <div class="review-avatar">
+                            {{-- Avatar: Màu vàng nếu là người mua, màu xám nếu là khách --}}
+                            <div class="review-avatar" style="{{ $review->so_sao ? 'background:#D4AF37; color:#fff;' : '' }}">
                                 {{ strtoupper(substr($review->user ? $review->user->name : 'A', 0, 1)) }}
                             </div>
                             <div style="flex: 1;">
                                 <div class="review-header" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <div style="font-weight: bold; color: #333;">
+                                    <div style="font-weight: bold; color: #333; display: flex; align-items: center; gap: 8px;">
                                         {{ $review->user ? $review->user->name : 'Người dùng ẩn danh' }}
+                                        
+                                        {{-- Badge xác nhận đã mua hàng --}}
+                                        @if($review->so_sao)
+                                            <span style="font-size: 11px; background: #e6fffa; color: #2c7a7b; padding: 2px 8px; border-radius: 12px; border: 1px solid #b2f5ea; display: flex; align-items: center; gap: 4px;">
+                                                <i class="fa-solid fa-check-circle"></i> Đã mua hàng
+                                            </span>
+                                        @endif
                                     </div>
                                     <div style="font-size: 12px; color: #999;">
                                         {{ $review->created_at->format('d/m/Y') }}
                                     </div>
                                 </div>
-                                <div class="review-stars" style="color: #FFD700; font-size: 12px; margin-bottom: 8px;">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="{{ $i <= $review->so_sao ? 'fa-solid' : 'fa-regular' }} fa-star"></i>
-                                    @endfor
-                                </div>
-                                <div class="review-content" style="color: #555; line-height: 1.5; font-size: 14px;">
+
+                                {{-- Chỉ hiện sao nếu có (tức là người mua) --}}
+                                @if($review->so_sao)
+                                    <div class="review-stars" style="color: #FFD700; font-size: 12px; margin-bottom: 8px;">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="{{ $i <= $review->so_sao ? 'fa-solid' : 'fa-regular' }} fa-star"></i>
+                                        @endfor
+                                    </div>
+                                @else
+                                    <div style="margin-bottom: 5px; font-size: 12px; color: #888; font-style: italic;">
+                                        <i class="fa-regular fa-comment-dots"></i> Câu hỏi / Thảo luận
+                                    </div>
+                                @endif
+
+                                <div class="review-content" style="color: #555; line-height: 1.6; font-size: 14px;">
                                     {{ $review->binh_luan }}
                                 </div>
                             </div>
@@ -336,7 +375,7 @@
                     </div>
                     @endforeach
                 @else
-                    <p style="text-align: center; color: #777; font-style: italic; margin-top: 20px;">Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá sản phẩm này!</p>
+                    <p style="text-align: center; color: #777; font-style: italic; margin-top: 20px;">Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ cảm nhận!</p>
                 @endif
             </div>
         </div>
