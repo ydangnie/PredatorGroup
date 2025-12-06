@@ -60,7 +60,7 @@
                     <a href="{{ route('admin.voucher.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-ticket-alt"></i>Voucher
                     </a>
-                     <a href="{{ route('admin.orders.index') }}" class="nav-item sub-nav-item">
+                    <a href="{{ route('admin.orders.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-file-invoice-dollar">Hóa đơn</i>
                     </a>
                 </div>
@@ -72,7 +72,7 @@
                     <i class="fas fa-chart-line"></i>
                     <span>Thống Kê</span>
                 </div>
-                <a href="{{ route('admin.inventory.index') }}" class="nav-item sub-nav-item">
+                <a href="{{ route('admin.inventory.index') }}" class="nav-item">
                     <i class="fas fa-warehouse"></i>
                     <span> Kho hàng</span>
                 </a>
@@ -80,10 +80,10 @@
                     <i class="fas fa-tags"></i>
                     <span>Khuyến Mãi</span>
                 </div>
-                <div class="nav-item">
+                <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews.index') ? 'active' : '' }}">
                     <i class="fas fa-star"></i>
                     <span>Đánh Giá</span>
-                </div>
+                </a>
                 <div class="nav-item">
                     <i class="fas fa-cog"></i>
                     <span>Cài Đặt</span>
