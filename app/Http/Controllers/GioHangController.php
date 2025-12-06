@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Voucher;
+use Carbon\Carbon;
 use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use App\Models\Products;
@@ -135,105 +137,173 @@ class GioHangController extends Controller
 
    // 7. Xử lý Đặt Hàng
    // 7. Xử lý Đặt Hàng
-  // 7. Xử lý Đặt Hàng
-    public function processCheckout(Request $request, VnpayService $vnpayService)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
-            'payment_method' => 'required|in:cod,banking'
-        ]);
+   // 7. Xử lý Đặt Hàng
+   public function processCheckout(Request $request, VnpayService $vnpayService)
+   {
+      $request->validate([
+         'name' => 'required|string|max:255',
+         'phone' => 'required|string|max:20',
+         'address' => 'required|string|max:255',
+         'payment_method' => 'required|in:cod,banking'
+      ]);
 
-        $cart = session()->get('cart', []);
-        $total = 0;
-        foreach($cart as $item) { $total += $item['price'] * $item['quantity']; }
+      $cart = session()->get('cart', []);
+      $total = 0;
+      foreach ($cart as $item) {
+         $total += $item['price'] * $item['quantity'];
+      }
 
-        DB::beginTransaction();
-        try {
-            // 1. Tạo đơn hàng (Status: Pending - Chờ thanh toán)
-            $order = Order::create([
-                'user_id' => Auth::id(),
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'note' => $request->note,
-                'payment_method' => $request->payment_method,
-                'total_price' => $total,
-                'status' => 'pending' // Mặc định là chờ xử lý
+      DB::beginTransaction();
+      try {
+         // 1. Tạo đơn hàng (Status: Pending - Chờ thanh toán)
+         $order = Order::create([
+            'user_id' => Auth::id(),
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'note' => $request->note,
+            'payment_method' => $request->payment_method,
+            'total_price' => $total,
+            'status' => 'pending' // Mặc định là chờ xử lý
+         ]);
+
+         // 2. Lưu chi tiết đơn hàng
+         foreach ($cart as $id => $item) {
+            OrderItem::create([
+               'order_id' => $order->id,
+               'product_id' => $id,
+               'product_name' => $item['name'],
+               'quantity' => $item['quantity'],
+               'price' => $item['price'],
+               'total' => $item['price'] * $item['quantity']
             ]);
+         }
 
-            // 2. Lưu chi tiết đơn hàng
-            foreach($cart as $id => $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $id,
-                    'product_name' => $item['name'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'total' => $item['price'] * $item['quantity']
-                ]);
-            }
+         DB::commit();
 
-            DB::commit();
+         // 3. Xử lý theo phương thức thanh toán
 
-            // 3. Xử lý theo phương thức thanh toán
-            
-            // === TRƯỜNG HỢP 1: THANH TOÁN VNPAY ===
-            if ($request->payment_method == 'banking') {
-                // Tạo URL thanh toán
-                $vnpUrl = $vnpayService->createPaymentUrl($order->id, $total);
-                
-                // LƯU Ý QUAN TRỌNG: Chưa xóa giỏ hàng ở đây!
-                // Chỉ chuyển hướng sang VNPAY. Giỏ hàng sẽ được xóa ở hàm vnpayReturn khi thành công.
-                
-                return redirect($vnpUrl);
-            }
+         // === TRƯỜNG HỢP 1: THANH TOÁN VNPAY ===
+         if ($request->payment_method == 'banking') {
+            // Tạo URL thanh toán
+            $vnpUrl = $vnpayService->createPaymentUrl($order->id, $total);
 
-            // === TRƯỜNG HỢP 2: THANH TOÁN COD ===
-            // Xóa giỏ hàng ngay lập tức vì đơn đã đặt thành công
+            // LƯU Ý QUAN TRỌNG: Chưa xóa giỏ hàng ở đây!
+            // Chỉ chuyển hướng sang VNPAY. Giỏ hàng sẽ được xóa ở hàm vnpayReturn khi thành công.
+
+            return redirect($vnpUrl);
+         }
+
+         // === TRƯỜNG HỢP 2: THANH TOÁN COD ===
+         // Xóa giỏ hàng ngay lập tức vì đơn đã đặt thành công
+         session()->forget('cart');
+
+         return redirect()->route('profile.order.show', $order->id)->with('success', 'Đặt hàng thành công! Chúng tôi sẽ sớm liên hệ.');
+      } catch (\Exception $e) {
+         DB::rollBack();
+         return back()->with('error', 'Lỗi: ' . $e->getMessage());
+      }
+   }
+
+   // 8. Xử lý kết quả trả về từ VNPAY
+   public function vnpayReturn(Request $request)
+   {
+      // Lấy dữ liệu trả về
+      $vnp_ResponseCode = $request->input('vnp_ResponseCode');
+      $orderId = $request->input('vnp_TxnRef');
+
+      $order = Order::find($orderId);
+
+      if ($order) {
+         if ($vnp_ResponseCode == '00') {
+            // --- THANH TOÁN THÀNH CÔNG ---
+
+            // 1. Cập nhật trạng thái đơn hàng thành Processing (Đã thanh toán/Đang xử lý)
+            $order->update(['status' => 'processing']);
+
+            // 2. Bây giờ mới XÓA GIỎ HÀNG
             session()->forget('cart');
-            
-            return redirect()->route('profile.order.show', $order->id)->with('success', 'Đặt hàng thành công! Chúng tôi sẽ sớm liên hệ.');
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Lỗi: ' . $e->getMessage());
-        }
-    }
+            return redirect()->route('profile.order.show', $orderId)->with('success', 'Thanh toán VNPAY thành công!');
+         } else {
+            // --- THANH TOÁN THẤT BẠI / HỦY BỎ ---
 
-    // 8. Xử lý kết quả trả về từ VNPAY
-    public function vnpayReturn(Request $request)
-    {
-        // Lấy dữ liệu trả về
-        $vnp_ResponseCode = $request->input('vnp_ResponseCode'); 
-        $orderId = $request->input('vnp_TxnRef');
+            // 1. Cập nhật trạng thái đơn hàng thành Cancelled (Đã hủy)
+            $order->update(['status' => 'cancelled']);
 
-        $order = Order::find($orderId);
+            // 2. KHÔNG XÓA GIỎ HÀNG -> Để người dùng có thể đặt lại hoặc chọn phương thức khác
 
-        if ($order) {
-            if ($vnp_ResponseCode == '00') {
-                // --- THANH TOÁN THÀNH CÔNG ---
-                
-                // 1. Cập nhật trạng thái đơn hàng thành Processing (Đã thanh toán/Đang xử lý)
-                $order->update(['status' => 'processing']); 
-                
-                // 2. Bây giờ mới XÓA GIỎ HÀNG
-                session()->forget('cart');
+            return redirect()->route('giohang')->with('error', 'Giao dịch thanh toán thất bại hoặc đã bị hủy.');
+         }
+      }
 
-                return redirect()->route('profile.order.show', $orderId)->with('success', 'Thanh toán VNPAY thành công!');
-            } else {
-                // --- THANH TOÁN THẤT BẠI / HỦY BỎ ---
-                
-                // 1. Cập nhật trạng thái đơn hàng thành Cancelled (Đã hủy)
-                $order->update(['status' => 'cancelled']);
-                
-                // 2. KHÔNG XÓA GIỎ HÀNG -> Để người dùng có thể đặt lại hoặc chọn phương thức khác
-                
-                return redirect()->route('giohang')->with('error', 'Giao dịch thanh toán thất bại hoặc đã bị hủy.');
-            }
-        }
+      return redirect()->route('giohang')->with('error', 'Không tìm thấy đơn hàng.');
+   }
+   public function applyCoupon(Request $request)
+   {
+      $code = $request->input('code');
+      // Tìm voucher theo mã
+      $voucher = Voucher::where('code', $code)->first();
 
-        return redirect()->route('giohang')->with('error', 'Không tìm thấy đơn hàng.');
-    }
+      // --- KIỂM TRA ĐIỀU KIỆN ---
+      if (!$voucher) {
+         return response()->json(['success' => false, 'message' => 'Mã giảm giá không tồn tại!']);
+      }
+      if ($voucher->quantity <= 0) {
+         return response()->json(['success' => false, 'message' => 'Mã giảm giá đã hết lượt sử dụng!']);
+      }
+      if (!$voucher->status) {
+         return response()->json(['success' => false, 'message' => 'Mã giảm giá hiện đang bị khóa!']);
+      }
+
+      $now = Carbon::now();
+      if ($voucher->start_date && $now->lt($voucher->start_date)) {
+         return response()->json(['success' => false, 'message' => 'Mã giảm giá chưa đến thời gian áp dụng!']);
+      }
+      if ($voucher->end_date && $now->gt($voucher->end_date)) {
+         return response()->json(['success' => false, 'message' => 'Mã giảm giá đã hết hạn!']);
+      }
+
+      // --- TÍNH TOÁN GIÁ TRỊ ---
+      $cart = session()->get('cart', []);
+      $total = 0;
+      foreach ($cart as $item) {
+         $total += $item['price'] * $item['quantity'];
+      }
+
+      // (Thêm đoạn này để trừ tiền giảm giá)
+      if (session()->has('coupon')) {
+         $discount = session('coupon')['discount'];
+         $total = $total - $discount;
+      }
+
+      $discount = 0;
+      if ($voucher->type == 'fixed') {
+         $discount = $voucher->value;
+      } elseif ($voucher->type == 'percent') {
+         $discount = $total * ($voucher->value / 100);
+      }
+
+      // Đảm bảo không giảm quá số tiền tổng
+      if ($discount > $total) {
+         $discount = $total;
+      }
+
+      // Lưu vào session để dùng cho bước Thanh toán sau này
+      session()->put('coupon', [
+         'code' => $voucher->code,
+         'discount' => $discount,
+         'type' => $voucher->type,
+         'value' => $voucher->value
+      ]);
+
+      $newTotal = $total - $discount;
+
+      return response()->json([
+         'success' => true,
+         'message' => 'Áp dụng mã thành công!',
+         'discount_string' => number_format($discount, 0, ',', '.') . '₫',
+         'total_string' => number_format($newTotal, 0, ',', '.') . '₫'
+      ]);
+   }
 }

@@ -154,3 +154,5 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+
+Route::post('/apply-coupon', [GioHangController::class, 'applyCoupon'])->name('cart.coupon');
