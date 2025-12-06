@@ -135,7 +135,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // 5. QUẢN LÝ HÓA ĐƠN (ORDERS) - ĐÃ SỬA CHUẨN
     Route::controller(AdminOrderController::class)->group(function () {
         // Route này sẽ có tên: admin.orders.index
-        Route::get('/orders', 'index')->name('orders.index');
+        Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         
         // Route này sẽ có tên: admin.orders.show
         Route::get('/orders/{id}', 'show')->name('orders.show');
@@ -145,6 +145,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         
         // Route này sẽ có tên: admin.orders.print
         Route::get('/orders/{id}/print', 'printInvoice')->name('orders.print');
+        
     });
+  Route::get('/chart-data', [AdminController::class, 'getChartData'])->name('chart.data');
 
 });
