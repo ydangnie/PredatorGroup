@@ -4,7 +4,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthDangKy;
 use App\Http\Controllers\AuthDangNhap;
 use App\Http\Controllers\ChatbotController;
-
+use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\BannerController;
 
 use App\Http\Controllers\ChiTietSanPhamCtr;
@@ -135,8 +135,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // ... các route cũ ...
-    
+
     // Quản lý Tồn kho
     Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
     Route::post('/inventory/update', [App\Http\Controllers\InventoryController::class, 'update'])->name('inventory.update');
@@ -156,3 +155,16 @@ Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 Route::post('/apply-coupon', [GioHangController::class, 'applyCoupon'])->name('cart.coupon');
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // ... các route cũ của bạn (product, banner...) giữ nguyên
+
+    // 2. Thêm đoạn này vào bên trong nhóm:
+    Route::controller(AdminOrderController::class)->group(function () {
+        Route::get('/orders', 'index')->name('orders.index'); // Tên đầy đủ sẽ là admin.orders.index
+        Route::get('/orders/{id}', 'show')->name('orders.show');
+        Route::post('/orders/{id}/status', 'updateStatus')->name('orders.update_status');
+        Route::get('/orders/{id}/print', 'printInvoice')->name('orders.print');
+    });
+
+});

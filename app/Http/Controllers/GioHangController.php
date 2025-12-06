@@ -148,14 +148,40 @@ class GioHangController extends Controller
       ]);
 
       $cart = session()->get('cart', []);
+      if (empty($cart)) {
+         return back()->with('error', 'Giỏ hàng trống!');
+      }
+
       $total = 0;
       foreach ($cart as $item) {
          $total += $item['price'] * $item['quantity'];
       }
 
+      // Xử lý mã giảm giá nếu có (đoạn code cũ của bạn)
+      if (session()->has('coupon')) {
+         $discount = session('coupon')['discount'];
+         $total = max(0, $total - $discount);
+      }
+
       DB::beginTransaction();
       try {
-         // 1. Tạo đơn hàng (Status: Pending - Chờ thanh toán)
+         // --- 1. KIỂM TRA VÀ TRỪ TỒN KHO ---
+         foreach ($cart as $id => $item) {
+            $product = Products::lockForUpdate()->find($id); // Khóa dòng để tránh xung đột
+
+            if (!$product) {
+               throw new \Exception("Sản phẩm \"{$item['name']}\" không tồn tại.");
+            }
+
+            if ($product->so_luong < $item['quantity']) {
+               throw new \Exception("Sản phẩm \"{$item['name']}\" chỉ còn {$product->so_luong} cái, không đủ số lượng bạn đặt.");
+            }
+
+            // Trừ tồn kho
+            $product->decrement('so_luong', $item['quantity']);
+         }
+
+         // --- 2. TẠO ĐƠN HÀNG ---
          $order = Order::create([
             'user_id' => Auth::id(),
             'name' => $request->name,
@@ -164,10 +190,9 @@ class GioHangController extends Controller
             'note' => $request->note,
             'payment_method' => $request->payment_method,
             'total_price' => $total,
-            'status' => 'pending' // Mặc định là chờ xử lý
+            'status' => 'pending'
          ]);
 
-         // 2. Lưu chi tiết đơn hàng
          foreach ($cart as $id => $item) {
             OrderItem::create([
                'order_id' => $order->id,
@@ -181,24 +206,16 @@ class GioHangController extends Controller
 
          DB::commit();
 
-         // 3. Xử lý theo phương thức thanh toán
-
-         // === TRƯỜNG HỢP 1: THANH TOÁN VNPAY ===
+         // --- 3. XỬ LÝ THANH TOÁN ---
          if ($request->payment_method == 'banking') {
-            // Tạo URL thanh toán
             $vnpUrl = $vnpayService->createPaymentUrl($order->id, $total);
-
-            // LƯU Ý QUAN TRỌNG: Chưa xóa giỏ hàng ở đây!
-            // Chỉ chuyển hướng sang VNPAY. Giỏ hàng sẽ được xóa ở hàm vnpayReturn khi thành công.
-
             return redirect($vnpUrl);
          }
 
-         // === TRƯỜNG HỢP 2: THANH TOÁN COD ===
-         // Xóa giỏ hàng ngay lập tức vì đơn đã đặt thành công
+         // COD
          session()->forget('cart');
-
-         return redirect()->route('profile.order.show', $order->id)->with('success', 'Đặt hàng thành công! Chúng tôi sẽ sớm liên hệ.');
+         session()->forget('coupon');
+         return redirect()->route('profile.order.show', $order->id)->with('success', 'Đặt hàng thành công!');
       } catch (\Exception $e) {
          DB::rollBack();
          return back()->with('error', 'Lỗi: ' . $e->getMessage());
@@ -208,34 +225,36 @@ class GioHangController extends Controller
    // 8. Xử lý kết quả trả về từ VNPAY
    public function vnpayReturn(Request $request)
    {
-      // Lấy dữ liệu trả về
+      // ... code cũ lấy $vnp_ResponseCode, $orderId ...
       $vnp_ResponseCode = $request->input('vnp_ResponseCode');
       $orderId = $request->input('vnp_TxnRef');
-
       $order = Order::find($orderId);
 
       if ($order) {
          if ($vnp_ResponseCode == '00') {
-            // --- THANH TOÁN THÀNH CÔNG ---
-
-            // 1. Cập nhật trạng thái đơn hàng thành Processing (Đã thanh toán/Đang xử lý)
+            // ... Thành công (giữ nguyên logic cũ) ...
             $order->update(['status' => 'processing']);
-
-            // 2. Bây giờ mới XÓA GIỎ HÀNG
             session()->forget('cart');
-
-            return redirect()->route('profile.order.show', $orderId)->with('success', 'Thanh toán VNPAY thành công!');
+            session()->forget('coupon');
+            return redirect()->route('profile.order.show', $orderId)->with('success', 'Thanh toán thành công!');
          } else {
-            // --- THANH TOÁN THẤT BẠI / HỦY BỎ ---
+            // ... Thất bại -> HOÀN LẠI KHO ...
+            if ($order->status != 'cancelled') {
+               $order->update(['status' => 'cancelled']);
 
-            // 1. Cập nhật trạng thái đơn hàng thành Cancelled (Đã hủy)
-            $order->update(['status' => 'cancelled']);
+               // Cộng lại số lượng hàng vào kho
+               foreach ($order->items as $item) {
+                  $product = Products::find($item->product_id);
+                  if ($product) {
+                     $product->increment('so_luong', $item->quantity);
+                  }
+               }
+            }
 
-            // 2. KHÔNG XÓA GIỎ HÀNG -> Để người dùng có thể đặt lại hoặc chọn phương thức khác
-
-            return redirect()->route('giohang')->with('error', 'Giao dịch thanh toán thất bại hoặc đã bị hủy.');
+            return redirect()->route('giohang')->with('error', 'Thanh toán thất bại. Đơn hàng đã bị hủy.');
          }
       }
+
 
       return redirect()->route('giohang')->with('error', 'Không tìm thấy đơn hàng.');
    }

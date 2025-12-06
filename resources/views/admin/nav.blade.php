@@ -60,6 +60,11 @@
                     <a href="{{ route('admin.voucher.index') }}" class="nav-item sub-nav-item">
                         <i class="fas fa-ticket-alt"></i>Voucher
                     </a>
+                    <a class="nav-item sub-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
+                        href="{{ route('admin.orders.index') }}">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Quản lý Hóa đơn</span>
+                    </a>
                 </div>
                 <div class="nav-item">
                     <i class="fas fa-users"></i>
