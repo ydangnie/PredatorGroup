@@ -204,7 +204,23 @@
 
                         // Cập nhật tổng đơn hàng
                         updateSummary(data.grand_total);
+                    } else {
+                        // --- XỬ LÝ LỖI KHI VƯỢT QUÁ TỒN KHO ---
+                        alert(data.message);
+                        
+                        // Nếu server yêu cầu reload (vd: sp đã bị xóa)
+                        if (data.reload) {
+                            location.reload();
+                        } 
+                        // Reset lại số lượng hợp lệ cũ
+                        else if (data.current_qty) {
+                            input.value = data.current_qty;
+                        }
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // alert("Có lỗi xảy ra, vui lòng thử lại.");
                 });
         }
 
@@ -253,40 +269,40 @@
             if (subtotalEl) subtotalEl.innerText = totalStr + '₫';
             if (totalEl) totalEl.innerText = totalStr + '₫';
         }
-        // Thêm hàm này vào trong thẻ <script>
-function applyCoupon() {
-    const couponInput = document.getElementById('whcart_coupon_input_z19a');
-    const code = couponInput.value.trim();
-    
-    if(!code) {
-        alert("Vui lòng nhập mã giảm giá!");
-        return;
-    }
 
-    fetch('{{ route("cart.coupon") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken // Biến csrfToken đã khai báo ở trên
-        },
-        body: JSON.stringify({ code: code })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success) {
-            alert(data.message);
-            // Cập nhật giao diện
-            document.getElementById('cart-discount').innerText = '-' + data.discount_string;
-            document.getElementById('cart-total').innerText = data.total_string;
-        } else {
-            alert(data.message);
+        function applyCoupon() {
+            const couponInput = document.getElementById('whcart_coupon_input_z19a');
+            const code = couponInput.value.trim();
+            
+            if(!code) {
+                alert("Vui lòng nhập mã giảm giá!");
+                return;
+            }
+
+            fetch('{{ route("cart.coupon") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken 
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert(data.message);
+                    // Cập nhật giao diện
+                    document.getElementById('cart-discount').innerText = '-' + data.discount_string;
+                    document.getElementById('cart-total').innerText = data.total_string;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Có lỗi xảy ra, vui lòng thử lại.");
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("Có lỗi xảy ra, vui lòng thử lại.");
-    });
-}
     </script>
 </body>
 

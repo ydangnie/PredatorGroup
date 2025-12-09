@@ -21,7 +21,7 @@ class GioHangController extends Controller
       return view('checkout.giohang', compact('cart'));
    }
 
-   // 2. Thêm vào giỏ (AJAX)
+   // 2. Thêm vào giỏ (AJAX) - CẬP NHẬT: Check tồn kho
    public function addToCart(Request $request)
    {
       $id = $request->product_id;
@@ -33,6 +33,18 @@ class GioHangController extends Controller
       }
 
       $cart = session()->get('cart', []);
+
+      // Tính tổng số lượng dự kiến (số đã có trong giỏ + số muốn thêm)
+      $currentQtyInCart = isset($cart[$id]) ? $cart[$id]['quantity'] : 0;
+      $newTotalQty = $currentQtyInCart + $quantity;
+
+      // --- KIỂM TRA TỒN KHO ---
+      if ($newTotalQty > $product->so_luong) {
+         return response()->json([
+             'error' => true,
+             'message' => "Sản phẩm này chỉ còn {$product->so_luong} chiếc. Trong giỏ bạn đã có {$currentQtyInCart} chiếc."
+         ], 400);
+      }
 
       if (isset($cart[$id])) {
          $cart[$id]['quantity'] += $quantity;
@@ -55,11 +67,35 @@ class GioHangController extends Controller
       ]);
    }
 
-   // 3. Cập nhật giỏ hàng (AJAX)
+   // 3. Cập nhật giỏ hàng (AJAX) - CẬP NHẬT: Check tồn kho
    public function updateCart(Request $request)
    {
       if ($request->id && $request->quantity) {
          $cart = session()->get('cart');
+         
+         // Lấy thông tin sản phẩm từ DB để check tồn kho thực tế
+         $product = Products::find($request->id);
+
+         if (!$product) {
+             return response()->json([
+                 'success' => false, 
+                 'message' => 'Sản phẩm không tồn tại hoặc đã bị xóa!',
+                 'reload' => true 
+             ]);
+         }
+
+         // --- KIỂM TRA TỒN KHO ---
+         if ($request->quantity > $product->so_luong) {
+             return response()->json([
+                 'success' => false,
+                 'message' => "Không thể thêm kho chỉ còn {$product->so_luong} sản phẩm!",
+                 
+                 'current_qty' => $cart[$request->id]['quantity'] // Trả về số lượng cũ để reset input
+                 
+             ]);
+         }
+
+         // Cập nhật session nếu đủ hàng
          $cart[$request->id]["quantity"] = $request->quantity;
          session()->put('cart', $cart);
 
@@ -108,7 +144,7 @@ class GioHangController extends Controller
       return response()->json(['count' => array_sum(array_column($cart, 'quantity'))]);
    }
 
-   // 6. Hiển thị trang Thanh Toán (CẬP NHẬT: Lấy thêm addresses)
+   // 6. Hiển thị trang Thanh Toán
    public function checkout()
    {
       $cart = session()->get('cart', []);
@@ -136,8 +172,6 @@ class GioHangController extends Controller
    }
 
    // 7. Xử lý Đặt Hàng
-   // 7. Xử lý Đặt Hàng
-   // 7. Xử lý Đặt Hàng
    public function processCheckout(Request $request, VnpayService $vnpayService)
    {
       $request->validate([
@@ -157,7 +191,7 @@ class GioHangController extends Controller
          $total += $item['price'] * $item['quantity'];
       }
 
-      // Xử lý mã giảm giá nếu có (đoạn code cũ của bạn)
+      // Xử lý mã giảm giá nếu có
       if (session()->has('coupon')) {
          $discount = session('coupon')['discount'];
          $total = max(0, $total - $discount);
@@ -225,20 +259,19 @@ class GioHangController extends Controller
    // 8. Xử lý kết quả trả về từ VNPAY
    public function vnpayReturn(Request $request)
    {
-      // ... code cũ lấy $vnp_ResponseCode, $orderId ...
       $vnp_ResponseCode = $request->input('vnp_ResponseCode');
       $orderId = $request->input('vnp_TxnRef');
       $order = Order::find($orderId);
 
       if ($order) {
          if ($vnp_ResponseCode == '00') {
-            // ... Thành công (giữ nguyên logic cũ) ...
+            // Thành công
             $order->update(['status' => 'processing']);
             session()->forget('cart');
             session()->forget('coupon');
             return redirect()->route('profile.order.show', $orderId)->with('success', 'Thanh toán thành công!');
          } else {
-            // ... Thất bại -> HOÀN LẠI KHO ...
+            // Thất bại -> HOÀN LẠI KHO
             if ($order->status != 'cancelled') {
                $order->update(['status' => 'cancelled']);
 
@@ -250,21 +283,18 @@ class GioHangController extends Controller
                   }
                }
             }
-
             return redirect()->route('giohang')->with('error', 'Thanh toán thất bại. Đơn hàng đã bị hủy.');
          }
       }
-
-
       return redirect()->route('giohang')->with('error', 'Không tìm thấy đơn hàng.');
    }
+
+   // 9. Áp mã giảm giá
    public function applyCoupon(Request $request)
    {
       $code = $request->input('code');
-      // Tìm voucher theo mã
       $voucher = Voucher::where('code', $code)->first();
 
-      // --- KIỂM TRA ĐIỀU KIỆN ---
       if (!$voucher) {
          return response()->json(['success' => false, 'message' => 'Mã giảm giá không tồn tại!']);
       }
@@ -283,18 +313,14 @@ class GioHangController extends Controller
          return response()->json(['success' => false, 'message' => 'Mã giảm giá đã hết hạn!']);
       }
 
-      // --- TÍNH TOÁN GIÁ TRỊ ---
       $cart = session()->get('cart', []);
       $total = 0;
       foreach ($cart as $item) {
          $total += $item['price'] * $item['quantity'];
       }
 
-      // (Thêm đoạn này để trừ tiền giảm giá)
-      if (session()->has('coupon')) {
-         $discount = session('coupon')['discount'];
-         $total = $total - $discount;
-      }
+      // Reset total về giá gốc trước khi tính lại coupon mới
+      // (Logic cũ của bạn đang trừ chồng coupon, nhưng ở đây ta tính lại từ đầu dựa trên giỏ hàng)
 
       $discount = 0;
       if ($voucher->type == 'fixed') {
@@ -303,12 +329,10 @@ class GioHangController extends Controller
          $discount = $total * ($voucher->value / 100);
       }
 
-      // Đảm bảo không giảm quá số tiền tổng
       if ($discount > $total) {
          $discount = $total;
       }
 
-      // Lưu vào session để dùng cho bước Thanh toán sau này
       session()->put('coupon', [
          'code' => $voucher->code,
          'discount' => $discount,
