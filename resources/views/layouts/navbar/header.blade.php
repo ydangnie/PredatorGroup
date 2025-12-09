@@ -248,7 +248,7 @@
                 </li>
                 <li class="nav-item">
                     {{-- Lọc nhanh giới tính Nữ --}}
-                    <a href="#" class="nav-link">Tin Tức</a>
+                    <a href="{{ route('posts.index') }}" class="nav-link">Tin Tức</a>
                 </li>
             </ul>
         </nav>

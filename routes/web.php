@@ -24,6 +24,7 @@ use App\Http\Controllers\AdminController;      // Quan trọng
 use App\Http\Controllers\VoucherController;    // Quan trọng
 use App\Http\Controllers\CategoryController;   // Quan trọng
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\AdminPostController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes (USER & GUEST)
@@ -102,6 +103,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wishlist/toggle/{id}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
     Route::get('/wishlist/count', [WishlistController::class, 'count'])->name('wishlist.count');
 });
+Route::get('/tin-tuc', [PostController::class, 'index'])->name('posts.index');
+Route::get('/tin-tuc/{slug}', [PostController::class, 'show'])->name('posts.show');
 /*
 |--------------------------------------------------------------------------
 | Admin Routes (QUẢN TRỊ VIÊN)
@@ -155,5 +158,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         
     });
   Route::get('/chart-data', [AdminController::class, 'getChartData'])->name('chart.data');
+  // routes/web.php
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // ... các route hiện có (product, category...)
+    
+    // Thêm dòng này:
+    Route::resource('posts', App\Http\Controllers\AdminPostController::class);
+});
 
 });

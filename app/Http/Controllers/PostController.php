@@ -10,10 +10,25 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function index()
+   public function index()
     {
-        $posts = DB::table('posts')->get();
+        // Lấy bài viết mới nhất, phân trang 6 bài/trang
+        $posts = Post::orderBy('created_at', 'desc')->paginate(6);
         return view('posts.index', compact('posts'));
+    }
+
+    // Hiển thị chi tiết bài viết (Dùng Slug cho chuẩn SEO)
+    public function show($slug)
+    {
+        $post = Post::where('slug', $slug)->firstOrFail();
+        
+        // Gợi ý bài viết liên quan (cùng mới nhất, trừ bài hiện tại)
+        $relatedPosts = Post::where('id', '!=', $post->id)
+                            ->orderBy('created_at', 'desc')
+                            ->take(3)
+                            ->get();
+
+        return view('posts.show', compact('post', 'relatedPosts'));
     }
 
     public function create()

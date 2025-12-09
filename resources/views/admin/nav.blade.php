@@ -61,7 +61,12 @@
                         <i class="fas fa-ticket-alt"></i>Voucher
                     </a>
                     <a href="{{ route('admin.orders.index') }}" class="nav-item sub-nav-item">
-                        <i class="fas fa-file-invoice-dollar">Hóa đơn</i>
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Hóa đơn</span>
+                    </a>
+                    <a href="#" class="nav-item sub-nav-item">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Tin tức</span>
                     </a>
                 </div>
                 <div class="nav-item">
