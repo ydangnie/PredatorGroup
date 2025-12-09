@@ -6,12 +6,18 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- Đảm bảo FontAwesome được load nếu chưa có trong app.css --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
-        /* CSS CHO THÔNG BÁO & POPUP */
-        .header-item-notify { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
-        
-        /* Badge số lượng đỏ trên chuông */
+        /* CSS CHO THÔNG BÁO & POPUP - GIỮ NGUYÊN NHƯ CŨ */
+        .header-item-notify {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
         .notify-badge {
             position: absolute;
             top: 0px;
@@ -29,7 +35,6 @@
             border: 1px solid #000;
         }
 
-        /* Dropdown thông báo */
         .notify-dropdown {
             display: none;
             position: absolute;
@@ -38,13 +43,16 @@
             width: 320px;
             background: #fff;
             border-radius: 4px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             overflow: hidden;
             border: 1px solid #eee;
         }
-        .notify-dropdown.active { display: block; }
-        
+
+        .notify-dropdown.active {
+            display: block;
+        }
+
         .notify-header {
             background: #111;
             padding: 10px 15px;
@@ -54,7 +62,7 @@
             font-size: 14px;
             text-transform: uppercase;
         }
-        
+
         .notify-body {
             max-height: 300px;
             overflow-y: auto;
@@ -69,7 +77,11 @@
             align-items: center;
             transition: background 0.2s;
         }
-        .notify-item:hover { background: #f9f9f9; }
+
+        .notify-item:hover {
+            background: #f9f9f9;
+        }
+
         .notify-item img {
             width: 45px;
             height: 45px;
@@ -78,7 +90,11 @@
             margin-right: 12px;
             border: 1px solid #eee;
         }
-        .notify-info { flex: 1; }
+
+        .notify-info {
+            flex: 1;
+        }
+
         .notify-title {
             font-size: 13px;
             font-weight: 700;
@@ -89,9 +105,13 @@
             overflow: hidden;
             margin-bottom: 2px;
         }
-        .notify-desc { font-size: 11px; color: #155724; font-weight: 500; }
 
-        /* Toast Popup góc màn hình */
+        .notify-desc {
+            font-size: 11px;
+            color: #155724;
+            font-weight: 500;
+        }
+
         .review-toast {
             position: fixed;
             bottom: 30px;
@@ -99,7 +119,7 @@
             background: #fff;
             border-left: 4px solid #D4AF37;
             width: 320px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
             border-radius: 4px;
             z-index: 9999;
             animation: slideInLeft 0.5s ease;
@@ -107,6 +127,7 @@
             display: flex;
             flex-direction: column;
         }
+
         .toast-header {
             padding: 10px 15px;
             border-bottom: 1px solid #eee;
@@ -116,9 +137,26 @@
             background: #f8f8f8;
             border-top-right-radius: 4px;
         }
-        .toast-body { padding: 15px; font-size: 14px; color: #444; line-height: 1.5; }
-        .btn-close-toast { background: none; border: none; font-size: 18px; cursor: pointer; color: #999; }
-        .btn-close-toast:hover { color: #333; }
+
+        .toast-body {
+            padding: 15px;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .btn-close-toast {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .btn-close-toast:hover {
+            color: #333;
+        }
+
         .btn-view-now {
             background: #111;
             color: #D4AF37;
@@ -130,15 +168,25 @@
             font-weight: bold;
             transition: all 0.3s;
         }
-        .btn-view-now:hover { background: #D4AF37; color: #fff; }
+
+        .btn-view-now:hover {
+            background: #D4AF37;
+            color: #fff;
+        }
 
         @keyframes slideInLeft {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
-
 
 <header class="header">
     <div class="header-top">
@@ -162,24 +210,21 @@
                         <div class="mega-menu-grid">
                             <div class="mega-menu-column">
                                 <h4>Theo Thương Hiệu</h4>
-                                <a href="#" class="mega-menu-item">Rolex</a>
-                                <a href="#" class="mega-menu-item">Omega</a>
-                                <a href="#" class="mega-menu-item">Patek Philippe</a>
-                                <a href="#" class="mega-menu-item">Audemars Piguet</a>
+                                {{-- Lưu ý: ID thương hiệu phải khớp với Database. Ví dụ ở đây tôi dùng route query --}}
+                                <a href="{{ route('sanpham', ['keyword' => 'Rolex']) }}" class="mega-menu-item">Rolex</a>
+                                <a href="{{ route('sanpham', ['keyword' => 'Omega']) }}" class="mega-menu-item">Omega</a>
+                                <a href="{{ route('sanpham', ['keyword' => 'Patek']) }}" class="mega-menu-item">Patek Philippe</a>
+                                <a href="{{ route('sanpham', ['keyword' => 'Theorema']) }}" class="mega-menu-item">Theorema</a>
                             </div>
                             <div class="mega-menu-column">
                                 <h4>Theo Danh Mục </h4>
-                                <a href="#" class="mega-menu-item">Đồng Hồ Lặn</a>
-                                <a href="#" class="mega-menu-item">Đồng Hồ Quân Đội</a>
-                                <a href="#" class="mega-menu-item">Đồng Hồ Thụy Sĩ</a>
-                                <a href="#" class="mega-menu-item">Apple Watch</a>
+                                <a href="{{ route('sanpham', ['keyword' => 'Lặn']) }}" class="mega-menu-item">Đồng Hồ Lặn</a>
+                                <a href="{{ route('sanpham', ['keyword' => 'Quân Đội']) }}" class="mega-menu-item">Đồng Hồ Quân Đội</a>
                             </div>
                             <div class="mega-menu-column">
                                 <h4>Mức giá </h4>
-                                <a href="#" class="mega-menu-item">Trên 5 triệu</a>
-                                <a href="#" class="mega-menu-item">Trên 10 triệu</a>
-                                <a href="#" class="mega-menu-item">trên 15 triệu</a>
-                                <a href="#" class="mega-menu-item">trên 50 triệu</a>
+                                <a href="{{ route('sanpham', ['sort' => 'price-asc']) }}" class="mega-menu-item">Giá thấp đến cao</a>
+                                <a href="{{ route('sanpham', ['sort' => 'price-desc']) }}" class="mega-menu-item">Giá cao đến thấp</a>
                             </div>
 
                         </div>
@@ -187,35 +232,38 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">Nam</a>
+                    {{-- Lọc nhanh giới tính Nam --}}
+                    <a href="{{ route('sanpham', ['gender' => 'male']) }}" class="nav-link">Nam</a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">Nữ</a>
+                    {{-- Lọc nhanh giới tính Nữ --}}
+                    <a href="{{ route('sanpham', ['gender' => 'female']) }}" class="nav-link">Nữ</a>
                 </li>
-                
+
+              
+                 <li class="nav-item">
+                    {{-- Lọc nhanh giới tính Nữ --}}
+                    <a href="{{ route('lienhe') }}" class="nav-link">Liên hệ</a>
+                </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">Dịch Vụ
-                        <span class="dropdown-arrow">▼</span>
-                    </a>
-                    <ul class="dropdown">
-                        <li><a href="{{ route('lienhe') }}" class="dropdown-item">Liên hệ</a></li>
-                    </ul>
+                    {{-- Lọc nhanh giới tính Nữ --}}
+                    <a href="#" class="nav-link">Tin Tức</a>
                 </li>
             </ul>
         </nav>
 
         <div class="header-actions">
-            <form action="#" method="GET" class="search-box" id="searchBox">
-                <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm...">
-                <button type="button" class="action-btn" onclick="toggleSearch()">
+            {{-- FORM TÌM KIẾM ĐÃ CHỈNH SỬA --}}
+            <form action="{{ route('sanpham') }}" method="GET" class="search-box" id="searchBox">
+                <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm sản phẩm..." value="{{ request('keyword') }}">
+                <button type="submit" class="action-btn">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </form>
 
             <a class="action-btn" href="{{ route('giohang') }}" style="position: relative;">
                 <i class="fa-solid fa-cart-shopping"></i>
-                {{-- Badge số lượng --}}
                 <span id="cart-count-badge"
                     style="position: absolute; top: -5px; right: -5px; 
                  background-color: #D4AF37; color: #000; 
@@ -224,32 +272,25 @@
                  display: none;">0</span>
             </a>
 
-            {{-- 
-                ============================================
-                ICON THÔNG BÁO (CHUÔNG) - MỚI THÊM
-                ============================================
-            --}}
             @auth
             <div class="action-btn header-item-notify" style="cursor: pointer;" onclick="toggleNotify()">
                 <i class="fa-regular fa-bell"></i>
-                
                 @if(isset($productsToReview) && $productsToReview->count() > 0)
-                    <span class="notify-badge">{{ $productsToReview->count() }}</span>
-                    
-                    <div class="notify-dropdown" id="notifyDropdown">
-                        <div class="notify-header">Sản phẩm chờ đánh giá</div>
-                        <div class="notify-body">
-                            @foreach($productsToReview as $prod)
-                            <a href="{{ route('chitietsanpham', $prod->id) }}#review-section" class="notify-item">
-                                <img src="{{ asset('storage/' . $prod->hinh_anh) }}" alt="img">
-                                <div class="notify-info">
-                                    <div class="notify-title">{{ $prod->tensp }}</div>
-                                    <div class="notify-desc"><i class="fa-solid fa-check-circle"></i> Đã giao hàng. Đánh giá ngay!</div>
-                                </div>
-                            </a>
-                            @endforeach
-                        </div>
+                <span class="notify-badge">{{ $productsToReview->count() }}</span>
+                <div class="notify-dropdown" id="notifyDropdown">
+                    <div class="notify-header">Sản phẩm chờ đánh giá</div>
+                    <div class="notify-body">
+                        @foreach($productsToReview as $prod)
+                        <a href="{{ route('chitietsanpham', $prod->id) }}#review-section" class="notify-item">
+                            <img src="{{ asset('storage/' . $prod->hinh_anh) }}" alt="img">
+                            <div class="notify-info">
+                                <div class="notify-title">{{ $prod->tensp }}</div>
+                                <div class="notify-desc"><i class="fa-solid fa-check-circle"></i> Đã giao hàng. Đánh giá ngay!</div>
+                            </div>
+                        </a>
+                        @endforeach
                     </div>
+                </div>
                 @endif
             </div>
             @else
@@ -282,11 +323,7 @@
     </div>
 </header>
 
-{{-- 
-    ============================================
-    POPUP NHẮC NHỞ (TOAST) - MỚI THÊM
-    ============================================
---}}
+{{-- GIỮ NGUYÊN PHẦN TOAST VÀ SCRIPT --}}
 @if(auth()->check() && isset($productsToReview) && $productsToReview->count() > 0)
 <div id="review-reminder-toast" class="review-toast">
     <div class="toast-header">
@@ -294,7 +331,7 @@
         <button type="button" class="btn-close-toast" onclick="closeToast()">&times;</button>
     </div>
     <div class="toast-body">
-        Bạn có <b>{{ $productsToReview->count() }}</b> sản phẩm đã nhận hàng nhưng chưa đánh giá. 
+        Bạn có <b>{{ $productsToReview->count() }}</b> sản phẩm đã nhận hàng nhưng chưa đánh giá.
         <br><span style="font-size:12px; color:#888;">Hãy đánh giá để giúp cộng đồng mua sắm tốt hơn!</span>
         <div style="margin-top: 15px; text-align: right;">
             <button class="btn-view-now" onclick="toggleNotify()">Xem ngay</button>
@@ -305,25 +342,22 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Fetch số lượng giỏ hàng
         fetch('{{ route("cart.count") }}')
             .then(res => res.json())
             .then(data => {
                 const badge = document.getElementById('cart-count-badge');
-                if(data.count > 0) {
+                if (data.count > 0) {
                     badge.innerText = data.count;
                     badge.style.display = 'inline-block';
                 }
             })
             .catch(err => console.log('Lỗi cart count:', err));
 
-        // 2. Tự động tắt Toast sau 15 giây nếu không tương tác
         setTimeout(() => {
             closeToast();
         }, 15000);
     });
 
-    // Hàm bật/tắt dropdown thông báo
     function toggleNotify() {
         const dropdown = document.getElementById('notifyDropdown');
         if (dropdown) {
@@ -331,7 +365,6 @@
         }
     }
 
-    // Hàm đóng Popup Toast
     function closeToast() {
         const toast = document.getElementById('review-reminder-toast');
         if (toast) {
@@ -339,7 +372,6 @@
         }
     }
 
-    // Click ra ngoài thì tắt dropdown thông báo
     window.addEventListener('click', function(e) {
         const notifyBox = document.querySelector('.header-item-notify');
         if (notifyBox && !notifyBox.contains(e.target)) {
@@ -348,15 +380,17 @@
         }
     });
 
-    // Các hàm cũ (toggleSearch, toggleMenu) nếu có ở file JS ngoài thì OK, 
-    // nếu chưa có thì cần đảm bảo chúng tồn tại.
     function toggleSearch() {
         const box = document.getElementById('searchBox');
-        box.classList.toggle('active'); // Bạn cần CSS cho class .active này nếu chưa có
+        box.classList.toggle('active');
+        // Focus vào input khi mở
+        if (box.classList.contains('active')) {
+            box.querySelector('input').focus();
+        }
     }
-    
+
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
-        menu.classList.toggle('active'); // Bạn cần CSS cho class .active này nếu chưa có
+        menu.classList.toggle('active');
     }
 </script>
