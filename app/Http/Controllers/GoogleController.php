@@ -7,6 +7,9 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+// [1] Thêm 2 dòng này để sử dụng tính năng gửi mail
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class GoogleController extends Controller
 {
@@ -44,6 +47,9 @@ class GoogleController extends Controller
                     'password' => Hash::make('123456dummy'), // Mật khẩu giả
                     'role' => 'user'
                 ]);
+
+                // [2] Gửi email chào mừng (Sử dụng hàng đợi queue giống AuthDangKy)
+                Mail::to($newUser->email)->queue(new WelcomeMail($newUser));
 
                 Auth::login($newUser);
                 return redirect('/');
