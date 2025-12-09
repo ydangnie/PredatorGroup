@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\WishlistController; // Nhớ import ở đầu file
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http; // Bổ sung import Http
@@ -97,7 +97,11 @@ Route::get('/check-models', function () {
 Route::middleware(['auth'])->group(function () {
     Route::post('/review/store', [ReviewController::class, 'store'])->name('review.store');
 });
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/toggle/{id}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::get('/wishlist/count', [WishlistController::class, 'count'])->name('wishlist.count');
+});
 /*
 |--------------------------------------------------------------------------
 | Admin Routes (QUẢN TRỊ VIÊN)
