@@ -3,11 +3,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predator Group | Luxury Timepieces</title>
     {{-- Import Font sang trọng --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     @vite(['resources/css/layout/main.css', 'resources/js/layout/main.js', 'resources/css/layout/chatbot.css', 'resources/js/layout/chatbot.js'])
 </head>
 
 {{-- 1. BANNER CAROUSEL (GIỮ NGUYÊN) --}}
+
 <div class="carousel">
     <div class="list">
         @foreach($banners as $banner)

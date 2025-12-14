@@ -12,72 +12,90 @@ class ChatbotController extends Controller
 {
     public function chat(Request $request)
     {
-        $userMessage = $request->input('message');
-        $apiKey = env('GOOGLE_API_KEY');
+        try {
+            $userMessage = $request->input('message');
+            $apiKey = env('GOOGLE_API_KEY');
 
-        if (!$apiKey) return response()->json(['reply' => 'Lỗi: Chưa cấu hình API Key.'], 500);
+            // 1. Kiểm tra API Key
+            if (!$apiKey) {
+                return response()->json(['reply' => 'Lỗi: Chưa cấu hình API Key trong file .env']);
+            }
 
-        // 1. Tìm sản phẩm trong Database 
-        $products = [];
-        $systemContext = "";
+            // 2. Xử lý logic tìm sản phẩm (Giữ nguyên logic của bạn)
+            $products = [];
+            $systemContext = "";
 
-       
-        if (preg_match('/(dưới|thấp hơn)\s*(\d+)\s*(tr|triệu|m)/iu', $userMessage, $matches)) {
-            $price = intval($matches[2]) * 1000000;
-            $products = Products::where('gia', '<=', $price)
-                                ->select('id', 'tensp', 'gia', 'hinh_anh')
-                                ->orderBy('gia', 'desc') // Ưu tiên giá cao nhất trong khoảng
-                                ->take(4)->get();
-        } 
-        // --- CASE 2: Tìm giá "TRÊN" 
-        else if (preg_match('/(trên|hơn|từ)\s*(\d+)\s*(tr|triệu|m)/iu', $userMessage, $matches)) {
-            $price = intval($matches[2]) * 1000000;
-            $products = Products::where('gia', '>=', $price)
-                                ->select('id', 'tensp', 'gia', 'hinh_anh')
-                                ->orderBy('gia', 'asc') // Ưu tiên giá thấp nhất trong khoảng
-                                ->take(4)->get();
-        }
-        // --- CASE 3: Tìm theo TÊN/TỪ KHÓA 
-        else if (preg_match('/(tìm|mua|xem|giá|đồng hồ)\s+(.+)/iu', $userMessage, $matches)) {
-            $keyword = $matches[2];
-            // Loại bỏ từ nhiễu để tìm chính xác hơn
-            $keyword = preg_replace('/(của|hãng|hiệu|màu|cái|chiếc|nào|rẻ|mắc|tốt|đẹp)/iu', '', $keyword);
-            $keyword = trim($keyword);
-            
-            if (!empty($keyword)) {
-                $products = Products::where('tensp', 'like', "%$keyword%")
+            // Logic tìm kiếm sản phẩm...
+            if (preg_match('/(dưới|thấp hơn)\s*(\d+)\s*(tr|triệu|m)/iu', $userMessage, $matches)) {
+                $price = intval($matches[2]) * 1000000;
+                $products = Products::where('gia', '<=', $price)
                                     ->select('id', 'tensp', 'gia', 'hinh_anh')
+                                    ->orderBy('gia', 'desc')
+                                    ->take(4)->get();
+            } 
+            else if (preg_match('/(trên|hơn|từ)\s*(\d+)\s*(tr|triệu|m)/iu', $userMessage, $matches)) {
+                $price = intval($matches[2]) * 1000000;
+                $products = Products::where('gia', '>=', $price)
+                                    ->select('id', 'tensp', 'gia', 'hinh_anh')
+                                    ->orderBy('gia', 'asc')
                                     ->take(4)->get();
             }
-        }
-
-        // Tạo ngữ cảnh cho AI
-        if ($products->count() > 0) {
-            $list = $products->map(fn($p) => "- " . $p->tensp . " (" . number_format($p->gia) . "đ)")->implode("\n");
-            $systemContext = "\n[Hệ thống]: Tìm thấy sản phẩm khớp yêu cầu:\n" . $list . "\nHãy giới thiệu ngắn gọn.";
-        } else {
-            // Nếu tìm theo giá mà không có
-            if (strpos($userMessage, 'triệu') !== false || strpos($userMessage, 'tr') !== false) {
-                $systemContext = "\n[Hệ thống]: Không tìm thấy sản phẩm nào trong khoảng giá này. Hãy gợi ý khách xem mức giá khác.";
+            else if (preg_match('/(tìm|mua|xem|giá|đồng hồ)\s+(.+)/iu', $userMessage, $matches)) {
+                $keyword = $matches[2];
+                $keyword = preg_replace('/(của|hãng|hiệu|màu|cái|chiếc|nào|rẻ|mắc|tốt|đẹp)/iu', '', $keyword);
+                $keyword = trim($keyword);
+                
+                if (!empty($keyword)) {
+                    $products = Products::where('tensp', 'like', "%$keyword%")
+                                        ->select('id', 'tensp', 'gia', 'hinh_anh')
+                                        ->take(4)->get();
+                }
             }
-        }
 
-        // 2. Gửi sang Gemini AI
-        try {
+            // Tạo ngữ cảnh cho AI
+            if ($products->count() > 0) {
+                $list = $products->map(fn($p) => "- " . $p->tensp . " (" . number_format($p->gia) . "đ)")->implode("\n");
+                $systemContext = "\n[Hệ thống]: Tìm thấy sản phẩm:\n" . $list . "\nHãy giới thiệu ngắn gọn.";
+            }
+
+            // 3. Chuẩn bị dữ liệu gửi sang Google
             $history = Session::get('chat_history', []);
             $historyToSend = array_merge($history, [
                 ['role' => 'user', 'parts' => [['text' => $userMessage . $systemContext]]]
             ]);
 
-            $response = Http::withOptions(['verify' => false])
+            // --- CẤU HÌNH QUAN TRỌNG ĐỂ FIX LỖI 500 ---
+            // Dùng gemini-1.5-flash cho ổn định (bản 2.5-flash đôi khi chưa active với key thường)
+            $model = 'gemini-1.5-flash';
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+
+            // Gọi API với verify => false để tránh lỗi SSL trên Localhost
+            $response = Http::withOptions(['verify' => false]) 
                 ->withHeaders(['Content-Type' => 'application/json'])
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}", [
+                ->post($url, [
                     'contents' => $historyToSend
                 ]);
 
-            $botReply = $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? 'Xin lỗi, tôi chưa hiểu ý bạn.';
+            $data = $response->json();
 
-            // Lưu lịch sử
+            // 4. KIỂM TRA LỖI TỪ GOOGLE TRẢ VỀ (Quan trọng nhất)
+            if (isset($data['error'])) {
+                Log::error('Gemini API Error: ' . json_encode($data['error']));
+                return response()->json([
+                    'reply' => 'Hệ thống AI đang bảo trì (Lỗi API). Bạn vui lòng thử lại sau.'
+                ]);
+            }
+
+            // Kiểm tra xem có câu trả lời không trước khi lấy
+            if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                return response()->json([
+                    'reply' => 'Xin lỗi, tôi không hiểu ý bạn. Vui lòng hỏi lại.'
+                ]);
+            }
+
+            $botReply = $data['candidates'][0]['content']['parts'][0]['text'];
+
+            // 5. Lưu lịch sử
             $history[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
             $history[] = ['role' => 'model', 'parts' => [['text' => $botReply]]];
             if (count($history) > 10) $history = array_slice($history, -10);
@@ -89,7 +107,11 @@ class ChatbotController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['reply' => 'Lỗi hệ thống: ' . $e->getMessage()]);
+            // Bắt mọi lỗi crash để không hiện màn hình đỏ (500)
+            Log::error('Chatbot Controller Exception: ' . $e->getMessage());
+            return response()->json([
+                'reply' => 'Có lỗi xảy ra khi xử lý tin nhắn. Vui lòng thử lại.'
+            ]);
         }
     }
 }

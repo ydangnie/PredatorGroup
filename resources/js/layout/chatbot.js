@@ -7,20 +7,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const userInput = document.getElementById('user-input');
     const messages = document.getElementById('messages');
 
-    // Lấy cấu hình từ thẻ ẩn trong HTML
+    // Lấy cấu hình từ thẻ ẩn (nếu có) hoặc dùng mặc định
     const configElement = document.getElementById('chatbot-config');
     const chatUrl = configElement ? configElement.dataset.url : '/chat-ai';
 
-    // Lấy CSRF Token từ thẻ meta
+    // Lấy CSRF Token
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
 
-    // --- 2. XỬ LÝ ĐÓNG / MỞ ---
+    // --- 2. XỬ LÝ ĐÓNG / MỞ CHATBOT ---
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             chatBox.classList.toggle('active');
             toggleBtn.classList.toggle('toggled');
-            if (chatBox.classList.contains('active')) setTimeout(() => userInput.focus(), 300);
+            if (chatBox.classList.contains('active')) {
+                setTimeout(() => userInput.focus(), 300);
+            }
         });
     }
     if (closeBtnMini) {
@@ -30,42 +32,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- 3. GỬI TIN NHẮN ---
-    function sendMessage() {
+    // --- 3. HÀM GỬI TIN NHẮN (ĐÃ SỬA LỖI 405) ---
+    function sendMessage(e) {
+        // [QUAN TRỌNG] Ngăn chặn hành vi submit form mặc định (gây ra lỗi GET 405)
+        if (e) e.preventDefault();
+
         const text = userInput.value.trim();
         if (!text) return;
 
+        // Hiển thị tin nhắn người dùng
         appendMessage(text, 'user');
         userInput.value = '';
 
+        // Hiển thị loading
         const loadingId = 'loading-' + Date.now();
         showLoading(loadingId);
 
+        // Gửi POST request
         fetch(chatUrl, {
-                method: 'POST',
+                method: 'POST', // Luôn dùng POST
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify({ message: text })
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Lỗi kết nối: ' + res.status);
+                }
+                return res.json();
+            })
             .then(data => {
                 removeLoading(loadingId);
-                if (data.reply) appendMessage(data.reply, 'bot');
-                if (data.products && data.products.length > 0) renderProductList(data.products);
+                // Hiển thị câu trả lời từ Bot
+                if (data.reply) {
+                    appendMessage(data.reply, 'bot');
+                }
+                // Hiển thị danh sách sản phẩm nếu có
+                if (data.products && data.products.length > 0) {
+                    renderProductList(data.products);
+                }
             })
             .catch(err => {
                 removeLoading(loadingId);
-                appendMessage('Lỗi kết nối server.', 'bot');
                 console.error(err);
+                appendMessage('Xin lỗi, hệ thống đang bận. Vui lòng thử lại sau.', 'bot');
             });
     }
 
-    // --- 4. HÀM VẼ DANH SÁCH SẢN PHẨM (List View Dọc) ---
+    // --- 4. HÀM VẼ DANH SÁCH SẢN PHẨM ---
     function renderProductList(products) {
         const container = document.createElement('div');
-        // CSS Container: Xếp dọc
         container.style.cssText = "display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding: 0 5px;";
 
         products.forEach(p => {
@@ -75,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const card = document.createElement('a');
             card.href = linkUrl;
-            // CSS Thẻ: Flex row (Ảnh trái - Chữ phải)
             card.style.cssText = `
                 display: flex; 
                 align-items: center;
@@ -90,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             card.innerHTML = `
                 <div style="width: 50px; height: 50px; flex-shrink: 0; margin-right: 10px; border-radius: 4px; overflow: hidden; background: #000; border: 1px solid #444;">
-                    <img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="${p.tensp}">
+                    <img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="${p.tensp}" onerror="this.src='https://via.placeholder.com/50'">
                 </div>
                 <div style="flex-grow: 1; overflow: hidden;">
                     <div style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f0f0f0;">
@@ -105,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
 
-            // Hover effect bằng JS
+            // Hiệu ứng hover
             card.onmouseover = function() { this.style.background = '#2a2a2a';
                 this.style.borderColor = '#d4af37'; };
             card.onmouseout = function() { this.style.background = '#1e1e1e';
@@ -118,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scrollToBottom();
     }
 
-    // --- 5. CÁC HÀM HỖ TRỢ KHÁC ---
+    // --- 5. CÁC HÀM HỖ TRỢ ---
     function appendMessage(text, sender) {
         const div = document.createElement('div');
         div.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
@@ -145,7 +162,18 @@ document.addEventListener('DOMContentLoaded', function() {
         messages.scrollTop = messages.scrollHeight;
     }
 
-    // Bắt sự kiện
-    if (sendBtn) sendBtn.addEventListener('click', sendMessage);
-    if (userInput) userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    // --- 6. GẮN SỰ KIỆN (QUAN TRỌNG) ---
+    if (sendBtn) {
+        sendBtn.addEventListener('click', function(e) {
+            sendMessage(e); // Truyền event để chặn submit
+        });
+    }
+
+    if (userInput) {
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage(e); // Truyền event để chặn submit
+            }
+        });
+    }
 });
