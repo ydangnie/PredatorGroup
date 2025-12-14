@@ -86,7 +86,16 @@ Route::prefix('posts')->controller(PostController::class)->name('posts.')->group
     route::put('/{id}', 'update')->name('update');
     Route::get('/{id}/delete', 'delete')->name('delete');
 });
+// Route kiểm tra danh sách Model
+Route::get('/check-models', function () {
+    $apiKey = env('GOOGLE_API_KEY');
+    
+    // Gọi API để lấy danh sách model
+    $response = Illuminate\Support\Facades\Http::withOptions(['verify' => false])
+        ->get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
 
+    return $response->json();
+});
 // Chat AI
 Route::post('/chat-ai', [ChatbotController::class, 'chat'])->name('chat.ai');
 Route::get('/check-models', function () {
