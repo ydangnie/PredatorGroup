@@ -174,7 +174,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // ... các route hiện có (product, category...)
     
     // Thêm dòng này:
-    Route::resource('posts', App\Http\Controllers\AdminPostController::class);
+    Route::resource('posts', AdminPostController::class);
 });
 
 });

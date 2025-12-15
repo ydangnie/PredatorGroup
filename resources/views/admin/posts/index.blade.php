@@ -8,24 +8,55 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap-grid.min.css" rel="stylesheet">
-    
+
     {{-- Tận dụng CSS của Brand/Banner để đồng bộ giao diện --}}
     @vite(['resources/css/admin/banner.css'])
 
     <style>
         /* CSS bổ sung cho form tin tức dài hơn form brand */
-        .modal-content { max-width: 900px !important; width: 95%; max-height: 90vh; overflow-y: auto; }
-        .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
-        .form-col { flex: 1; }
-        textarea.form-input { height: auto; line-height: 1.5; }
-        .seo-box { background: #1e1e24; padding: 15px; border-radius: 8px; border: 1px dashed #444; margin-top: 10px; }
-        .seo-title { color: #D4AF37; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; }
+        .modal-content {
+            max-width: 900px !important;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        textarea.form-input {
+            height: auto;
+            line-height: 1.5;
+        }
+
+        .seo-box {
+            background: #1e1e24;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #444;
+            margin-top: 10px;
+        }
+
+        .seo-title {
+            color: #D4AF37;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
 <body>
     @include('admin.nav')
-    
+
     <div class="banner-container">
         @if(session('success'))
         <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
@@ -37,7 +68,7 @@
         <div class="card-box">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
                 <h5><i class="fas fa-newspaper"></i> Danh sách Tin Tức</h5>
-                
+
                 @if(isset($postEdit))
                 {{-- Nếu đang sửa thì nút này reset về trang danh sách --}}
                 <a href="{{ route('admin.posts.index') }}" class="btn-action btn-add-new">
@@ -68,8 +99,8 @@
                             <td>{{ $key + 1 }}</td>
                             <td>
                                 <div class="thumb-box">
-                                    <img src="{{ asset('storage/'.$item->thumbnail) }}" class="thumb-img" alt="img" 
-                                         onerror="this.src='https://placehold.co/50x50?text=No+Img'">
+                                    <img src="{{ asset('storage/'.$item->thumbnail) }}" class="thumb-img" alt="img"
+                                        onerror="this.src='https://placehold.co/50x50?text=No+Img'">
                                 </div>
                             </td>
                             <td>
@@ -77,10 +108,15 @@
                                 <small style="color: #888;">Slug: {{ $item->slug }}</small>
                             </td>
                             <td>
-                                @if($item->meta_title && $item->meta_description)
-                                    <span style="color: #4ade80; font-size: 12px;"><i class="fas fa-check"></i> Đã tối ưu</span>
+                                {{-- Sửa meta_description thành meta_desc --}}
+                                @if(!empty($item->meta_title) && !empty($item->meta_desc))
+                                <span style="color: #4ade80; font-size: 12px; font-weight:bold;">
+                                    <i class="fas fa-check-circle"></i> Đã tối ưu
+                                </span>
                                 @else
-                                    <span style="color: #f87171; font-size: 12px;">Chưa tối ưu</span>
+                                <span style="color: #f87171; font-size: 12px;">
+                                    <i class="fas fa-exclamation-circle"></i> Chưa tối ưu
+                                </span>
                                 @endif
                             </td>
                             <td class="text-center">
@@ -117,42 +153,42 @@
                 </h5>
                 <button type="button" class="close-modal" onclick="closeModal()">&times;</button>
             </div>
-            
+
             <div class="card-body-custom">
-                <form action="{{ isset($postEdit) ? route('admin.posts.update', $postEdit->id) : route('admin.posts.store') }}" 
-                      method="POST" enctype="multipart/form-data">
+                <form action="{{ isset($postEdit) ? route('admin.posts.update', $postEdit->id) : route('admin.posts.store') }}"
+                    method="POST" enctype="multipart/form-data">
                     @csrf
                     @if(isset($postEdit)) @method('PUT') @endif
-                    
+
                     <div class="form-row">
                         <div class="form-col">
                             {{-- Tiêu đề --}}
                             <div class="form-group">
                                 <label class="form-label">Tiêu đề bài viết <span style="color:red">*</span></label>
-                                <input type="text" name="title" id="title" class="form-input" required 
-                                       onkeyup="ChangeToSlug()"
-                                       value="{{ isset($postEdit) ? $postEdit->title : old('title') }}"
-                                       placeholder="Nhập tiêu đề...">
+                                <input type="text" name="title" id="title" class="form-input" required
+                                    onkeyup="ChangeToSlug()"
+                                    value="{{ isset($postEdit) ? $postEdit->title : old('title') }}"
+                                    placeholder="Nhập tiêu đề...">
                             </div>
 
                             {{-- Slug --}}
                             <div class="form-group">
                                 <label class="form-label">Slug (URL chuẩn SEO)</label>
-                                <input type="text" name="slug" id="slug" class="form-input" 
-                                       value="{{ isset($postEdit) ? $postEdit->slug : old('slug') }}">
+                                <input type="text" name="slug" id="slug" class="form-input"
+                                    value="{{ isset($postEdit) ? $postEdit->slug : old('slug') }}">
                             </div>
 
                             {{-- Ảnh đại diện --}}
                             <div class="form-group">
                                 <label class="form-label">Ảnh đại diện</label>
                                 <input type="file" name="thumbnail" class="form-input" onchange="previewFile(this)" {{ isset($postEdit) ? '' : 'required' }}>
-                                
+
                                 <div class="preview-area" style="margin-top: 10px;">
                                     <img id="preview" src="#" style="display: none; max-width: 100px; border-radius: 4px;">
                                     @if(isset($postEdit) && $postEdit->thumbnail)
-                                        <div id="old-img">
-                                            <img src="{{ asset('storage/'.$postEdit->thumbnail) }}" style="max-width: 100px; border-radius: 4px;">
-                                        </div>
+                                    <div id="old-img">
+                                        <img src="{{ asset('storage/'.$postEdit->thumbnail) }}" style="max-width: 100px; border-radius: 4px;">
+                                    </div>
                                     @endif
                                 </div>
                             </div>
@@ -162,25 +198,25 @@
                             {{-- Cấu hình SEO --}}
                             <div class="seo-box">
                                 <div class="seo-title"><i class="fas fa-search"></i> Cấu hình SEO (SEOquake)</div>
-                                
+
                                 <div class="form-group">
                                     <label class="form-label" style="font-size: 12px;">Meta Title (Tiêu đề Google)</label>
-                                    <input type="text" name="meta_title" class="form-input" 
-                                           value="{{ isset($postEdit) ? $postEdit->meta_title : old('meta_title') }}"
-                                           placeholder="Tự động lấy theo tiêu đề nếu trống">
+                                    <input type="text" name="meta_title" class="form-input"
+                                        value="{{ isset($postEdit) ? $postEdit->meta_title : old('meta_title') }}"
+                                        placeholder="Tự động lấy theo tiêu đề nếu trống">
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label" style="font-size: 12px;">Meta Description (Mô tả tìm kiếm)</label>
-                                    <textarea name="meta_desc" class="form-input" rows="3"
-                                              placeholder="Mô tả ngắn gọn nội dung...">{{ isset($postEdit) ? $postEdit->meta_description : old('meta_description') }}</textarea>
+                                    <textarea name="meta_description" class="form-input" rows="3"
+                                        placeholder="Mô tả ngắn gọn nội dung (Nên dưới 160 ký tự)...">{{ isset($postEdit) ? $postEdit->meta_desc : old('meta_description') }}</textarea>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label" style="font-size: 12px;">Meta Keywords</label>
-                                    <input type="text" name="meta_keywords" class="form-input" 
-                                           value="{{ isset($postEdit) ? $postEdit->meta_keywords : old('meta_keywords') }}"
-                                           placeholder="dong ho, thoi trang...">
+                                    <input type="text" name="meta_keywords" class="form-input"
+                                        value="{{ isset($postEdit) ? $postEdit->meta_keywords : old('meta_keywords') }}"
+                                        placeholder="dong ho, thoi trang...">
                                 </div>
                             </div>
                         </div>
@@ -197,7 +233,7 @@
                         <button type="submit" class="btn-action btn-save" style="flex: 1;">
                             {{ isset($postEdit) ? 'Lưu Thay Đổi' : 'Đăng Bài' }}
                         </button>
-                        
+
                         @if(isset($postEdit))
                         <a href="{{ route('admin.posts.index') }}" class="btn-action btn-back" style="flex: 1; margin:0; text-align: center; text-decoration: none; line-height: 40px;">Hủy bỏ</a>
                         @else
@@ -219,8 +255,8 @@
 
         function closeModal() {
             @if(!isset($postEdit))
-             modal.style.display = 'none';
-             document.body.style.overflow = 'auto';
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
             @endif
         }
 
@@ -259,7 +295,7 @@
 
         // Tự động mở modal nếu đang Edit hoặc có lỗi
         document.addEventListener("DOMContentLoaded", function() {
-            @if(isset($postEdit) || $errors->any())
+            @if(isset($postEdit) || $errors -> any())
             openModal();
             @endif
         });
@@ -271,6 +307,33 @@
                 @endif
             }
         }
+        // Tìm textarea meta_description
+        const metaDescInput = document.querySelector('textarea[name="meta_description"]');
+
+        if (metaDescInput) {
+            // Tạo thẻ hiển thị số ký tự
+            const counter = document.createElement('small');
+            counter.style.display = 'block';
+            counter.style.marginTop = '5px';
+            counter.style.color = '#888';
+            metaDescInput.parentNode.appendChild(counter);
+
+            function updateCounter() {
+                const len = metaDescInput.value.length;
+                counter.textContent = `${len}/160 ký tự`;
+                if (len > 160) {
+                    counter.style.color = 'red';
+                } else {
+                    counter.style.color = '#4ade80'; // Màu xanh
+                }
+            }
+
+            // Lắng nghe sự kiện nhập liệu
+            metaDescInput.addEventListener('input', updateCounter);
+            // Chạy lần đầu
+            updateCounter();
+        }
     </script>
 </body>
+
 </html>

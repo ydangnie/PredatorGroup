@@ -56,21 +56,20 @@ class AdminPostController extends Controller
         ]);
 
         $data = $request->all();
-        $data['user_id'] = Auth::id() ?? 1; // Gán user hiện tại
+        // Kiểm tra user đăng nhập, nếu không có lấy mặc định là 1 (Admin)
+        $data['user_id'] = Auth::id() ?? 1; 
 
         // --- Xử lý Slug (Chống trùng) ---
-        // Nếu người dùng nhập slug thì lấy, không thì lấy title
         $inputSlug = $request->slug ? $request->slug : $request->title;
         $data['slug'] = $this->generateUniqueSlug($inputSlug);
 
-        // --- Xử lý SEO (Mapping tên cột) ---
-        // DB dùng 'meta_desc', Form dùng 'meta_description' -> Cần chuyển đổi
+        // --- Xử lý SEO ---
         $data['meta_title'] = $request->meta_title ?? $request->title;
         
-        // Lấy dữ liệu từ form meta_description GÁN VÀO meta_desc
-        $data['meta_desc'] = $request->meta_description ?? substr(strip_tags($request->content), 0, 160);
+        // --- FIX LỖI UTF-8 Ở ĐÂY: Dùng mb_substr thay vì substr ---
+        $data['meta_desc'] = $request->meta_description ?? mb_substr(strip_tags($request->content), 0, 160, 'UTF-8');
         
-        // Xóa key thừa để tránh lỗi "Column not found"
+        // Xóa key thừa
         unset($data['meta_description']);
 
         // --- Xử lý Ảnh ---
@@ -96,16 +95,17 @@ class AdminPostController extends Controller
 
         $data = $request->all();
 
-        // --- Xử lý Slug (Truyền $id để không báo trùng với chính nó) ---
+        // --- Xử lý Slug ---
         $inputSlug = $request->slug ? $request->slug : $request->title;
         $data['slug'] = $this->generateUniqueSlug($inputSlug, $id);
 
         // --- Xử lý SEO ---
         $data['meta_title'] = $request->meta_title ?? $request->title;
         
-        // Mapping meta_description -> meta_desc
-        $data['meta_desc'] = $request->meta_description ?? substr(strip_tags($request->content), 0, 160);
-        unset($data['meta_description']); // Quan trọng: Xóa key cũ
+        // --- FIX LỖI UTF-8 Ở ĐÂY: Dùng mb_substr thay vì substr ---
+        $data['meta_desc'] = $request->meta_description ?? mb_substr(strip_tags($request->content), 0, 160, 'UTF-8');
+        
+        unset($data['meta_description']);
 
         // --- Xử lý Ảnh ---
         if ($request->hasFile('thumbnail')) {
@@ -119,7 +119,6 @@ class AdminPostController extends Controller
 
         $post->update($data);
 
-        // Quay về trang index (xóa biến $postEdit khỏi session/view)
         return redirect()->route('admin.posts.index')->with('success', 'Cập nhật bài viết thành công!');
     }
 
@@ -128,7 +127,6 @@ class AdminPostController extends Controller
     {
         $post = Post::findOrFail($id);
         
-        // Xóa ảnh trong storage trước
         if ($post->thumbnail) {
             Storage::disk('public')->delete($post->thumbnail);
         }
