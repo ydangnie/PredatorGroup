@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liên Hệ Hỗ Trợ - PredatorWatch</title>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     @vite(['resources/css/layout/lienhe.css', 'resources/js/layout/lienhe.js'])
 </head>
+
 <body style="margin: 0; padding: 0;">
-@extends('layouts.navbar.header')
+    @extends('layouts.navbar.header')
     <div class="contact-wrapper">
         <div class="contact-ui-wrap">
             <header class="contact-ui-top">
                 <div class="contact-ui-title-group">
-                   
+
                     <div class="contact-ui-logo">PW</div>
                     <div class="contact-ui-heading">
                         <h1>Liên hệ</h1>
@@ -38,7 +40,8 @@
                     <h2 style="margin:0 0 8px 0;font-family:'Rubik',sans-serif;color:#fff;font-size:20px">Gửi tin nhắn</h2>
                     <p style="color:#9aa0a6;margin:0 0 16px 0">Chúng tôi sẽ phản hồi nhanh nhất có thể.</p>
 
-                    <form id="contactForm" class="contact-ui-form" novalidate>
+                    <form id="contactForm" class="contact-ui-form" method="POST" action="{{ route('lienhe.send') }}" novalidate>
+                        @csrf
                         <div class="contact-ui-row">
                             <div class="contact-ui-col contact-ui-field">
                                 <input id="name" name="name" type="text" placeholder=" " required />
@@ -113,7 +116,7 @@
                 </aside>
             </section>
         </div>
-        
+
         <div class="contact-ui-modal" id="mapModal">
             <div class="contact-ui-modal-card">
                 <iframe src="https://maps.google.com/maps?q=Hanoi%20Vietnam&t=&z=13&ie=UTF8&iwloc=&output=embed" style="width:100%;height:100%;border:0"></iframe>
@@ -125,4 +128,5 @@
     </div>
     @extends('layouts.navbar.footer')
 </body>
+
 </html>

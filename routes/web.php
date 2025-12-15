@@ -31,6 +31,11 @@ use App\Http\Controllers\AdminPostController;
 | Web Routes (USER & GUEST)
 |--------------------------------------------------------------------------
 */
+// Route hiện thị trang liên hệ (GET)
+Route::get('lienhe', [LienHeController::class, 'lienhe'])->name('lienhe');
+
+// Route xử lý gửi form liên hệ (POST)
+Route::post('lienhe', [LienHeController::class, 'postLienhe'])->name('lienhe.send');
 Route::get('/tin-tuc', [PostController::class, 'index'])->name('posts.index');
 Route::get('/tin-tuc/{slug}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/search', [ProductController::class, 'search'])->name('search');
