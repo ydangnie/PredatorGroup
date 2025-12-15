@@ -49,17 +49,77 @@
 
 {{-- Script xử lý xóa (dùng lại logic cũ) --}}
 <script>
-    function toggleWishlist(event, productId) {
-        event.preventDefault();
-        fetch(`/wishlist/toggle/${productId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
+  // Hàm hiển thị Toast
+function showToast(message) {
+    var x = document.getElementById("custom-toast");
+    document.getElementById("toast-text").innerText = message;
+    x.className = "custom-toast show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000); // Ẩn sau 3 giây
+}
+
+function toggleWishlist(event, productId) {
+    event.preventDefault(); 
+    event.stopPropagation(); 
+
+    fetch(`/wishlist/toggle/${productId}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 401 || response.status === 419) {
+            // Nếu chưa đăng nhập
+            if(confirm('Bạn cần đăng nhập để thêm sản phẩm yêu thích. Đi đến trang đăng nhập?')) {
+                window.location.href = '/dangnhap';
             }
-        });
-        // Không cần xử lý UI update phức tạp ở đây vì ta remove luôn element cha
-    }
+            return null;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if(!data) return;
+
+        const btn = event.target.closest('button');
+        const icon = btn.querySelector('i');
+        const badge = document.getElementById('wishlist-count-badge'); // Đảm bảo ID này khớp với Header
+        
+        // Cập nhật số lượng trên Header (nếu có)
+        let currentCount = 0;
+        if (badge && badge.innerText) {
+            currentCount = parseInt(badge.innerText) || 0;
+        }
+
+        if (data.status === 'added') {
+            // Đổi icon sang tim đỏ đặc
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+            icon.style.color = '#ef4444';
+            
+            if(badge) {
+                currentCount++;
+                badge.innerText = currentCount;
+                badge.style.display = 'inline-block';
+            }
+        } else if (data.status === 'removed') {
+            // Đổi icon về tim rỗng
+            icon.classList.remove('fa-solid');
+            icon.classList.add('fa-regular');
+            icon.style.color = '#ccc'; 
+            
+            if(badge) {
+                currentCount--;
+                badge.innerText = currentCount;
+                if(currentCount <= 0) badge.style.display = 'none';
+            }
+        }
+
+        // QUAN TRỌNG: Gọi hàm hiển thị thông báo ở đây
+        showToast(data.message);
+    })
+    .catch(error => console.error('Error:', error));
+}
 </script>
 
 @include('layouts.navbar.footer')

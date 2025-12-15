@@ -262,9 +262,19 @@
                 </button>
 
             </form>
-            <button class="action-btn">
+
+            {{-- Tìm đoạn nút Wishlist và thay thế bằng đoạn này --}}
+            <a href="{{ route('wishlist.index') }}" class="action-btn" style="position: relative;">
                 <i class="fa-regular fa-heart"></i>
-            </button>
+
+                {{-- Thẻ hiển thị số lượng --}}
+                <span id="wishlist-count-badge"
+                    style="position: absolute; top: -5px; right: -5px; 
+                 background-color: #ef4444; color: #fff; 
+                 font-size: 10px; font-weight: bold; 
+                 padding: 2px 5px; border-radius: 50%; 
+                 display: none;">0</span>
+            </a>
             <a class="action-btn" href="{{ route('giohang') }}" style="position: relative;">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span id="cart-count-badge"
@@ -344,6 +354,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. Code lấy số lượng Giỏ hàng (Giữ nguyên code cũ của bạn) ---
         fetch('{{ route("cart.count") }}')
             .then(res => res.json())
             .then(data => {
@@ -355,9 +366,21 @@
             })
             .catch(err => console.log('Lỗi cart count:', err));
 
-        setTimeout(() => {
-            closeToast();
-        }, 15000);
+        // --- 2. Code MỚI: Lấy số lượng Wishlist ---
+        fetch('{{ route("wishlist.count") }}')
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('wishlist-count-badge');
+                if (badge) {
+                    if (data.count > 0) {
+                        badge.innerText = data.count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            })
+            .catch(err => console.log('Lỗi wishlist count:', err));
     });
 
     function toggleNotify() {
