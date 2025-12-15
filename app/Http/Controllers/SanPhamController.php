@@ -13,10 +13,50 @@ class SanPhamController extends Controller
         // 1. Khởi tạo query
         $query = Products::with(['brand', 'category']);
 
-        // 2. Tìm kiếm theo từ khóa (navbar search)
+        // 2. Tìm kiếm theo từ khóa (navbar search / sidebar search)
         if ($request->has('keyword') && $request->keyword != null) {
             $keyword = $request->keyword;
-            $query->where('tensp', 'LIKE', "%{$keyword}%");
+
+            // Định nghĩa ánh xạ từ tiếng Việt sang giá trị DB (male, female, unisex)
+            // Dùng strtolower để tìm kiếm không phân biệt chữ hoa/thường.
+            $loweredKeyword = strtolower($keyword);
+            $genderMap = [
+                'nam' => 'male',
+                'nữ' => 'female',
+                'nu' => 'female', // Thêm trường hợp gõ không dấu
+                'unisex' => 'unisex',
+            ];
+
+            $genderToSearch = null;
+            
+            // Kiểm tra xem từ khóa có chứa từ giới tính cụ thể nào không
+            foreach ($genderMap as $viTerm => $dbValue) {
+                // Dùng str_contains để kiểm tra từ khóa (vd: "đồng hồ nam" chứa "nam")
+                if (str_contains($loweredKeyword, $viTerm)) {
+                    $genderToSearch = $dbValue;
+                    break;
+                }
+            }
+
+            // BẮT ĐẦU PHẦN ĐÃ CẬP NHẬT
+            $query->where(function ($q) use ($keyword, $genderToSearch) {
+                // 1. Tìm kiếm theo Tên sản phẩm (tensp) - Vẫn tìm kiếm cả cụm từ
+                $q->where('tensp', 'LIKE', "%{$keyword}%")
+                  
+                  // 2. HOẶC tìm kiếm theo Tên danh mục (ten_danhmuc)
+                  ->orWhereHas('category', function ($q2) use ($keyword) {
+                      $q2->where('ten_danhmuc', 'LIKE', "%{$keyword}%");
+                  });
+
+                // 3. HOẶC tìm kiếm theo Giới tính (gender) - Chỉ tìm kiếm khi xác định được giới tính
+                if ($genderToSearch) {
+                    // Nếu tìm thấy từ giới tính ("nam", "nữ"), áp dụng tìm kiếm chính xác
+                    // (gender = 'male' hoặc 'female' hoặc 'unisex')
+                    $q->orWhere('gender', $genderToSearch);
+                }
+                // Lưu ý: Đã loại bỏ orWhere('gender', 'LIKE', "%{$keyword}%") không hiệu quả
+            });
+            // KẾT THÚC PHẦN ĐÃ CẬP NHẬT
         }
 
         // 3. Lọc theo Danh mục (Category)

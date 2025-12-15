@@ -256,12 +256,20 @@
         <div class="header-actions">
             {{-- FORM TÌM KIẾM ĐÃ CHỈNH SỬA --}}
             <form action="{{ route('sanpham') }}" method="GET" class="search-box" id="searchBox">
-                <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm sản phẩm..." value="{{ request('keyword') }}">
-                <button type="submit" class="action-btn">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
+    @php
+        // Lấy tất cả các tham số query hiện tại, loại trừ 'keyword' và 'page'
+        $currentFilters = request()->except(['keyword', 'page']);
+    @endphp
 
-            </form>
+    @foreach($currentFilters as $key => $value)
+        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+    @endforeach
+
+    <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm sản phẩm..." value="{{ request('keyword') }}">
+    <button type="submit" class="action-btn">
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+</form>
 
             {{-- Tìm đoạn nút Wishlist và thay thế bằng đoạn này --}}
             <a href="{{ route('wishlist.index') }}" class="action-btn" style="position: relative;">

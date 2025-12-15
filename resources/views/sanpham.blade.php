@@ -30,6 +30,19 @@
         }
         .wt-btn-filter:hover { background: #D4AF37; color: #fff; }
 
+        /* CSS Bổ sung cho input tìm kiếm mới */
+        .wt-search-input { 
+            width: 100%; 
+            padding: 8px 10px; 
+            border: 1px solid #ddd; 
+            margin-bottom: 10px; 
+            box-sizing: border-box; 
+            border-radius: 4px;
+        }
+        .wt-search-input:focus {
+            border-color: #D4AF37;
+            outline: none;
+        }
         /* CSS cho nút Yêu thích */
         .wt-wishlist-btn {
             position: absolute; 
@@ -106,10 +119,10 @@
         {{-- MỞ FORM ĐỂ BAO QUANH CẢ SIDEBAR VÀ SORT SELECT --}}
         <form action="{{ route('sanpham') }}" method="GET" id="filterForm" class="d-flex w-100" style="display: flex; gap: 20px; width: 100%;">
             
-            {{-- Giữ lại từ khóa tìm kiếm nếu có --}}
-            @if(request('keyword'))
+            {{-- Đã thay thế input hidden bằng input text trong sidebar để tìm kiếm trực tiếp --}}
+            {{-- @if(request('keyword'))
                 <input type="hidden" name="keyword" value="{{ request('keyword') }}">
-            @endif
+            @endif --}}
 
             <aside class="wt-filter-sidebar" id="wtFilterSidebar">
                 <div class="wt-filter-header">
@@ -117,6 +130,17 @@
                     <a href="{{ route('sanpham') }}" class="wt-clear-button" type="button" style="text-decoration: none; font-size: 12px;">Xóa Tất Cả</a>
                 </div>
 
+                {{-- THÊM 0. TÌM KIẾM SẢN PHẨM --}}
+                <div class="wt-filter-group">
+                    <h4>Tìm kiếm</h4>
+                    <input type="text" 
+                           name="keyword" 
+                           value="{{ request('keyword') }}"
+                           placeholder="Nhập tên sản phẩm..."
+                           class="wt-search-input">
+                    {{-- Nút "Áp Dụng" ở cuối sidebar sẽ submit form và tìm kiếm --}}
+                </div>
+                
                 {{-- 1. Lọc Danh Mục (Từ DB Categories) --}}
                 <div class="wt-filter-group">
                     <h4>Danh Mục</h4>
@@ -182,7 +206,8 @@
                     <select class="wt-sort-select" name="sort" id="wtSortSelect" onchange="this.form.submit()">
                         <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
                         <option value="price-asc" {{ request('sort') == 'price-asc' ? 'selected' : '' }}>Giá: Thấp đến Cao</option>
-                        <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Giá: Cao đến Thấp</option>
+                        {{-- ĐÃ SỬA: Thay price-high bằng price-desc để khớp với Controller --}}
+                        <option value="price-desc" {{ request('sort') == 'price-desc' ? 'selected' : '' }}>Giá: Cao đến Thấp</option>
                         <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Tên: A-Z</option>
                     </select>
                 </div>
