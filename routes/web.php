@@ -30,10 +30,11 @@ use App\Http\Controllers\AdminPostController;
 | Web Routes (USER & GUEST)
 |--------------------------------------------------------------------------
 */
-
+Route::get('/tin-tuc', [PostController::class, 'index'])->name('posts.index');
+Route::get('/tin-tuc/{slug}', [PostController::class, 'show'])->name('posts.show');
 // Trang chủ & User thường
 Route::controller(HomeController::class)->group(function () {
-    Route::get('/', 'index');
+    Route::get('/', 'index')->name('home');
     Route::get('/about', 'about');
     Route::get('/users', [UserConTroller::class, 'index'])->middleware('access.time');
 });
@@ -120,7 +121,7 @@ Route::get('/tin-tuc/{slug}', [PostController::class, 'show'])->name('posts.show
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    
+    Route::resource('posts', AdminPostController::class);
     // Dashboard
     Route::get('/dasboard', [AdminController::class, 'index'])->name('dasboard'); // Lưu ý: Bạn đang viết sai chính tả 'dashboard' thành 'dasboard'
 

@@ -64,10 +64,10 @@
                         <i class="fas fa-file-invoice-dollar"></i>
                         <span>Hóa đơn</span>
                     </a>
-                    <a href="#" class="nav-item sub-nav-item">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        <span>Tin tức</span>
-                    </a>
+                    <a href="{{ route('admin.posts.index') }}" class="nav-item sub-nav-item {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
+    <i class="fas fa-newspaper"></i> {{-- Đổi icon thành tờ báo --}}
+    <span>Tin tức</span>
+</a>
                 </div>
                 <div class="nav-item">
                     <i class="fas fa-users"></i>

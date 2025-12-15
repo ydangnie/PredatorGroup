@@ -4,30 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title', 
-        'slug', 
-        'content', 
-        'excerpt', 
-        'thumbnail', 
-        'meta_title', 
-        'meta_desc'
-    ];
+    protected $table = 'posts';
 
-    // Tự động tạo slug khi lưu nếu chưa có
-    protected static function boot()
+    // === QUAN TRỌNG: PHẢI CÓ CÁC TRƯỜNG SEO Ở ĐÂY ===
+protected $fillable = [
+    'title',
+    'slug',
+    'thumbnail',
+    'content',
+    'excerpt',          // <--- SỬA: Đổi 'short_description' thành 'excerpt' cho khớp Database
+    'meta_title',
+    'meta_desc',        // <--- ĐÚNG: Khớp với Database
+    'meta_keywords',    // <--- ĐÚNG: Nếu bạn đã chạy lệnh thêm cột này
+    'is_active',     // <--- CẨN THẬN: Kiểm tra xem DB có cột này chưa, nếu chưa thì comment lại
+    'user_id'        // <--- CẨN THẬN: Kiểm tra xem DB có cột này chưa
+];
+
+    public function user()
     {
-        parent::boot();
-        static::creating(function ($post) {
-            if (empty($post->slug)) {
-                $post->slug = Str::slug($post->title);
-            }
-        });
+        return $this->belongsTo(User::class);
     }
 }

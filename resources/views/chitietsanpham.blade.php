@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $product->tensp }} - Predator Group</title>
     {{-- CSS chính --}}
     @vite(['resources/css/layout/chitietsanpham.css'])
@@ -38,6 +39,9 @@
         .toast-msg i {
             color: #D4AF37;
         }
+        
+        .toast-msg.added i { color: #4ade80; }
+        .toast-msg.removed i { color: #f87171; }
 
         @keyframes slideIn {
             from {
@@ -58,52 +62,86 @@
 
         /* Review Section Styles */
         .wtch-reviews-section {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 30px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        /* Thay background trắng thành đen xám */
+        background: #111; 
+        color: #eee;
+        border: 1px solid #333;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    }
 
-        .wtch-review-form textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            font-family: inherit;
-        }
+    .wtch-section-title {
+        color: #D4AF37; /* Tiêu đề màu vàng */
+        border-bottom: 1px solid #333;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
 
-        .wtch-review-form select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #fff;
-        }
+    /* Form nhập liệu tối màu */
+    .wtch-review-form {
+        /* Nền form tối hơn một chút */
+        background: #1a1a1a !important; 
+        border: 1px dashed #444 !important;
+        color: #fff;
+    }
 
-        .review-item {
-            border-bottom: 1px solid #f1f1f1;
-            padding: 20px 0;
-        }
+    .wtch-review-form textarea, 
+    .wtch-review-form select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #444;
+        border-radius: 4px;
+        resize: vertical;
+        /* Input nền đen, chữ trắng */
+        background-color: #222; 
+        color: #fff;
+    }
+    
+    .wtch-review-form textarea:focus,
+    .wtch-review-form select:focus {
+        border-color: #D4AF37;
+        outline: none;
+    }
 
-        .review-item:last-child {
-            border-bottom: none;
-        }
+    /* Danh sách review */
+    .review-item {
+        border-bottom: 1px solid #333; /* Đường kẻ mờ tối */
+        padding: 20px 0;
+    }
+    
+    .review-header {
+        color: #fff !important; /* Tên người dùng màu trắng */
+    }
+    
+    .review-content {
+        color: #ccc !important; /* Nội dung bình luận màu xám sáng */
+    }
 
-        .review-avatar {
-            width: 40px;
-            height: 40px;
-            background: #eee;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #555;
-            margin-right: 15px;
-            font-size: 16px;
-        }
+    .review-avatar {
+        width: 40px;
+        height: 40px;
+        background: #333; /* Avatar nền tối */
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #D4AF37; /* Chữ cái avatar màu vàng */
+        margin-right: 15px;
+        font-size: 16px;
+        border: 1px solid #444;
+    }
+    
+    /* Chỉnh lại màu text trong summary */
+    .wtch-rating-summary {
+        border-bottom: 1px solid #333 !important;
+    }
+    .wtch-rating-summary div {
+        color: #fff !important;
+    }
     </style>
 </head>
 
@@ -122,8 +160,15 @@
             <div class="wtch-gallery-zone">
                 <div class="wtch-main-image">
                     <img id="mainImage" src="{{ asset('storage/' . $product->hinh_anh) }}" alt="{{ $product->tensp }}">
-                    <button class="wtch-wishlist-btn" onclick="toggleWishlist(this)" title="Thêm vào yêu thích">
-                        <i class="fa-regular fa-heart"></i>
+                    
+                    {{-- SỬA NÚT: Thêm product id vào hàm onclick --}}
+                    <button class="wtch-wishlist-btn" onclick="toggleWishlist(this, {{ $product->id }})" title="Thêm vào yêu thích">
+                        {{-- Kiểm tra xem user đã like chưa để hiển thị đúng icon --}}
+                        @if(Auth::check() && \App\Models\Wishlist::where('user_id', Auth::id())->where('product_id', $product->id)->exists())
+                            <i class="fa-solid fa-heart" style="color: #d4af37;"></i>
+                        @else
+                            <i class="fa-regular fa-heart"></i>
+                        @endif
                     </button>
                 </div>
 
@@ -249,9 +294,7 @@
             </div>
         </div>
 
-        {{-- ========================================== --}}
-        {{-- PHẦN ĐÁNH GIÁ & BÌNH LUẬN (ĐÃ SỬA LOGIC) --}}
-        {{-- ========================================== --}}
+        {{-- PHẦN ĐÁNH GIÁ & BÌNH LUẬN --}}
         <div class="wtch-reviews-section" id="review-section">
             <h3 class="wtch-section-title">Khách hàng nói về sản phẩm</h3>
 
@@ -341,7 +384,7 @@
                 @foreach($product->reviews as $review)
                 <div class="review-item">
                     <div style="display: flex;">
-                        {{-- Avatar: Màu vàng nếu là người mua, màu xám nếu là khách --}}
+                        {{-- Avatar --}}
                         <div class="review-avatar" style="{{ $review->so_sao ? 'background:#D4AF37; color:#fff;' : '' }}">
                             {{ strtoupper(substr($review->user ? $review->user->name : 'A', 0, 1)) }}
                         </div>
@@ -350,7 +393,6 @@
                                 <div style="font-weight: bold; color: #333; display: flex; align-items: center; gap: 8px;">
                                     {{ $review->user ? $review->user->name : 'Người dùng ẩn danh' }}
 
-                                    {{-- Badge xác nhận đã mua hàng --}}
                                     @if($review->so_sao)
                                     <span style="font-size: 11px; background: #e6fffa; color: #2c7a7b; padding: 2px 8px; border-radius: 12px; border: 1px solid #b2f5ea; display: flex; align-items: center; gap: 4px;">
                                         <i class="fa-solid fa-check-circle"></i> Đã mua hàng
@@ -362,7 +404,6 @@
                                 </div>
                             </div>
 
-                            {{-- Chỉ hiện sao nếu có (tức là người mua) --}}
                             @if($review->so_sao)
                             <div class="review-stars" style="color: #FFD700; font-size: 12px; margin-bottom: 8px;">
                                 @for($i = 1; $i <= 5; $i++)
@@ -409,46 +450,11 @@
             @endif
         </div>
     </div>
-    {{-- HTML Toast Thông báo --}}
-    <div id="custom-toast" class="custom-toast">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <i id="toast-icon" class="fa-solid fa-check-circle" style="color: #4ade80; font-size: 18px;"></i>
-            <span id="toast-text" style="font-weight: 500;">Nội dung thông báo</span>
-        </div>
-    </div>
-
-    {{-- CSS cho Toast --}}
-    <style>
-        .custom-toast {
-            visibility: hidden;
-            min-width: 280px;
-            background-color: #fff;
-            color: #333;
-            text-align: left;
-            border-radius: 8px;
-            padding: 16px;
-            position: fixed;
-            z-index: 9999;
-            right: 20px;
-            bottom: 20px;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-left: 5px solid #D4AF37;
-            transform: translateY(100%);
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-
-        .custom-toast.show {
-            visibility: visible;
-            transform: translateY(0);
-            opacity: 1;
-            bottom: 40px;
-        }
-    </style>
-    @include('layouts.navbar.footer')
-
+    
+    {{-- Container cho Toast --}}
     <div id="toast-box"></div>
+
+    @include('layouts.navbar.footer')
 
     <script>
         // Hàm đổi ảnh chính
@@ -464,30 +470,51 @@
             el.classList.add('selected');
         }
 
-        // Hàm yêu thích
-        function toggleWishlist(btn) {
-            btn.classList.toggle('active');
-            let icon = btn.querySelector('i');
-            if (btn.classList.contains('active')) {
-                icon.classList.remove('fa-regular');
-                icon.classList.add('fa-solid');
-                icon.style.color = '#d4af37';
-            } else {
-                icon.classList.remove('fa-solid');
-                icon.classList.add('fa-regular');
-                icon.style.color = '#fff';
-            }
+        // Hàm yêu thích đã được cập nhật logic gọi API
+        function toggleWishlist(btn, productId) {
+            fetch(`/wishlist/toggle/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 401 || response.status === 419) {
+                    if(confirm('Bạn cần đăng nhập để thêm vào yêu thích. Đi tới trang đăng nhập?')) {
+                        window.location.href = '/dangnhap';
+                    }
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+
+                btn.classList.toggle('active');
+                let icon = btn.querySelector('i');
+                
+                if (data.status === 'added') {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                    icon.style.color = '#d4af37';
+                } else {
+                    icon.classList.remove('fa-solid');
+                    icon.classList.add('fa-regular');
+                    icon.style.color = ''; // Reset
+                }
+
+                // Gọi hàm hiển thị thông báo
+                showToast(data.message, data.status);
+            })
+            .catch(error => console.error('Lỗi:', error));
         }
 
         // Hàm tăng giảm số lượng
         function changeQty(n) {
             let input = document.getElementById('qtyInput');
             let val = parseInt(input.value) + n;
-            const max = {
-                {
-                    $product - > so_luong ?? 100
-                }
-            };
+            const max = {{ $product->so_luong ?? 100 }};
 
             if (val >= 1 && val <= max) input.value = val;
         }
@@ -502,11 +529,7 @@
 
         // Hàm thêm vào giỏ hàng
         function addToCart() {
-            const productId = {
-                {
-                    $product - > id
-                }
-            };
+            const productId = {{ $product->id }};
             const qtyInput = document.getElementById('qtyInput');
             const quantity = parseInt(qtyInput.value);
 
@@ -529,7 +552,7 @@
                             badge.innerText = data.total_qty;
                             badge.style.display = 'inline-block';
                         }
-                        showToast('Thành công!', `Đã thêm ${quantity} sản phẩm vào giỏ.`);
+                        showToast('Thành công! Đã thêm vào giỏ.', 'added');
                     } else {
                         alert('Có lỗi xảy ra: ' + (data.error || 'Vui lòng thử lại'));
                     }
@@ -538,13 +561,18 @@
         }
 
         // Hàm hiển thị thông báo Toast
-        function showToast(title, msg) {
+        function showToast(message, type) {
             const box = document.getElementById('toast-box');
             if (!box) return;
 
             const toast = document.createElement('div');
             toast.classList.add('toast-msg');
-            toast.innerHTML = `<i class="fa-solid fa-check-circle"></i> <div><strong>${title}</strong><br><span style="font-size:12px; color:#ccc;">${msg}</span></div>`;
+            if (type) toast.classList.add(type);
+
+            let iconClass = 'fa-check-circle';
+            if (type === 'removed') iconClass = 'fa-trash-can';
+
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${message}</span>`;
             box.appendChild(toast);
 
             setTimeout(() => {

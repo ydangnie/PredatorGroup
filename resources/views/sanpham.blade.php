@@ -1,6 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Bộ Sưu Tập Đồng Hồ Cao Cấp</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     {{-- Chỉ load file CSS --}}
@@ -52,6 +53,46 @@
         .wt-wishlist-btn:hover {
             transform: scale(1.1);
             background: #fff;
+        }
+
+        /* CSS cho Toast Notification */
+        #toast-box {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast-msg {
+            background: #1E1E1E;
+            border-left: 4px solid #D4AF37;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast-msg i { font-size: 18px; }
+        /* Màu icon tùy chỉnh */
+        .toast-msg.added i { color: #4ade80; }
+        .toast-msg.removed i { color: #f87171; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
         }
     </style>
 </head>
@@ -221,6 +262,9 @@
     </div>
 </div>
 
+{{-- Container cho Toast Notification --}}
+<div id="toast-box"></div>
+
 @include('layouts.navbar.footer')
 
 <script>
@@ -236,7 +280,29 @@
             sidebar.style.display = 'block';
         }
     }
-function toggleWishlist(event, productId) {
+
+    // Hàm hiển thị Toast Notification
+    function showToast(message, type) {
+        const box = document.getElementById('toast-box');
+        if (!box) return;
+
+        const toast = document.createElement('div');
+        toast.classList.add('toast-msg');
+        if (type) toast.classList.add(type);
+
+        let iconClass = 'fa-check-circle';
+        if (type === 'removed') iconClass = 'fa-trash-can';
+
+        toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${message}</span>`;
+        box.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3500);
+    }
+
+    // Hàm xử lý logic Wishlist
+    function toggleWishlist(event, productId) {
         event.preventDefault(); 
         event.stopPropagation(); 
 
@@ -280,8 +346,8 @@ function toggleWishlist(event, productId) {
                     badge.style.display = 'inline-block';
                 }
                 
-                // === GỌI HÀM HIỂN THỊ THÔNG BÁO ===
-                if(typeof showToast === 'function') showToast(data.message, 'added');
+                // Hiển thị thông báo
+                showToast(data.message, 'added');
 
             } else if (data.status === 'removed') {
                 // Đổi tim rỗng
@@ -296,8 +362,8 @@ function toggleWishlist(event, productId) {
                     if(newCount <= 0) badge.style.display = 'none';
                 }
 
-                // === GỌI HÀM HIỂN THỊ THÔNG BÁO ===
-                if(typeof showToast === 'function') showToast(data.message, 'removed');
+                // Hiển thị thông báo
+                showToast(data.message, 'removed');
             }
         })
         .catch(error => console.error('Error:', error));
