@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use App\Models\Products;
+use Illuminate\Http\Client\ConnectionException; 
 
 class ChatbotController extends Controller
 {
@@ -16,90 +17,84 @@ class ChatbotController extends Controller
             $userMessage = $request->input('message');
             $apiKey = env('GOOGLE_API_KEY');
 
-            // 1. Kiểm tra API Key
             if (!$apiKey) {
-                return response()->json(['reply' => 'Lỗi: Chưa cấu hình API Key trong file .env']);
+                return response()->json(['reply' => 'Lỗi: Chưa cấu hình API Key.']);
             }
 
-            // 2. Tìm sản phẩm (Giữ nguyên logic của bạn)
-            // Khởi tạo Collection rỗng để tránh lỗi count()
+            // --- TỐI ƯU 1: GIẢM DỮ LIỆU GỬI ĐI ---
             $products = collect([]); 
             $systemContext = "";
 
             if (preg_match('/(dưới|thấp hơn)\s*(\d+)\s*(tr|triệu|m)/iu', $userMessage, $matches)) {
                 $price = intval($matches[2]) * 1000000;
-                $products = Products::where('gia', '<=', $price)->select('id', 'tensp', 'gia', 'hinh_anh')->orderBy('gia', 'desc')->take(4)->get();
+                $products = Products::where('gia', '<=', $price)
+                            ->select('id', 'tensp', 'gia', 'hinh_anh')
+                            ->orderBy('gia', 'desc')->take(2)->get();
             } 
             else if (preg_match('/(trên|hơn|từ)\s*(\d+)\s*(tr|triệu|m)/iu', $userMessage, $matches)) {
                 $price = intval($matches[2]) * 1000000;
-                $products = Products::where('gia', '>=', $price)->select('id', 'tensp', 'gia', 'hinh_anh')->orderBy('gia', 'asc')->take(4)->get();
+                $products = Products::where('gia', '>=', $price)
+                            ->select('id', 'tensp', 'gia', 'hinh_anh')
+                            ->orderBy('gia', 'asc')->take(2)->get();
             }
             else if (preg_match('/(tìm|mua|xem|giá|đồng hồ)\s+(.+)/iu', $userMessage, $matches)) {
                 $keyword = trim(preg_replace('/(của|hãng|hiệu|màu|cái|chiếc|nào|rẻ|mắc|tốt|đẹp)/iu', '', $matches[2]));
                 if (!empty($keyword)) {
-                    $products = Products::where('tensp', 'like', "%$keyword%")->select('id', 'tensp', 'gia', 'hinh_anh')->take(4)->get();
+                    $products = Products::where('tensp', 'like', "%$keyword%")
+                                ->select('id', 'tensp', 'gia', 'hinh_anh')->take(2)->get();
                 }
             }
 
-            // Tạo ngữ cảnh
             if ($products->count() > 0) {
                 $list = $products->map(fn($p) => "- " . $p->tensp . " (" . number_format($p->gia) . "đ)")->implode("\n");
-                $systemContext = "\n[Hệ thống]: Tìm thấy sản phẩm:\n" . $list . "\nHãy giới thiệu ngắn gọn.";
+                $systemContext = "\n[Hệ thống]: Tìm thấy SP:\n" . $list . "\nGiới thiệu ngắn gọn.";
             }
 
-            // 3. Chuẩn bị dữ liệu (QUAN TRỌNG: Xử lý lịch sử)
+            // --- TỐI ƯU 2: GIẢM LỊCH SỬ CHAT ---
             $history = Session::get('chat_history', []);
-            
-            // Giới hạn lịch sử để tránh lỗi quá tải token
-            if (count($history) > 6) {
-                $history = array_slice($history, -6);
+            if (count($history) > 2) {
+                $history = array_slice($history, -2);
             }
 
-            // Ghép tin nhắn mới
             $historyToSend = array_merge($history, [
                 ['role' => 'user', 'parts' => [['text' => $userMessage . $systemContext]]]
             ]);
 
-            // --- CẤU HÌNH MODEL CHUẨN THEO DANH SÁCH CỦA BẠN ---
-            // Bạn có quyền dùng 'gemini-2.0-flash'
-            $model = 'gemini-2.0-flash';
+            // --- [QUAN TRỌNG] CẬP NHẬT TÊN MODEL ĐÚNG TRONG LIST CỦA BẠN ---
+            // Dùng gemini-2.0-flash-lite để tránh 404 và 429
+            $model = 'gemini-2.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-            // 4. Gọi API
-            $response = Http::withOptions(['verify' => false]) // Bỏ qua SSL local
-                ->timeout(30) // Tăng thời gian chờ lên 30s
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post($url, [
-                    'contents' => $historyToSend
-                ]);
+            try {
+                $response = Http::withOptions(['verify' => false, 'timeout' => 30])
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post($url, ['contents' => $historyToSend]);
 
-            // 5. Xử lý lỗi kết nối
+            } catch (ConnectionException $e) {
+                return response()->json(['reply' => 'Lỗi kết nối mạng (cURL 6). Kiểm tra Wifi server.']);
+            }
+
             if ($response->failed()) {
-                // Log lỗi chi tiết để debug
-                Log::error('Gemini API Error (Code ' . $response->status() . '): ' . $response->body());
+                Log::error('Gemini Error: ' . $response->body());
 
-                // Nếu lỗi 400 (Bad Request), có thể do lịch sử chat bị lỗi => Xóa lịch sử
-                if ($response->status() == 400) {
-                    Session::forget('chat_history');
-                    return response()->json(['reply' => 'Hệ thống vừa reset phiên chat để sửa lỗi. Bạn vui lòng hỏi lại nhé.']);
+                if ($response->status() == 429) {
+                    return response()->json(['reply' => 'Hệ thống đang quá tải. Vui lòng đợi 1 phút rồi thử lại.']);
                 }
-
-                return response()->json(['reply' => 'Hệ thống AI đang bận (Mã lỗi: ' . $response->status() . '). Vui lòng thử lại sau.']);
+                if ($response->status() == 404) {
+                    // Nếu vẫn lỗi này nghĩa là tên model sai hoặc chưa được cấp quyền
+                    return response()->json(['reply' => "Lỗi: Model '$model' không tồn tại hoặc bị chặn."]);
+                }
+                
+                return response()->json(['reply' => 'Lỗi hệ thống AI (Mã: ' . $response->status() . ').']);
             }
 
             $data = $response->json();
+            $botReply = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Xin lỗi, tôi chưa hiểu ý bạn.';
 
-            // Kiểm tra cấu trúc trả về
-            if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                Log::error('Gemini Response Invalid: ' . json_encode($data));
-                return response()->json(['reply' => 'Xin lỗi, tôi không hiểu ý bạn.']);
-            }
-
-            $botReply = $data['candidates'][0]['content']['parts'][0]['text'];
-
-            // 6. Lưu lịch sử (Chỉ lưu nếu thành công)
+            // Lưu lịch sử
             $history[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
             $history[] = ['role' => 'model', 'parts' => [['text' => $botReply]]];
+            if (count($history) > 4) $history = array_slice($history, -4);
             Session::put('chat_history', $history);
 
             return response()->json([
@@ -108,8 +103,7 @@ class ChatbotController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Chatbot Controller Exception: ' . $e->getMessage());
-            return response()->json(['reply' => 'Có lỗi hệ thống: ' . $e->getMessage()]);
+            return response()->json(['reply' => 'Lỗi nội bộ: ' . $e->getMessage()]);
         }
     }
 }

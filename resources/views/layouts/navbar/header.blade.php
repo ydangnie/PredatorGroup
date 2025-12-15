@@ -241,8 +241,8 @@
                     <a href="{{ route('sanpham', ['gender' => 'female']) }}" class="nav-link">Nữ</a>
                 </li>
 
-              
-                 <li class="nav-item">
+
+                <li class="nav-item">
                     {{-- Lọc nhanh giới tính Nữ --}}
                     <a href="{{ route('lienhe') }}" class="nav-link">Liên hệ</a>
                 </li>
@@ -260,8 +260,11 @@
                 <button type="submit" class="action-btn">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
-            </form>
 
+            </form>
+            <button class="action-btn">
+                <i class="fa-regular fa-heart"></i>
+            </button>
             <a class="action-btn" href="{{ route('giohang') }}" style="position: relative;">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span id="cart-count-badge"
@@ -270,6 +273,7 @@
                  font-size: 10px; font-weight: bold; 
                  padding: 2px 5px; border-radius: 50%; 
                  display: none;">0</span>
+
             </a>
 
             @auth
@@ -294,9 +298,7 @@
                 @endif
             </div>
             @else
-            <button class="action-btn">
-                <i class="fa-regular fa-heart"></i>
-            </button>
+
             @endauth
 
             <li class="nav-item" id="logout">

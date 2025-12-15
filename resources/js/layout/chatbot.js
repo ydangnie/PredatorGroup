@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
 
+    // [FIX 1] Biến cờ để chặn click nhiều lần
+    let isSending = false;
+
     // Toggle Chat
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
@@ -33,12 +36,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendMessage(e) {
         if (e) e.preventDefault();
 
+        // [FIX 2] Nếu đang gửi thì chặn lại ngay (Tránh lỗi 429)
+        if (isSending) return;
+
         const text = userInput.value.trim();
         if (!text) return;
 
+        // [FIX 3] Khóa nút và ô nhập liệu
+        isSending = true;
+        userInput.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
+
+        // Hiển thị tin nhắn người dùng
         appendMessage(text, 'user');
         userInput.value = '';
 
+        // Hiển thị loading
         const loadingId = 'loading-' + Date.now();
         showLoading(loadingId);
 
@@ -53,16 +66,19 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => {
                 if (!res.ok) {
-                    // Nếu lỗi (500, 404, 419), ném ra lỗi để catch bắt
+                    // Nếu lỗi (500, 404, 419, 429...), ném ra lỗi để catch bắt
                     return res.text().then(text => { throw new Error(text || res.statusText) });
                 }
                 return res.json();
             })
             .then(data => {
                 removeLoading(loadingId);
+
+                // Hiển thị câu trả lời của Bot
                 if (data.reply) {
                     appendMessage(data.reply, 'bot');
                 }
+                // Hiển thị danh sách sản phẩm (nếu có)
                 if (data.products && data.products.length > 0) {
                     renderProductList(data.products);
                 }
@@ -72,23 +88,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error("Chatbot Error:", err);
 
                 // Hiển thị thông báo lỗi thân thiện hơn
-                let errorMsg = 'Xin lỗi, hệ thống đang gặp sự cố.';
+                let errorMsg = 'Hệ thống đang bận, vui lòng thử lại sau giây lát.';
+
+                // Kiểm tra các lỗi đặc thù
                 if (err.message && err.message.includes('CSRF')) {
                     errorMsg = 'Phiên làm việc hết hạn. Vui lòng tải lại trang.';
+                } else if (err.message && (err.message.includes('429') || err.message.includes('Too Many Requests'))) {
+                    errorMsg = 'Bạn hỏi nhanh quá! Vui lòng đợi 30 giây nhé.';
                 }
+
                 appendMessage(errorMsg, 'bot');
+            })
+            .finally(() => {
+                // [FIX 4] Mở khóa lại sau khi xong (Dù thành công hay lỗi)
+                isSending = false;
+                userInput.disabled = false;
+                if (sendBtn) sendBtn.disabled = false;
+                userInput.focus(); // Trả lại con trỏ chuột vào ô nhập
             });
     }
 
-    // Các hàm render giao diện giữ nguyên...
+    // --- Các hàm render giao diện giữ nguyên ---
+
     function renderProductList(products) {
         const container = document.createElement('div');
         container.style.cssText = "display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding: 0 5px;";
 
         products.forEach(p => {
-            // Fix lỗi format tiền nếu giá trị null
+            // Format tiền tệ
             const price = p.gia ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.gia) : 'Liên hệ';
-            const imgUrl = `/storage/${p.hinh_anh}`;
+            // Đường dẫn ảnh (sửa lại cho đúng path storage)
+            const imgUrl = p.hinh_anh.startsWith('http') ? p.hinh_anh : `/storage/${p.hinh_anh}`;
 
             const card = document.createElement('a');
             card.href = `/chi-tiet-san-pham/${p.id}`;
@@ -96,6 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 display: flex; align-items: center; background: #1e1e1e; border: 1px solid #333; 
                 border-radius: 6px; padding: 8px; text-decoration: none; transition: 0.2s; color: #fff;
             `;
+            // Hiệu ứng hover nhẹ
+            card.onmouseover = () => card.style.borderColor = '#d4af37';
+            card.onmouseout = () => card.style.borderColor = '#333';
 
             card.innerHTML = `
                 <div style="width: 50px; height: 50px; flex-shrink: 0; margin-right: 10px; border-radius: 4px; overflow: hidden; background: #000; border: 1px solid #444;">
@@ -118,11 +151,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const div = document.createElement('div');
         div.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
 
-        // Hỗ trợ Markdown cơ bản cho bot (xuống dòng, in đậm)
+        // Hỗ trợ Markdown cơ bản cho bot
         if (sender === 'bot') {
-            // Chuyển **text** thành in đậm
-            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-            formattedText = formattedText.replace(/\n/g, '<br>');
+            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // In đậm
+            formattedText = formattedText.replace(/\n/g, '<br>'); // Xuống dòng
             div.innerHTML = formattedText;
         } else {
             div.innerText = text;
@@ -150,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         messages.scrollTop = messages.scrollHeight;
     }
 
+    // Sự kiện click và enter
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
     if (userInput) {
         userInput.addEventListener('keypress', (e) => {
