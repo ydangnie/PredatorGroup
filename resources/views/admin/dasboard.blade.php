@@ -1,91 +1,197 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Quản Trị | Predator Group</title>
-    
+
     {{-- Sử dụng CSS chung của Admin --}}
-    @vite(['resources/css/admin/banner.css']) 
+    @vite(['resources/css/admin/banner.css'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     {{-- Thư viện Chart.js --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         /* --- DASHBOARD SPECIFIC CSS --- */
-        
+
         /* 1. Stats Cards */
         .stats-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
         }
+
         .stat-card {
-            background: #1E1E1E; border: 1px solid #333; border-radius: 8px; padding: 25px;
-            position: relative; overflow: hidden; display: flex; flex-direction: column;
+            background: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             transition: transform 0.3s ease;
         }
-        .stat-card:hover { transform: translateY(-5px); border-color: #D4AF37; }
-        
-        .stat-value { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 5px; }
-        .stat-label { font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-icon {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            font-size: 40px; opacity: 0.1; color: #fff;
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #D4AF37;
         }
-        .stat-card.revenue .stat-value { color: #D4AF37; } /* Màu vàng cho tiền */
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            opacity: 0.1;
+            color: #fff;
+        }
+
+        .stat-card.revenue .stat-value {
+            color: #D4AF37;
+        }
+
+        /* Màu vàng cho tiền */
 
         /* 2. Chart Section */
         .chart-section {
-            background: #1E1E1E; border: 1px solid #333; border-radius: 8px; padding: 25px;
+            background: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 25px;
             margin-bottom: 30px;
         }
+
         .chart-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .chart-title { font-size: 18px; font-weight: 700; color: #fff; }
-        
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
         /* Filter Buttons */
         .chart-filter button {
-            background: transparent; border: 1px solid #444; color: #aaa;
-            padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 5px;
+            background: transparent;
+            border: 1px solid #444;
+            color: #aaa;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
             transition: 0.3s;
         }
-        .chart-filter button:hover, .chart-filter button.active {
-            background: #D4AF37; color: #000; border-color: #D4AF37; font-weight: bold;
+
+        .chart-filter button:hover,
+        .chart-filter button.active {
+            background: #D4AF37;
+            color: #000;
+            border-color: #D4AF37;
+            font-weight: bold;
         }
 
         /* 3. Tables Grid */
         .tables-grid {
-            display: grid; grid-template-columns: 2fr 1fr; gap: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
         }
+
         .table-card {
-            background: #1E1E1E; border: 1px solid #333; border-radius: 8px; padding: 20px;
+            background: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
             height: 100%;
         }
-        .table-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
 
         /* Custom Table */
-        .ds-table { width: 100%; border-collapse: collapse; }
-        .ds-table th { text-align: left; padding: 10px; color: #666; font-size: 12px; text-transform: uppercase; }
-        .ds-table td { padding: 12px 10px; border-bottom: 1px solid #2a2a2a; font-size: 14px; color: #ccc; }
-        .ds-table tr:last-child td { border-bottom: none; }
-        
-        .top-prod-name { color: #fff; font-weight: 500; }
-        .top-prod-sales { color: #D4AF37; font-weight: 700; }
+        .ds-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ds-table th {
+            text-align: left;
+            padding: 10px;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .ds-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #2a2a2a;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .ds-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .top-prod-name {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .top-prod-sales {
+            color: #D4AF37;
+            font-weight: 700;
+        }
 
         /* Responsive */
         @media (max-width: 992px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .tables-grid { grid-template-columns: 1fr; }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
 
     @include('admin.nav')
 
     {{-- Dùng class .banner-container để giữ margin bên trái cho Sidebar --}}
     <div class="banner-container">
-        
+
         <h2 style="color: #fff; font-size: 24px; margin-bottom: 30px;">Tổng Quan</h2>
 
         <div class="stats-grid">
@@ -144,7 +250,9 @@
                             <td style="text-align:right;" class="top-prod-sales">{{ number_format($prod->total_revenue) }}₫</td>
                         </tr>
                         @empty
-                        <tr><td colspan="3" style="text-align:center;">Chưa có dữ liệu</td></tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">Chưa có dữ liệu</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -166,17 +274,19 @@
                             <td style="color:#aaa">#{{ $order->id }}</td>
                             <td>
                                 @php
-                                    $colors = ['pending'=>'#ffc107', 'processing'=>'#3b82f6', 'completed'=>'#4ade80', 'cancelled'=>'#ef4444'];
-                                    $labels = ['pending'=>'Chờ duyệt', 'processing'=>'Đang xử lý', 'completed'=>'Hoàn thành', 'cancelled'=>'Đã hủy'];
-                                    $color = $colors[$order->status] ?? '#fff';
-                                    $label = $labels[$order->status] ?? $order->status;
+                                $colors = ['pending'=>'#ffc107', 'processing'=>'#3b82f6', 'completed'=>'#4ade80', 'cancelled'=>'#ef4444'];
+                                $labels = ['pending'=>'Chờ duyệt', 'processing'=>'Đang xử lý', 'completed'=>'Hoàn thành', 'cancelled'=>'Đã hủy'];
+                                $color = $colors[$order->status] ?? '#fff';
+                                $label = $labels[$order->status] ?? $order->status;
                                 @endphp
                                 <span style="color:{{$color}}; font-size:11px; font-weight:bold; text-transform:uppercase;">{{ $label }}</span>
                             </td>
                             <td style="text-align:right; color:#fff;">{{ number_format($order->total_price) }}₫</td>
                         </tr>
                         @empty
-                         <tr><td colspan="3" style="text-align:center;">Chưa có đơn hàng</td></tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">Chưa có đơn hàng</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -197,13 +307,13 @@
             fetch(`{{ route('admin.chart.data') }}?filter=${filter}`)
                 .then(response => response.json())
                 .then(data => {
-                    renderChart(data.labels, data.data);
+                    renderChart(data.labels, data.values); // Đổi data.data thành data.values
                 });
         }
 
         function renderChart(labels, data) {
             const ctx = document.getElementById('revenueChart').getContext('2d');
-            
+
             // Hủy biểu đồ cũ nếu có để vẽ lại
             if (revenueChart) {
                 revenueChart.destroy();
@@ -234,14 +344,21 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false },
+                        legend: {
+                            display: false
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
-                                    if (label) { label += ': '; }
+                                    if (label) {
+                                        label += ': ';
+                                    }
                                     if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                        label += new Intl.NumberFormat('vi-VN', {
+                                            style: 'currency',
+                                            currency: 'VND'
+                                        }).format(context.parsed.y);
                                     }
                                     return label;
                                 }
@@ -251,12 +368,20 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: '#333' },
-                            ticks: { color: '#888' }
+                            grid: {
+                                color: '#333'
+                            },
+                            ticks: {
+                                color: '#888'
+                            }
                         },
                         x: {
-                            grid: { display: false },
-                            ticks: { color: '#888' }
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#888'
+                            }
                         }
                     }
                 }
@@ -269,4 +394,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -4,30 +4,187 @@
     <title>PREDATORWATCH - Luxury Timepieces</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Đảm bảo FontAwesome được load nếu chưa có trong app.css --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
-        /* CSS Mini cho Header */
-        .header-item-notify { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
-        .notify-badge { position: absolute; top: 0px; right: 0px; background: #ef4444; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; justify-content: center; align-items: center; font-weight: bold; border: 1px solid #000; }
-        .notify-dropdown { display: none; position: absolute; top: 100%; right: -50px; width: 320px; background: #fff; border-radius: 4px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); z-index: 1000; overflow: hidden; border: 1px solid #eee; }
-        .notify-dropdown.active { display: block; }
-        .notify-header { background: #111; padding: 10px 15px; font-weight: bold; color: #D4AF37; border-bottom: 1px solid #333; font-size: 14px; text-transform: uppercase; }
-        .notify-body { max-height: 300px; overflow-y: auto; background: #fff; }
-        .notify-item { display: flex; padding: 12px 15px; border-bottom: 1px solid #f1f1f1; text-decoration: none; align-items: center; transition: background 0.2s; }
-        .notify-item:hover { background: #f9f9f9; }
-        .notify-item img { width: 45px; height: 45px; object-fit: cover; border-radius: 4px; margin-right: 12px; border: 1px solid #eee; }
-        .notify-info { flex: 1; }
-        .notify-title { font-size: 13px; font-weight: 700; color: #333; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 2px; }
-        .notify-desc { font-size: 11px; color: #155724; font-weight: 500; }
-        .review-toast { position: fixed; bottom: 30px; left: 30px; background: #fff; border-left: 4px solid #D4AF37; width: 320px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15); border-radius: 4px; z-index: 9999; animation: slideInLeft 0.5s ease; font-family: sans-serif; display: flex; flex-direction: column; }
-        .toast-header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #f8f8f8; border-top-right-radius: 4px; }
-        .toast-body { padding: 15px; font-size: 14px; color: #444; line-height: 1.5; }
-        .btn-close-toast { background: none; border: none; font-size: 18px; cursor: pointer; color: #999; }
-        .btn-close-toast:hover { color: #333; }
-        .btn-view-now { background: #111; color: #D4AF37; border: 1px solid #D4AF37; padding: 6px 15px; border-radius: 2px; font-size: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
-        .btn-view-now:hover { background: #D4AF37; color: #fff; }
-        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        /* CSS CHO THÔNG BÁO & POPUP - GIỮ NGUYÊN NHƯ CŨ */
+        .header-item-notify {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .notify-badge {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            border: 1px solid #000;
+        }
+
+        .notify-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: -50px;
+            width: 320px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .notify-dropdown.active {
+            display: block;
+        }
+
+        .notify-header {
+            background: #111;
+            padding: 10px 15px;
+            font-weight: bold;
+            color: #D4AF37;
+            border-bottom: 1px solid #333;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .notify-body {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .notify-item {
+            display: flex;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f1f1;
+            text-decoration: none;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .notify-item:hover {
+            background: #f9f9f9;
+        }
+
+        .notify-item img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 12px;
+            border: 1px solid #eee;
+        }
+
+        .notify-info {
+            flex: 1;
+        }
+
+        .notify-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 2px;
+        }
+
+        .notify-desc {
+            font-size: 11px;
+            color: #155724;
+            font-weight: 500;
+        }
+
+        .review-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: #fff;
+            border-left: 4px solid #D4AF37;
+            width: 320px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            z-index: 9999;
+            animation: slideInLeft 0.5s ease;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toast-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f8f8;
+            border-top-right-radius: 4px;
+        }
+
+        .toast-body {
+            padding: 15px;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .btn-close-toast {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .btn-close-toast:hover {
+            color: #333;
+        }
+
+        .btn-view-now {
+            background: #111;
+            color: #D4AF37;
+            border: 1px solid #D4AF37;
+            padding: 6px 15px;
+            border-radius: 2px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-view-now:hover {
+            background: #D4AF37;
+            color: #fff;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
@@ -45,11 +202,15 @@
         <nav>
             <ul class="nav-menu" id="navMenu">
                 <li class="nav-item">
-                    <a href="{{ route('sanpham') }}" class="nav-link">SẢN PHẨM <span class="dropdown-arrow">▼</span></a>
+                    <a href="{{ route('sanpham') }}" class="nav-link">
+                        SẢN PHẨM
+                        <span class="dropdown-arrow">▼</span>
+                    </a>
                     <div class="mega-menu">
                         <div class="mega-menu-grid">
                             <div class="mega-menu-column">
                                 <h4>Theo Thương Hiệu</h4>
+                                {{-- Lưu ý: ID thương hiệu phải khớp với Database. Ví dụ ở đây tôi dùng route query --}}
                                 <a href="{{ route('sanpham', ['keyword' => 'Rolex']) }}" class="mega-menu-item">Rolex</a>
                                 <a href="{{ route('sanpham', ['keyword' => 'Omega']) }}" class="mega-menu-item">Omega</a>
                                 <a href="{{ route('sanpham', ['keyword' => 'Patek']) }}" class="mega-menu-item">Patek Philippe</a>
@@ -65,29 +226,64 @@
                                 <a href="{{ route('sanpham', ['sort' => 'price-asc']) }}" class="mega-menu-item">Giá thấp đến cao</a>
                                 <a href="{{ route('sanpham', ['sort' => 'price-desc']) }}" class="mega-menu-item">Giá cao đến thấp</a>
                             </div>
+
                         </div>
                     </div>
                 </li>
-                <li class="nav-item"><a href="{{ route('sanpham', ['gender' => 'male']) }}" class="nav-link">Nam</a></li>
-                <li class="nav-item"><a href="{{ route('sanpham', ['gender' => 'female']) }}" class="nav-link">Nữ</a></li>
-                <li class="nav-item"><a href="{{ route('lienhe') }}" class="nav-link">Liên hệ</a></li>
-                <li class="nav-item"><a href="{{ route('posts.index') }}" class="nav-link">Tin Tức</a></li>
+
+                <li class="nav-item">
+                    {{-- Lọc nhanh giới tính Nam --}}
+                    <a href="{{ route('sanpham', ['gender' => 'male']) }}" class="nav-link">Nam</a>
+                </li>
+
+                <li class="nav-item">
+                    {{-- Lọc nhanh giới tính Nữ --}}
+                    <a href="{{ route('sanpham', ['gender' => 'female']) }}" class="nav-link">Nữ</a>
+                </li>
+
+
+                <li class="nav-item">
+                    {{-- Lọc nhanh giới tính Nữ --}}
+                    <a href="{{ route('lienhe') }}" class="nav-link">Liên hệ</a>
+                </li>
+                <li class="nav-item">
+                    {{-- Lọc nhanh giới tính Nữ --}}
+                    <a href="{{ route('posts.index') }}" class="nav-link">Tin Tức</a>
+                </li>
             </ul>
         </nav>
 
         <div class="header-actions">
+            {{-- FORM TÌM KIẾM ĐÃ CHỈNH SỬA --}}
             <form action="{{ route('sanpham') }}" method="GET" class="search-box" id="searchBox">
                 <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm sản phẩm..." value="{{ request('keyword') }}">
-                <button type="submit" class="action-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <button type="submit" class="action-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+
             </form>
 
+            {{-- Tìm đoạn nút Wishlist và thay thế bằng đoạn này --}}
             <a href="{{ route('wishlist.index') }}" class="action-btn" style="position: relative;">
                 <i class="fa-regular fa-heart"></i>
-                <span id="wishlist-count-badge" style="position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: #fff; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 50%; display: none;">0</span>
+
+                {{-- Thẻ hiển thị số lượng --}}
+                <span id="wishlist-count-badge"
+                    style="position: absolute; top: -5px; right: -5px; 
+                 background-color: #ef4444; color: #fff; 
+                 font-size: 10px; font-weight: bold; 
+                 padding: 2px 5px; border-radius: 50%; 
+                 display: none;">0</span>
             </a>
             <a class="action-btn" href="{{ route('giohang') }}" style="position: relative;">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cart-count-badge" style="position: absolute; top: -5px; right: -5px; background-color: #D4AF37; color: #000; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 50%; display: none;">0</span>
+                <span id="cart-count-badge"
+                    style="position: absolute; top: -5px; right: -5px; 
+                 background-color: #D4AF37; color: #000; 
+                 font-size: 10px; font-weight: bold; 
+                 padding: 2px 5px; border-radius: 50%; 
+                 display: none;">0</span>
+
             </a>
 
             @auth
@@ -111,6 +307,8 @@
                 </div>
                 @endif
             </div>
+            @else
+
             @endauth
 
             <li class="nav-item" id="logout">
@@ -137,6 +335,7 @@
     </div>
 </header>
 
+{{-- GIỮ NGUYÊN PHẦN TOAST VÀ SCRIPT --}}
 @if(auth()->check() && isset($productsToReview) && $productsToReview->count() > 0)
 <div id="review-reminder-toast" class="review-toast">
     <div class="toast-header">
@@ -155,25 +354,49 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. Code lấy số lượng Giỏ hàng (Giữ nguyên code cũ của bạn) ---
         fetch('{{ route("cart.count") }}')
             .then(res => res.json())
             .then(data => {
                 const badge = document.getElementById('cart-count-badge');
-                if (data.count > 0) { badge.innerText = data.count; badge.style.display = 'inline-block'; }
-            }).catch(err => console.log('Lỗi cart count:', err));
+                if (data.count > 0) {
+                    badge.innerText = data.count;
+                    badge.style.display = 'inline-block';
+                }
+            })
+            .catch(err => console.log('Lỗi cart count:', err));
 
+        // --- 2. Code MỚI: Lấy số lượng Wishlist ---
         fetch('{{ route("wishlist.count") }}')
             .then(res => res.json())
             .then(data => {
                 const badge = document.getElementById('wishlist-count-badge');
                 if (badge) {
-                    if (data.count > 0) { badge.innerText = data.count; badge.style.display = 'inline-block'; } 
-                    else { badge.style.display = 'none'; }
+                    if (data.count > 0) {
+                        badge.innerText = data.count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
                 }
-            }).catch(err => console.log('Lỗi wishlist count:', err));
+            })
+            .catch(err => console.log('Lỗi wishlist count:', err));
     });
-    function toggleNotify() { const dropdown = document.getElementById('notifyDropdown'); if(dropdown) dropdown.classList.toggle('active'); }
-    function closeToast() { const toast = document.getElementById('review-reminder-toast'); if(toast) toast.style.display = 'none'; }
+
+    function toggleNotify() {
+        const dropdown = document.getElementById('notifyDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('active');
+        }
+    }
+
+    function closeToast() {
+        const toast = document.getElementById('review-reminder-toast');
+        if (toast) {
+            toast.style.display = 'none';
+        }
+    }
+
     window.addEventListener('click', function(e) {
         const notifyBox = document.querySelector('.header-item-notify');
         if (notifyBox && !notifyBox.contains(e.target)) {
@@ -181,6 +404,18 @@
             if (dropdown) dropdown.classList.remove('active');
         }
     });
-    function toggleSearch() { const box = document.getElementById('searchBox'); box.classList.toggle('active'); if(box.classList.contains('active')) box.querySelector('input').focus(); }
-    function toggleMenu() { const menu = document.getElementById('navMenu'); menu.classList.toggle('active'); }
+
+    function toggleSearch() {
+        const box = document.getElementById('searchBox');
+        box.classList.toggle('active');
+        // Focus vào input khi mở
+        if (box.classList.contains('active')) {
+            box.querySelector('input').focus();
+        }
+    }
+
+    function toggleMenu() {
+        const menu = document.getElementById('navMenu');
+        menu.classList.toggle('active');
+    }
 </script>

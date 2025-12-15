@@ -154,4 +154,15 @@ class ProductController extends Controller
         $image->delete();
         return back()->with('success', 'Đã xóa ảnh khỏi album');
     }
+    public function search(Request $request)
+{
+    $keyword = $request->input('keyword');
+
+    // Tìm kiếm theo tên sản phẩm hoặc mô tả
+    $products = Products::where('name', 'LIKE', "%{$keyword}%")
+                        ->orWhere('description', 'LIKE', "%{$keyword}%")
+                        ->paginate(12);
+
+    return view('sanpham', compact('products', 'keyword'));
+}
 }

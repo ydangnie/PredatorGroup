@@ -25,6 +25,7 @@ use App\Http\Controllers\VoucherController;    // Quan trọng
 use App\Http\Controllers\CategoryController;   // Quan trọng
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdminPostController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes (USER & GUEST)
@@ -32,6 +33,7 @@ use App\Http\Controllers\AdminPostController;
 */
 Route::get('/tin-tuc', [PostController::class, 'index'])->name('posts.index');
 Route::get('/tin-tuc/{slug}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/search', [ProductController::class, 'search'])->name('search');
 // Trang chủ & User thường
 Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('home');
@@ -165,9 +167,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         
         // Route này sẽ có tên: admin.orders.print
         Route::get('/orders/{id}/print', 'printInvoice')->name('orders.print');
-        
+        Route::get('/dasboard', [AdminController::class, 'index'])->name('dashboard'); // Trang hiển thị
+    Route::get('/chart-data', [AdminController::class, 'getChartData'])->name('chart.data'); // API lấy dữ liệu
     });
-  Route::get('/chart-data', [AdminController::class, 'getChartData'])->name('chart.data');
+
   // routes/web.php
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
