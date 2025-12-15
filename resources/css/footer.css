@@ -457,3 +457,56 @@ body {
     position: relative;
     overflow: hidden;
 }
+
+.custom-toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #fff;
+    color: #333;
+    border-left: 5px solid #D4AF37;
+    border-radius: 4px;
+    padding: 16px;
+    position: fixed;
+    z-index: 99999;
+    right: 20px;
+    bottom: 20px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%);
+    opacity: 0;
+    transition: all 0.4s;
+}
+
+.custom-toast.show {
+    visibility: visible;
+    transform: translateY(0);
+    opacity: 1;
+    bottom: 50px;
+}
+
+.custom-toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #fff;
+    color: #333;
+    border-left: 5px solid #D4AF37;
+    /* Màu vàng kim */
+    border-radius: 4px;
+    padding: 16px;
+    position: fixed;
+    z-index: 99999;
+    right: 20px;
+    bottom: 20px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.custom-toast.show {
+    visibility: visible;
+    transform: translateY(0);
+    opacity: 1;
+    bottom: 50px;
+}

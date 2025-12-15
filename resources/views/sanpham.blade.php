@@ -236,11 +236,9 @@
             sidebar.style.display = 'block';
         }
     }
-
-    // Hàm thêm/xóa yêu thích (AJAX)
-    function toggleWishlist(event, productId) {
-        event.preventDefault(); // Ngăn chặn thẻ <a> cha chuyển trang
-        event.stopPropagation(); // Ngăn chặn sự kiện nổi bọt
+function toggleWishlist(event, productId) {
+        event.preventDefault(); 
+        event.stopPropagation(); 
 
         fetch(`/wishlist/toggle/${productId}`, {
             method: 'POST',
@@ -251,8 +249,9 @@
         })
         .then(response => {
             if (response.status === 401 || response.status === 419) {
-                alert('Vui lòng đăng nhập để sử dụng tính năng này!');
-                window.location.href = '/dangnhap';
+                if(confirm('Bạn cần đăng nhập để sử dụng tính năng này. Đi đến trang đăng nhập?')) {
+                    window.location.href = '/dangnhap';
+                }
                 return null;
             }
             return response.json();
@@ -264,35 +263,41 @@
             const icon = btn.querySelector('i');
             const badge = document.getElementById('wishlist-count-badge');
             
-            // Xử lý đếm số lượng trên header (nếu badge tồn tại)
             let currentCount = 0;
-            if (badge) {
+            if (badge && badge.innerText) {
                 currentCount = parseInt(badge.innerText) || 0;
             }
 
             if (data.status === 'added') {
+                // Đổi tim đỏ
                 icon.classList.remove('fa-regular');
                 icon.classList.add('fa-solid');
                 icon.style.color = '#ef4444';
                 
+                // Tăng số lượng badge
                 if(badge) {
-                    currentCount++;
-                    badge.innerText = currentCount;
+                    badge.innerText = currentCount + 1;
                     badge.style.display = 'inline-block';
                 }
                 
-                // Optional: Hiển thị thông báo nhỏ
-                // alert('Đã thêm vào yêu thích!'); 
+                // === GỌI HÀM HIỂN THỊ THÔNG BÁO ===
+                if(typeof showToast === 'function') showToast(data.message, 'added');
+
             } else if (data.status === 'removed') {
+                // Đổi tim rỗng
                 icon.classList.remove('fa-solid');
                 icon.classList.add('fa-regular');
-                icon.style.color = '#ccc'; // Trở về màu mặc định
+                icon.style.color = '#ccc'; 
                 
+                // Giảm số lượng badge
                 if(badge) {
-                    currentCount--;
-                    badge.innerText = currentCount;
-                    if(currentCount <= 0) badge.style.display = 'none';
+                    let newCount = currentCount - 1;
+                    badge.innerText = newCount > 0 ? newCount : 0;
+                    if(newCount <= 0) badge.style.display = 'none';
                 }
+
+                // === GỌI HÀM HIỂN THỊ THÔNG BÁO ===
+                if(typeof showToast === 'function') showToast(data.message, 'removed');
             }
         })
         .catch(error => console.error('Error:', error));

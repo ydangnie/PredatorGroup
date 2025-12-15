@@ -46,3 +46,114 @@ window.addEventListener('scroll', () => {
         decoration.style.transform = `translateY(${scrolled * speed}px)`;
     });
 });
+// 1. Hàm hiển thị thông báo
+function showToast(message, type = 'success') {
+    const toast = document.getElementById("custom-toast");
+    const text = document.getElementById("toast-text");
+    const icon = document.getElementById("toast-icon");
+
+    if (!toast) return;
+
+    text.innerText = message;
+    if (type === 'removed') {
+        icon.className = "fa-solid fa-trash-can";
+        icon.style.color = "#ef4444";
+    } else {
+        icon.className = "fa-solid fa-check-circle";
+        icon.style.color = "#22c55e";
+    }
+
+    toast.classList.add("show");
+    setTimeout(() => { toast.classList.remove("show"); }, 3000);
+}
+
+// 2. Hàm xử lý Click Tim (Dùng chung)
+function toggleWishlist(event, productId) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Tìm thẻ icon bên trong nút bấm
+    const btn = event.currentTarget;
+    const icon = btn.querySelector('i');
+
+    fetch(`/wishlist/toggle/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.status === 401 || response.status === 419) {
+                if (confirm('Bạn cần đăng nhập để sử dụng tính năng này. Đăng nhập ngay?')) {
+                    window.location.href = '/dangnhap';
+                }
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            // Cập nhật số lượng trên Header (nếu có)
+            const badge = document.getElementById('wishlist-count-badge');
+            let currentCount = badge && badge.innerText ? parseInt(badge.innerText) : 0;
+
+            if (data.status === 'added') {
+                // Đổi icon tim đỏ
+                if (icon) {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                    icon.style.color = '#ef4444';
+                }
+                // Tăng số lượng
+                if (badge) {
+                    badge.innerText = currentCount + 1;
+                    badge.style.display = 'inline-block';
+                }
+                showToast(data.message, 'added');
+
+            } else if (data.status === 'removed') {
+                // Đổi icon tim rỗng
+                if (icon) {
+                    icon.classList.remove('fa-solid');
+                    icon.classList.add('fa-regular');
+                    icon.style.color = '#ccc';
+                }
+                // Giảm số lượng
+                if (badge) {
+                    let newCount = currentCount - 1;
+                    badge.innerText = newCount > 0 ? newCount : 0;
+                    if (newCount <= 0) badge.style.display = 'none';
+                }
+                showToast(data.message, 'removed');
+            }
+        })
+        .catch(error => console.error('Lỗi:', error));
+}
+// Hàm hiển thị thông báo (Global function)
+function showToast(message, type = 'success') {
+    const toast = document.getElementById("custom-toast");
+    const text = document.getElementById("toast-text");
+    const icon = document.getElementById("toast-icon");
+
+    if (!toast) return;
+
+    text.innerText = message;
+
+    // Đổi màu icon dựa trên loại thông báo
+    if (type === 'removed') {
+        icon.className = "fa-solid fa-trash-can";
+        icon.style.color = "#ef4444"; // Đỏ
+    } else {
+        icon.className = "fa-solid fa-check-circle";
+        icon.style.color = "#22c55e"; // Xanh lá
+    }
+
+    toast.classList.add("show");
+
+    // Tự ẩn sau 3 giây
+    setTimeout(function() {
+        toast.classList.remove("show");
+    }, 3000);
+}

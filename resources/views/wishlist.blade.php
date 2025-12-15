@@ -47,79 +47,52 @@
     @endif
 </div>
 
-{{-- Script xử lý xóa (dùng lại logic cũ) --}}
 <script>
-  // Hàm hiển thị Toast
-function showToast(message) {
-    var x = document.getElementById("custom-toast");
-    document.getElementById("toast-text").innerText = message;
-    x.className = "custom-toast show";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000); // Ẩn sau 3 giây
-}
-
-function toggleWishlist(event, productId) {
-    event.preventDefault(); 
-    event.stopPropagation(); 
-
-    fetch(`/wishlist/toggle/${productId}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (response.status === 401 || response.status === 419) {
-            // Nếu chưa đăng nhập
-            if(confirm('Bạn cần đăng nhập để thêm sản phẩm yêu thích. Đi đến trang đăng nhập?')) {
-                window.location.href = '/dangnhap';
-            }
-            return null;
-        }
-        return response.json();
-    })
-    .then(data => {
-        if(!data) return;
-
-        const btn = event.target.closest('button');
-        const icon = btn.querySelector('i');
-        const badge = document.getElementById('wishlist-count-badge'); // Đảm bảo ID này khớp với Header
+    // Chỉ cần giữ lại logic xử lý xóa
+    function toggleWishlist(event, productId) {
+        event.preventDefault();
         
-        // Cập nhật số lượng trên Header (nếu có)
-        let currentCount = 0;
-        if (badge && badge.innerText) {
-            currentCount = parseInt(badge.innerText) || 0;
-        }
-
-        if (data.status === 'added') {
-            // Đổi icon sang tim đỏ đặc
-            icon.classList.remove('fa-regular');
-            icon.classList.add('fa-solid');
-            icon.style.color = '#ef4444';
-            
-            if(badge) {
-                currentCount++;
-                badge.innerText = currentCount;
-                badge.style.display = 'inline-block';
+        // Gọi API xóa
+        fetch(`/wishlist/toggle/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
             }
-        } else if (data.status === 'removed') {
-            // Đổi icon về tim rỗng
-            icon.classList.remove('fa-solid');
-            icon.classList.add('fa-regular');
-            icon.style.color = '#ccc'; 
-            
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Cập nhật số lượng trên header
+            const badge = document.getElementById('wishlist-count-badge');
             if(badge) {
-                currentCount--;
-                badge.innerText = currentCount;
-                if(currentCount <= 0) badge.style.display = 'none';
+                let currentCount = parseInt(badge.innerText) || 0;
+                if(currentCount > 0) {
+                    badge.innerText = currentCount - 1;
+                    if(currentCount - 1 === 0) badge.style.display = 'none';
+                }
             }
-        }
 
-        // QUAN TRỌNG: Gọi hàm hiển thị thông báo ở đây
-        showToast(data.message);
-    })
-    .catch(error => console.error('Error:', error));
-}
+            // Gọi hàm thông báo từ Footer
+            if(typeof showToast === 'function') {
+                showToast(data.message, 'removed');
+            }
+        });
+        
+        // Xóa ngay phần tử giao diện (UI)
+        // Tìm thẻ cha .wt-product-card để xóa
+        const card = event.target.closest('.wt-product-card');
+        if(card) card.remove();
+        
+        // Kiểm tra nếu xóa hết thì hiện thông báo rỗng (Optional)
+        const grid = document.querySelector('.wt-products-grid');
+        if(grid && grid.children.length === 0) {
+            document.querySelector('.wishlist-container').innerHTML = `
+                <div style="text-align: center; padding: 50px;">
+                    <h3>Bạn chưa có sản phẩm yêu thích nào.</h3>
+                    <a href="/sanpham">Khám phá ngay</a>
+                </div>`;
+        }
+    }
 </script>
 
 @include('layouts.navbar.footer')
